@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- SEO Optimization Meta Tags -->
+  <title>Memories — Dear Diary</title>
+  <meta name="description" content="Capture and review your daily photo memories. Keep your snap streak alive, apply retro photo filters, and decorate your memories with stickers.">
+  <meta name="robots" content="noindex, nofollow">
+
+  <!-- Google Fonts Link -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Lato:ital,wght@0,300;0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+  <!-- Snap Style Sheet Link -->
+  <link rel="stylesheet" href="../css/snap.css">
+</head>
+<body>
+
+  <!-- Full-Screen Entry Overlay (Fades out from black on load) -->
+  <div id="fade-overlay" class="fade-overlay"></div>
+
+  <!-- Main Snap Panel Wrapper -->
+  <div class="snap-wrapper">
+
+    <!-- Header -->
+    <header class="snap-header">
+      <h1 class="snap-title">Memories 📸</h1>
+    </header>
+
+    <!-- Scrollable Content Area -->
+    <main class="snap-main">
+
+      <!-- SNAP STREAK CARD -->
+      <section class="streak-card dashboard-card">
+        <div class="streak-card-top">
+          <div class="streak-info-left">
+            <span class="streak-emoji">📸</span>
+            <div>
+              <h2 id="snap-streak-title" class="streak-title">0 Day Snap Streak</h2>
+              <p class="streak-sub">Snap today to keep it alive!</p>
+            </div>
+          </div>
+          <!-- Circular milestone progress ring -->
+          <div class="streak-progress-right">
+            <svg class="progress-ring" width="54" height="54">
+              <circle class="progress-ring-bg" stroke="rgba(139, 115, 85, 0.25)" stroke-width="4.5" fill="transparent" r="21" cx="27" cy="27" />
+              <circle id="progress-ring-circle" class="progress-ring-fill" stroke="#FFD700" stroke-width="4.5" fill="transparent" r="21" cx="27" cy="27" />
+            </svg>
+            <span id="progress-percent-label" class="progress-percent-label">0%</span>
+          </div>
+        </div>
+        
+        <!-- Days to next milestone bar -->
+        <div class="milestone-bar-wrapper">
+          <div class="milestone-bar-container">
+            <div id="milestone-progress-bar" class="milestone-bar-fill"></div>
+          </div>
+          <div class="milestone-labels">
+            <span id="milestone-prev">0d</span>
+            <span id="milestone-target" class="gold-text">Next: 7d</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- TODAY SNAP STATUS CARD -->
+      <section id="today-snap-card" class="today-snap-card dashboard-card">
+        <!-- Not Snapped state template -->
+        <div id="not-snapped-state" class="snap-status-content active">
+          <div class="camera-pulse-icon">📸</div>
+          <h2 class="snap-status-title">Send today's memory<br>to your diary</h2>
+          <p class="snap-status-sub">Your diary is waiting 🥺</p>
+          <button id="btn-snap-now" class="btn-snap-now">Snap Now 📸</button>
+        </div>
+
+        <!-- Snapped state template (Hidden by default) -->
+        <div id="snapped-state" class="snap-status-content">
+          <div class="success-icon">✅</div>
+          <h2 class="snap-status-title">Memory saved! 🥺</h2>
+          <p class="snap-status-sub" id="companion-happy-speech">Ollie is happy you showed up today!</p>
+          <div class="celebration-companion">
+            <span id="companion-celebrate-emoji" class="companion-celebrate-emoji">🦉</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- SNAP GALLERY AREA -->
+      <section class="gallery-section dashboard-card">
+        <h2 class="gallery-title">Your Memories</h2>
+        
+        <!-- Month Navigation Bar -->
+        <div class="month-navigation">
+          <button id="btn-prev-month" class="btn-month-nav" aria-label="Previous Month">&lsaquo;</button>
+          <span id="month-year-label" class="month-year-label">May 2026</span>
+          <button id="btn-next-month" class="btn-month-nav" aria-label="Next Month">&rsaquo;</button>
+        </div>
+
+        <!-- Monthly Calendar Grid View -->
+        <div class="calendar-grid">
+          <!-- Weekday headings -->
+          <div class="grid-day-header">Mon</div>
+          <div class="grid-day-header">Tue</div>
+          <div class="grid-day-header">Wed</div>
+          <div class="grid-day-header">Thu</div>
+          <div class="grid-day-header">Fri</div>
+          <div class="grid-day-header">Sat</div>
+          <div class="grid-day-header">Sun</div>
+
+          <!-- Calendar monthly cell days grid (Generated in JS) -->
+          <div id="calendar-days-container" class="calendar-days-container"></div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Draggable Floating Character -->
+    <div id="floating-companion" class="floating-companion">
+      <span id="floating-companion-emoji" class="floating-companion-emoji">🦉</span>
+      <div id="floating-speech-bubble" class="floating-speech-bubble">
+        Hi Friend! 📖
+      </div>
+    </div>
+
+    <!-- Bottom Fixed Navigation Tab Bar -->
+    <nav class="bottom-nav">
+      <!-- Home Tab -->
+      <a href="home.html" class="nav-tab">
+        <span class="tab-dot"></span>
+        <span class="tab-icon">🏠</span>
+        <span class="tab-label">Home</span>
+      </a>
+
+      <!-- Snap Tab (Active) -->
+      <a href="snap.html" class="nav-tab active">
+        <span class="tab-dot"></span>
+        <span class="tab-icon">📸</span>
+        <span class="tab-label">Snap</span>
+      </a>
+
+      <!-- Elevated Center Diary Tab -->
+      <a href="diary.html" class="nav-tab center-diary-tab">
+        <div class="diary-circle" aria-label="Open Diary">
+          <span class="diary-icon">📖</span>
+        </div>
+      </a>
+
+      <!-- Play Tab -->
+      <a href="play.html" class="nav-tab">
+        <span class="tab-dot"></span>
+        <span class="tab-icon">🎮</span>
+        <span class="tab-label">Play</span>
+      </a>
+
+      <!-- Me Tab -->
+      <a href="me.html" class="nav-tab">
+        <span class="tab-dot"></span>
+        <span class="tab-icon">👤</span>
+        <span class="tab-label">Me</span>
+      </a>
+    </nav>
+
+  </div>
+
+  <!-- ====================================================================
+       CAMERA FEED VIEW OVERLAY (Fullscreen slide up)
+       ==================================================================== -->
+  <div id="camera-screen" class="camera-screen">
+    <!-- Camera Viewport Layer -->
+    <div class="camera-viewport-container">
+      <!-- Video Element for Live Camera stream -->
+      <video id="camera-stream-video" autoplay playsinline class="camera-video-feed filter-normal"></video>
+      
+      <!-- Webcam error fallback placeholder box -->
+      <div id="camera-placeholder" class="camera-placeholder">
+        <span class="camera-placeholder-icon">📸</span>
+        <p class="camera-placeholder-text">Authorizing Camera Access...</p>
+      </div>
+
+      <!-- Floating character inside camera view -->
+      <div id="camera-companion" class="camera-companion">
+        <span id="camera-companion-emoji" class="camera-companion-emoji">🦉</span>
+        <div id="camera-companion-speech" class="camera-companion-speech">
+          I'm in the photo! 📸
+        </div>
+      </div>
+
+      <!-- Full-screen Camera Flash flash overlay -->
+      <div id="camera-flash" class="camera-flash"></div>
+    </div>
+
+    <!-- Toolbar Top -->
+    <header class="camera-top-bar">
+      <button id="btn-close-camera" class="btn-camera-top" aria-label="Close camera">✕</button>
+      <button id="btn-switch-camera" class="btn-camera-top" aria-label="Switch camera">🔄</button>
+    </header>
+
+    <!-- Filters horizontal scroll list -->
+    <section class="filters-scroller">
+      <div class="filters-row">
+        <!-- Normal -->
+        <button class="filter-option active" data-filter="normal">
+          <div class="filter-preview filter-normal"></div>
+          <span class="filter-name">Normal</span>
+        </button>
+        <!-- Warm -->
+        <button class="filter-option" data-filter="warm">
+          <div class="filter-preview filter-warm"></div>
+          <span class="filter-name">Warm</span>
+        </button>
+        <!-- Vintage -->
+        <button class="filter-option" data-filter="vintage">
+          <div class="filter-preview filter-vintage"></div>
+          <span class="filter-name">Vintage</span>
+        </button>
+        <!-- BW -->
+        <button class="filter-option" data-filter="bw">
+          <div class="filter-preview filter-bw"></div>
+          <span class="filter-name">B&W</span>
+        </button>
+        <!-- Bloom -->
+        <button class="filter-option" data-filter="bloom">
+          <div class="filter-preview filter-bloom"></div>
+          <span class="filter-name">Bloom</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Capture Trigger Footer -->
+    <footer class="camera-footer">
+      <button id="btn-capture" class="btn-capture" aria-label="Capture Photo"></button>
+    </footer>
+  </div>
+
+  <!-- ====================================================================
+       PHOTO PREVIEW REVIEW VIEW OVERLAY
+       ==================================================================== -->
+  <div id="photo-review-screen" class="photo-review-screen">
+    <!-- Captured image display -->
+    <img id="review-photo-img" src="" alt="Captured memory preview" class="review-photo filter-normal">
+
+    <!-- Action buttons bottom footer -->
+    <footer class="review-footer">
+      <button id="btn-retake" class="btn-review-outline">Retake</button>
+      <button id="btn-save-snap" class="btn-review-filled">Save to Diary ✓</button>
+    </footer>
+  </div>
+
+  <!-- ====================================================================
+       SNAP DETAILED SCREEN VIEW OVERLAY
+       ==================================================================== -->
+  <div id="snap-detail-screen" class="snap-detail-screen">
+    <!-- Close header -->
+    <header class="detail-header">
+      <button id="btn-close-detail" class="btn-detail-back">&larr; Back</button>
+    </header>
+
+    <!-- Canvas wrapping photo backdrop and placed draggable sticker layers -->
+    <div id="detail-canvas" class="detail-canvas">
+      <img id="detail-photo-img" src="" alt="Diary memory photo" class="detail-photo filter-normal">
+      <div id="detail-stickers-wrapper" class="detail-stickers-wrapper"></div>
+    </div>
+
+    <!-- Bottom info section -->
+    <section class="detail-bottom-info">
+      <div class="detail-meta">
+        <span id="detail-date-label" class="detail-date-label">May 29, 2026</span>
+        <span id="detail-companion-emoji" class="detail-reaction-emoji">🦉</span>
+      </div>
+
+      <!-- Action buttons row -->
+      <div class="detail-actions-row">
+        <button class="detail-tool-btn" id="btn-detail-decorate">
+          <span class="tool-icon">📌</span> Decorate
+        </button>
+        <button class="detail-tool-btn" id="btn-detail-favorite">
+          <span class="tool-icon" id="fav-icon">🤍</span> Favorite
+        </button>
+        <button class="detail-tool-btn" id="btn-detail-link">
+          <span class="tool-icon">📖</span> Add to Entry
+        </button>
+        <button class="detail-tool-btn" id="btn-detail-delete">
+          <span class="tool-icon">🗑️</span> Delete
+        </button>
+      </div>
+    </section>
+
+    <!-- Modal Sticker decorations popup -->
+    <div id="sticker-selector-overlay" class="sticker-selector-overlay">
+      <div class="sticker-popup-card">
+        <div class="sticker-popup-header">
+          <h3>Stickers</h3>
+          <button id="btn-close-stickers" class="btn-close-popup">&times;</button>
+        </div>
+        <div class="stickers-row-container">
+          <button class="sticker-select-btn" data-sticker="📌">📌</button>
+          <button class="sticker-select-btn" data-sticker="⭐">⭐</button>
+          <button class="sticker-select-btn" data-sticker="❤️">❤️</button>
+          <button class="sticker-select-btn" data-sticker="🌟">🌟</button>
+          <button class="sticker-select-btn" data-sticker="✨">✨</button>
+          <button class="sticker-select-btn" data-sticker="🎀">🎀</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal link snaps to diary list popup -->
+    <div id="link-entry-overlay" class="link-entry-overlay">
+      <div class="link-popup-card">
+        <div class="link-popup-header">
+          <h3>Link to Diary Entry</h3>
+          <button id="btn-close-links" class="btn-close-popup">&times;</button>
+        </div>
+        <div id="entries-checklist" class="entries-checklist">
+          <!-- Dynamically populated checklist -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Celebratory particles canvas overlay (fades out) -->
+  <canvas id="confetti-canvas" class="confetti-canvas"></canvas>
+
+  <!-- Snap Controller Script Link -->
+  <script src="../js/snap.js"></script>
+</body>
+</html>

@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- SEO Optimization Meta Tags -->
+  <title>Play Center — Dear Diary</title>
+  <meta name="description" content="Engage in cozy reflections and challenge your memory. Play games like Memory Match, Mood Guesser, Word Puzzle, and earn coins to bonding with your companion.">
+  <meta name="robots" content="noindex, nofollow">
+
+  <!-- Google Fonts Link -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Lato:ital,wght@0,300;0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+  <!-- Play Style Sheet Link -->
+  <link rel="stylesheet" href="../css/play.css">
+</head>
+<body>
+
+  <!-- Full-Screen Entry Overlay (Fades out from black on load) -->
+  <div id="fade-overlay" class="fade-overlay"></div>
+
+  <!-- Main Play Page Wrapper -->
+  <div class="play-wrapper">
+
+    <!-- Top Dashboard Header -->
+    <header class="play-header">
+      <div class="header-left">
+        <h1 class="play-title">Play 🎮</h1>
+      </div>
+      <div class="header-right">
+        <div class="coin-badge">
+          <span class="coin-icon">🪙</span>
+          <span id="header-coin-count" class="coin-count">0</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Scrollable Content Container -->
+    <main class="play-main">
+
+      <!-- DAILY CHALLENGE CARD -->
+      <section class="daily-challenge-card">
+        <div class="challenge-card-top">
+          <span class="challenge-title">Daily Challenge 🎯</span>
+          <span class="challenge-reward">+50 🪙</span>
+        </div>
+        <p class="challenge-text">"Write 3 things you are grateful for today"</p>
+        <div class="challenge-card-bottom">
+          <span id="daily-challenge-timer" class="challenge-timer">Resets in: 12:34:56</span>
+          <button id="btn-play-daily" class="btn-play-now">Play Now →</button>
+        </div>
+      </section>
+
+      <!-- GAMES GRID (2 Columns) -->
+      <section class="games-grid">
+        
+        <!-- Game 1: Memory Match -->
+        <article class="game-card" id="card-memory-match">
+          <span class="game-card-emoji">🧠</span>
+          <h3 class="game-card-name">Memory Match</h3>
+          <p class="game-card-desc">Match your memories</p>
+          <span class="game-card-reward">+15 🪙</span>
+          <button class="btn-game-play" data-game="memory-match">Play</button>
+        </article>
+
+        <!-- Game 2: Mood Guesser -->
+        <article class="game-card" id="card-mood-guesser">
+          <span class="game-card-emoji">😊</span>
+          <h3 class="game-card-name">Mood Guesser</h3>
+          <p class="game-card-desc">Guess your past mood</p>
+          <span class="game-card-reward">+15 🪙</span>
+          <button class="btn-game-play" data-game="mood-guesser">Play</button>
+        </article>
+
+        <!-- Game 3: Word Puzzle -->
+        <article class="game-card" id="card-word-puzzle">
+          <span class="game-card-emoji">📝</span>
+          <h3 class="game-card-name">Word Puzzle</h3>
+          <p class="game-card-desc">Your diary words</p>
+          <span class="game-card-reward">+15 🪙</span>
+          <button class="btn-game-play" data-game="word-puzzle">Play</button>
+        </article>
+
+        <!-- Game 4: Daily Challenge -->
+        <article class="game-card" id="card-daily-challenge">
+          <span class="game-card-emoji">🎯</span>
+          <h3 class="game-card-name">Daily Challenge</h3>
+          <p class="game-card-desc">60 second writing</p>
+          <span class="game-card-reward">+50 🪙</span>
+          <button class="btn-game-play" data-game="daily-challenge">Play</button>
+        </article>
+
+        <!-- Game 5: Story Builder (Full Width) -->
+        <article class="game-card full-width" id="card-story-builder">
+          <span class="game-card-emoji">🌟</span>
+          <h3 class="game-card-name">Story Builder</h3>
+          <p class="game-card-desc">Complete the story starter given by your companion</p>
+          <span class="game-card-reward">+20 🪙</span>
+          <button class="btn-game-play" data-game="story-builder">Play</button>
+        </article>
+
+      </section>
+
+      <!-- LEADERBOARD ENTRANCE BUTTON -->
+      <button id="btn-leaderboard" class="btn-leaderboard-outline">
+        🏆 Hall of Fame
+      </button>
+
+    </main>
+
+    <!-- Draggable Floating Host Character -->
+    <div id="floating-companion" class="floating-companion">
+      <span id="floating-companion-emoji" class="floating-companion-emoji">🦉</span>
+      <!-- Speech bubble tooltip -->
+      <div id="floating-speech-bubble" class="floating-speech-bubble show">
+        Let's play! 🎮
+      </div>
+    </div>
+
+    <!-- Bottom Fixed Navigation Tab Bar -->
+    <nav class="bottom-nav">
+      <!-- Home Tab -->
+      <a href="home.html" class="nav-tab">
+        <span class="tab-dot"></span>
+        <span class="tab-icon">🏠</span>
+        <span class="tab-label">Home</span>
+      </a>
+
+      <!-- Snap Tab -->
+      <a href="snap.html" class="nav-tab">
+        <span class="tab-dot"></span>
+        <span class="tab-icon">📸</span>
+        <span class="tab-label">Snap</span>
+      </a>
+
+      <!-- Elevated Center Diary Tab -->
+      <a href="diary.html" class="nav-tab center-diary-tab">
+        <div class="diary-circle" aria-label="Open Diary">
+          <span class="diary-icon">📖</span>
+        </div>
+      </a>
+
+      <!-- Play Tab (Active) -->
+      <a href="play.html" class="nav-tab active">
+        <span class="tab-dot"></span>
+        <span class="tab-icon">🎮</span>
+        <span class="tab-label">Play</span>
+      </a>
+
+      <!-- Me Tab -->
+      <a href="me.html" class="nav-tab">
+        <span class="tab-dot"></span>
+        <span class="tab-icon">👤</span>
+        <span class="tab-label">Me</span>
+      </a>
+    </nav>
+
+  </div>
+
+  <!-- ====================================================================
+       MEMORY MATCH GAME OVERLAY (Slides Up Full Screen)
+       ==================================================================== -->
+  <div id="overlay-memory-match" class="game-overlay">
+    <header class="overlay-header">
+      <button class="btn-overlay-back" data-target="memory-match">← Back</button>
+      <h2 class="overlay-title">🧠 Memory Match</h2>
+      <div class="overlay-coins">
+        🪙 <span id="game-match-coins">0</span>
+      </div>
+    </header>
+
+    <div class="overlay-content">
+      <div class="game-stats-row">
+        <span id="match-timer" class="game-timer">⏱️ 00:45</span>
+        <span id="match-score-badge" class="game-score">Score: 0</span>
+      </div>
+
+      <!-- Small companion container to react to actions -->
+      <div class="overlay-companion-reaction" id="match-companion-box">
+        <span class="companion-reaction-emoji" id="match-companion-emoji">🦉</span>
+        <div class="companion-reaction-speech" id="match-companion-speech">Find the pairs! 🔍</div>
+      </div>
+
+      <div class="memory-grid" id="memory-grid-container">
+        <!-- 4x6 or 4x4 Grid of cards generated dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================================================================
+       MOOD GUESSER GAME OVERLAY (Slides Up Full Screen)
+       ==================================================================== -->
+  <div id="overlay-mood-guesser" class="game-overlay">
+    <header class="overlay-header">
+      <button class="btn-overlay-back" data-target="mood-guesser">← Back</button>
+      <h2 class="overlay-title">😊 Mood Guesser</h2>
+      <div class="overlay-score">Score: <span id="mood-score-tracker">0/5</span></div>
+    </header>
+
+    <div class="overlay-content">
+      <div class="progress-bar-container">
+        <div class="progress-bar-fill" id="mood-progress-bar" style="width: 0%;"></div>
+      </div>
+
+      <!-- Prompt text screen -->
+      <div class="mood-entry-paper">
+        <span class="mood-entry-date" id="mood-entry-date">May 29, 2026</span>
+        <p class="mood-entry-text" id="mood-entry-text">"I had a great time today, everything felt so warm..."</p>
+      </div>
+
+      <!-- Mood Guesser reaction character -->
+      <div class="overlay-companion-reaction" id="mood-companion-box">
+        <span class="companion-reaction-emoji" id="mood-companion-emoji">🦉</span>
+        <div class="companion-reaction-speech" id="mood-companion-speech">How was I feeling? 🤔</div>
+      </div>
+
+      <!-- Options 2x2 Grid -->
+      <div class="mood-options-grid">
+        <button class="mood-option-btn" data-mood="sad">
+          <span class="option-emoji">😔</span>
+          <span class="option-label">Sad</span>
+        </button>
+        <button class="mood-option-btn" data-mood="worried">
+          <span class="option-emoji">😕</span>
+          <span class="option-label">Worried</span>
+        </button>
+        <button class="mood-option-btn" data-mood="neutral">
+          <span class="option-emoji">😐</span>
+          <span class="option-label">Neutral</span>
+        </button>
+        <button class="mood-option-btn" data-mood="happy">
+          <span class="option-emoji">🙂</span>
+          <span class="option-label">Happy</span>
+        </button>
+        <button class="mood-option-btn" data-mood="joyful">
+          <span class="option-emoji">😄</span>
+          <span class="option-label">Joyful</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================================================================
+       WORD PUZZLE GAME OVERLAY (Slides Up Full Screen)
+       ==================================================================== -->
+  <div id="overlay-word-puzzle" class="game-overlay">
+    <header class="overlay-header">
+      <button class="btn-overlay-back" data-target="word-puzzle">← Back</button>
+      <h2 class="overlay-title">📝 Word Puzzle</h2>
+      <div class="overlay-timer"><span id="puzzle-timer">⏱️ 01:00</span></div>
+    </header>
+
+    <div class="overlay-content flex-column">
+      <p class="puzzle-instructions">Find words from your diary! Drag or tap letters sequentially to select.</p>
+
+      <!-- Grid area -->
+      <div class="puzzle-layout">
+        <div class="puzzle-grid-wrapper">
+          <div class="puzzle-grid" id="puzzle-grid-container">
+            <!-- 6x6 Letter Grid generated dynamically -->
+          </div>
+        </div>
+
+        <div class="word-list-card">
+          <h4>Words to Find:</h4>
+          <ul class="word-search-list" id="puzzle-word-list">
+            <!-- Words list items -->
+          </ul>
+        </div>
+      </div>
+
+      <!-- Companion helper -->
+      <div class="overlay-companion-reaction" id="puzzle-companion-box">
+        <span class="companion-reaction-emoji" id="puzzle-companion-emoji">🦉</span>
+        <div class="companion-reaction-speech" id="puzzle-companion-speech">Let's find them! 🔍</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================================================================
+       DAILY CHALLENGE GAME OVERLAY (Slides Up Full Screen)
+       ==================================================================== -->
+  <div id="overlay-daily-challenge" class="game-overlay">
+    <header class="overlay-header">
+      <button class="btn-overlay-back" data-target="daily-challenge">← Back</button>
+      <h2 class="overlay-title">🎯 Daily Challenge</h2>
+      <div class="overlay-timer"><span id="challenge-timer" class="gold-timer">⏱️ 00:60</span></div>
+    </header>
+
+    <div class="overlay-content flex-column">
+      <!-- Challenge Description -->
+      <div class="challenge-prompt-paper">
+        <p class="challenge-prompt-title">Write 3 things you are grateful for today</p>
+      </div>
+
+      <!-- Coach character alignment -->
+      <div class="challenge-coach-row">
+        <div class="coach-avatar-wrapper">
+          <span class="coach-emoji" id="challenge-companion-emoji">🦉</span>
+        </div>
+        <div class="coach-bubble">
+          <span class="coach-speech" id="challenge-companion-speech">You can do it! 💪</span>
+        </div>
+      </div>
+
+      <!-- Lined Writing Area -->
+      <div class="challenge-writing-paper">
+        <div class="ruled-lines-background"></div>
+        <div class="challenge-textarea" id="challenge-writing-area" contenteditable="true" placeholder="Start writing here..."></div>
+      </div>
+
+      <div class="challenge-footer-row">
+        <span class="word-tracker" id="challenge-word-counter">0 words</span>
+        <button id="btn-submit-challenge" class="btn-submit-gold disabled">Submit ✓</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================================================================
+       STORY BUILDER GAME OVERLAY (Slides Up Full Screen)
+       ==================================================================== -->
+  <div id="overlay-story-builder" class="game-overlay">
+    <header class="overlay-header">
+      <button class="btn-overlay-back" data-target="story-builder">← Back</button>
+      <h2 class="overlay-title">🌟 Story Builder</h2>
+      <div class="overlay-timer"><span id="story-reward-badge" class="coin-badge-small">🪙 +20</span></div>
+    </header>
+
+    <div class="overlay-content flex-column">
+      <!-- Story Starter Prompt -->
+      <div class="story-prompt-paper">
+        <p class="story-starter-heading">Story Starter:</p>
+        <p class="story-prompt-text" id="story-starter-text">"It was a quiet evening when suddenly..."</p>
+        <span class="story-prompt-sub">Continue the story...</span>
+      </div>
+
+      <!-- Visual reacting character -->
+      <div class="overlay-companion-reaction" id="story-companion-box">
+        <span class="companion-reaction-emoji" id="story-companion-emoji">🦉</span>
+        <div class="companion-reaction-speech" id="story-companion-speech">Write a beautiful tail... 📝</div>
+      </div>
+
+      <!-- Lined writing area -->
+      <div class="story-writing-paper">
+        <div class="ruled-lines-background"></div>
+        <div class="story-textarea" id="story-writing-area" contenteditable="true" placeholder="Dear Diary, continue the story here..."></div>
+      </div>
+
+      <div class="story-footer-row">
+        <span class="word-tracker" id="story-word-counter">0 / 50 words</span>
+        <button id="btn-save-story" class="btn-submit-gold disabled">Save to Diary 📖</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================================================================
+       LEADERBOARD / HALL OF FAME OVERLAY
+       ==================================================================== -->
+  <div id="overlay-leaderboard" class="game-overlay">
+    <header class="overlay-header">
+      <button class="btn-overlay-back" data-target="leaderboard">← Back</button>
+      <h2 class="overlay-title">🏆 Hall of Fame</h2>
+      <button id="btn-overlay-rewards" class="btn-header-rewards">🪙 Rewards</button>
+    </header>
+
+    <div class="overlay-content">
+      
+      <!-- Section 1: Streaks -->
+      <div class="leaderboard-section">
+        <h3 class="leader-section-title">Longest Streaks 🔥</h3>
+        <ul class="leader-list">
+          <li class="leader-row">
+            <span class="rank-badge gold">🥇</span>
+            <span class="leader-name">Aria</span>
+            <span class="leader-value">104 days</span>
+          </li>
+          <li class="leader-row">
+            <span class="rank-badge silver">🥈</span>
+            <span class="leader-name">Julian</span>
+            <span class="leader-value">82 days</span>
+          </li>
+          <li class="leader-row">
+            <span class="rank-badge bronze">🥉</span>
+            <span class="leader-name">Mei</span>
+            <span class="leader-value">56 days</span>
+          </li>
+          <li class="leader-row user-row">
+            <span class="rank-badge">4</span>
+            <span class="leader-name">You 💛</span>
+            <span class="leader-value" id="leaderboard-user-streak">1 day</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Section 2: Most Entries -->
+      <div class="leaderboard-section">
+        <h3 class="leader-section-title">Most Memories 📖</h3>
+        <ul class="leader-list">
+          <li class="leader-row">
+            <span class="rank-badge gold">🥇</span>
+            <span class="leader-name">Julian</span>
+            <span class="leader-value">256 entries</span>
+          </li>
+          <li class="leader-row">
+            <span class="rank-badge silver">🥈</span>
+            <span class="leader-name">Aria</span>
+            <span class="leader-value">198 entries</span>
+          </li>
+          <li class="leader-row user-row">
+            <span class="rank-badge">3</span>
+            <span class="leader-name">You 💛</span>
+            <span class="leader-value" id="leaderboard-user-entries">0 entries</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Section 3: Coins -->
+      <div class="leaderboard-section">
+        <h3 class="leader-section-title">Top Collectors 🪙</h3>
+        <ul class="leader-list">
+          <li class="leader-row">
+            <span class="rank-badge gold">🥇</span>
+            <span class="leader-name">Elena</span>
+            <span class="leader-value">4,520 🪙</span>
+          </li>
+          <li class="leader-row">
+            <span class="rank-badge silver">🥈</span>
+            <span class="leader-name">Marcus</span>
+            <span class="leader-value">3,120 🪙</span>
+          </li>
+          <li class="leader-row user-row">
+            <span class="rank-badge">3</span>
+            <span class="leader-name">You 💛</span>
+            <span class="leader-value" id="leaderboard-user-coins">0 🪙</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Your Stats card at bottom -->
+      <div class="your-stats-summary-card">
+        <div class="card-meta">
+          <span>Your Stats</span>
+          <span>🏆</span>
+        </div>
+        <div class="stats-summary-grid">
+          <div class="stat-sum-item">
+            <span class="stat-sum-label">Rank</span>
+            <span class="stat-sum-val">#4</span>
+          </div>
+          <div class="stat-sum-item">
+            <span class="stat-sum-label">Streak</span>
+            <span class="stat-sum-val" id="summary-user-streak">1d</span>
+          </div>
+          <div class="stat-sum-item">
+            <span class="stat-sum-label">Memories</span>
+            <span class="stat-sum-val" id="summary-user-entries">0</span>
+          </div>
+          <div class="stat-sum-item">
+            <span class="stat-sum-label">Coins</span>
+            <span class="stat-sum-val" id="summary-user-coins">0</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ====================================================================
+       REWARDS CENTER OVERLAY
+       ==================================================================== -->
+  <div id="overlay-rewards" class="game-overlay">
+    <header class="overlay-header">
+      <button class="btn-overlay-back" data-target="rewards">← Back</button>
+      <h2 class="overlay-title">🪙 Rewards</h2>
+    </header>
+
+    <div class="overlay-content">
+      
+      <!-- Balance indicator -->
+      <div class="reward-balance-card">
+        <span class="balance-title">Coin Balance</span>
+        <h2 id="rewards-coin-balance" class="balance-val">🪙 0</h2>
+      </div>
+
+      <!-- Claim Daily bonus card -->
+      <div class="daily-bonus-card">
+        <div class="bonus-card-left">
+          <h3>Daily Bonus</h3>
+          <p>Claim your daily journal coins allowance</p>
+        </div>
+        <button id="btn-claim-daily-bonus" class="btn-claim-bonus">+10 🪙</button>
+      </div>
+
+      <!-- Earn More list methods -->
+      <div class="rewards-section">
+        <h3 class="rewards-sec-title">Earn More Coins</h3>
+        <ul class="earn-methods-list">
+          <li class="earn-method">
+            <span class="method-icon">✍️</span>
+            <div class="method-info">
+              <h4>Write Entry</h4>
+              <p>Keep a daily reflection journal entry</p>
+            </div>
+            <span class="method-earn">+10 🪙</span>
+          </li>
+          <li class="earn-method">
+            <span class="method-icon">📸</span>
+            <div class="method-info">
+              <h4>Daily Snap Memory</h4>
+              <p>Capture camera snap logs</p>
+            </div>
+            <span class="method-earn">+5 🪙</span>
+          </li>
+          <li class="earn-method">
+            <span class="method-icon">🔥</span>
+            <div class="method-info">
+              <h4>7 Day Streak Reward</h4>
+              <p>Achieve weekly reflections streak</p>
+            </div>
+            <span class="method-earn">+50 🪙</span>
+          </li>
+          <li class="earn-method">
+            <span class="method-icon">🎮</span>
+            <div class="method-info">
+              <h4>Play Mini Games</h4>
+              <p>Solve memory grids & quizzes</p>
+            </div>
+            <span class="method-earn">+15 🪙</span>
+          </li>
+          <li class="earn-method">
+            <span class="method-icon">🏆</span>
+            <div class="method-info">
+              <h4>Companion Level Up</h4>
+              <p>Bond and level up companion Ollie</p>
+            </div>
+            <span class="method-earn">+100 🪙</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Spending Preview items (blurred, locked) -->
+      <div class="rewards-section">
+        <h3 class="rewards-sec-title">Spend Coins</h3>
+        <div class="spend-locked-shelf">
+          <span class="locked-banner">Coming Soon 🎨</span>
+          <div class="spend-shelf-items">
+            <div class="spend-item blurred">
+              <span class="item-visual">🎩</span>
+              <span class="item-name">Cozy Hat</span>
+              <span class="item-cost">🪙 150</span>
+            </div>
+            <div class="spend-item blurred">
+              <span class="item-visual">👓</span>
+              <span class="item-name">Tiny Glasses</span>
+              <span class="item-cost">🪙 200</span>
+            </div>
+            <div class="spend-item blurred">
+              <span class="item-visual">🧣</span>
+              <span class="item-name">Scarf</span>
+              <span class="item-cost">🪙 250</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ====================================================================
+       COGNITIVE GAME WIN SCREEN OVERLAY (Global Container)
+       ==================================================================== -->
+  <div id="global-win-overlay" class="win-overlay-modal">
+    <div class="win-card">
+      <h2 id="win-heading" class="win-title">You remembered! 🥺</h2>
+      <p id="win-score-label" class="win-score-info">Score: 16</p>
+      
+      <div class="win-reward-box">
+        <span class="win-reward-icon">🪙</span>
+        <span id="win-coins-earned" class="win-reward-val">+15 🪙 earned!</span>
+      </div>
+
+      <!-- Static Confetti Canvas Layer -->
+      <canvas id="win-confetti-canvas" class="confetti-canvas"></canvas>
+
+      <div class="win-actions-row">
+        <button id="btn-win-replay" class="btn-win-action font-lato">Play Again</button>
+        <button id="btn-win-back" class="btn-win-action outline font-lato">Back to Games</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Play Script Link -->
+  <script src="../js/play.js"></script>
+</body>
+</html>

@@ -1,0 +1,1061 @@
+/* ==========================================================================
+   Dear Diary - Onboarding CSS Layout (3D Page Flip Notebook)
+   ========================================================================== */
+
+/* Reset & Base Variables */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: #1A0A00;
+  color: #FFE066;
+  font-family: 'Lato', sans-serif;
+  overflow: hidden;
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Full Screen Transition Overlay (fade to black on completion) */
+.transition-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #000000;
+  z-index: 99999;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.8s ease, visibility 0.8s;
+}
+
+.transition-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Onboarding Outer Layout Wrapper */
+.onboarding-wrapper {
+  width: 100%;
+  max-width: 520px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  position: relative;
+}
+
+/* Top Branding Header */
+.onboarding-header {
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.brand-logo {
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  font-size: 40px; /* Size: 40px */
+  color: #FFD700; /* Color: #FFD700 */
+  text-align: center;
+  letter-spacing: -1px;
+  filter: drop-shadow(0 2px 5px rgba(255, 215, 0, 0.15));
+}
+
+/* 4 Progress Dots (Top Center) */
+.progress-dots-container {
+  display: flex;
+  gap: 10px; /* Spacing: 10px */
+  margin-bottom: 24px;
+  justify-content: center;
+  align-items: center;
+}
+
+.progress-dot {
+  width: 8px; /* Size: 8px each dot */
+  height: 8px;
+  border-radius: 50%;
+  border: 1px solid #FFD700; /* outline gold */
+  background-color: transparent;
+  transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.progress-dot.active {
+  background-color: #FFD700; /* filled gold #FFD700 */
+  border-color: #FFD700;
+  box-shadow: 0 0 8px #FFD700;
+}
+
+.progress-dot.completed {
+  background-color: transparent;
+  border-color: #FFD700;
+}
+
+/* ==========================================================================
+   3D Book / Notebook Container
+   ========================================================================== */
+
+.book-container {
+  position: relative;
+  width: 100%;
+  height: 580px;
+  perspective: 1200px; /* 3D Perspective space */
+}
+
+/* ==========================================================================
+   Stationary Spiral Binding Component (On top of pages at z-index: 100)
+   ========================================================================== */
+
+.spiral-binding {
+  position: absolute;
+  top: 25px;
+  bottom: 25px;
+  left: 5px; /* Sits precisely along the left margin of the stacked page sheets */
+  width: 24px;
+  z-index: 100;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+}
+
+/* Individual metallic gold spiral ring */
+.spiral-ring {
+  width: 28px;
+  height: 8px;
+  background: linear-gradient(180deg, #FFE066 0%, #D4AF37 40%, #B8860B 80%, #704F00 100%);
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4), 
+              0 1px 1px rgba(0, 0, 0, 0.2);
+  margin-bottom: 2px;
+}
+
+/* ==========================================================================
+   Notebook Page Layout (Aged Paper #F2E0BC)
+   ========================================================================== */
+
+.diary-page {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background-color: #F2E0BC;
+  border-radius: 4px 16px 16px 4px; /* Binder side is straight, outer page corners are rounded */
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.65), 
+              inset -2px 0 10px rgba(0, 0, 0, 0.05),
+              inset 20px 0 30px rgba(0, 0, 0, 0.08); /* shadow overlay for binding fold depth */
+  padding: 40px 36px 40px 52px; /* Extra left padding to clear the rings */
+  color: #1E1208; /* Dark ink sepia tone */
+  
+  /* 3D rotation settings */
+  transform-origin: left center;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transition: transform 0.8s cubic-bezier(0.645, 0.045, 0.355, 1);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Page states */
+.diary-page.active {
+  z-index: 10;
+  pointer-events: auto;
+}
+
+.diary-page.flipped {
+  transform: rotateY(-180deg);
+  pointer-events: none;
+  z-index: 1; /* Move behind on flip completion */
+}
+
+/* Page punch holes */
+.page-holes {
+  position: absolute;
+  top: 25px;
+  bottom: 25px;
+  left: 14px;
+  width: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+  pointer-events: none;
+}
+
+.page-hole {
+  width: 6px;
+  height: 6px;
+  background-color: #1A0A00; /* Matches viewport backdrop to look like cut holes */
+  border-radius: 50%;
+  box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+/* ==========================================================================
+   Page Inner Content Elements
+   ========================================================================== */
+
+/* Page heading styled with handwriting fonts */
+.page-question {
+  font-family: 'Dancing Script', cursive;
+  font-size: 28px;
+  font-weight: 700;
+  color: #8B5A2B; /* Warm sepia ink */
+  margin-top: 15px;
+  margin-bottom: 24px;
+  line-height: 1.25;
+  text-shadow: 0 0 1px rgba(139, 90, 43, 0.1);
+}
+
+.page-content-wrapper {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: stretch;
+  width: 100%;
+}
+
+/* Underline Inputs */
+.underline-input-wrapper {
+  position: relative;
+  margin-bottom: 30px;
+  width: 100%;
+}
+
+.underline-input {
+  width: 100%;
+  border: none;
+  border-bottom: 2px solid rgba(184, 134, 11, 0.4);
+  background: transparent;
+  color: #1E1208;
+  font-family: 'Lato', sans-serif;
+  font-size: 18px;
+  font-weight: 400;
+  padding: 10px 0;
+  text-align: center;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+.underline-input::placeholder {
+  color: rgba(30, 18, 8, 0.35);
+  font-style: italic;
+}
+
+.underline-input:focus {
+  border-bottom-color: #B8860B;
+}
+
+/* Suggestions chips (Screen 2) */
+.chips-container {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 35px;
+}
+
+.suggestion-chip {
+  background-color: rgba(184, 134, 11, 0.06);
+  border: 1px solid rgba(184, 134, 11, 0.35);
+  color: #8B5A2B;
+  font-family: 'Lato', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 16px;
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.suggestion-chip:hover {
+  background-color: rgba(184, 134, 11, 0.12);
+  border-color: #B8860B;
+  transform: translateY(-1px);
+}
+
+.suggestion-chip:active {
+  transform: translateY(0);
+}
+
+/* Character Cards Grid (Screen 3) */
+.character-grid-s3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+.char-card-s3 {
+  border: 1.5px solid #D4C09A;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 12px;
+  padding: 12px 6px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.char-emoji-s3 {
+  font-size: 26px;
+  margin-bottom: 6px;
+  transition: transform 0.3s ease;
+}
+
+.char-name-s3 {
+  font-family: 'Lato', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  color: #1E1208;
+  margin-bottom: 2px;
+}
+
+.char-desc-s3 {
+  font-family: 'Lato', sans-serif;
+  font-size: 9px;
+  color: rgba(30, 18, 8, 0.6);
+  font-style: italic;
+}
+
+/* Card Selection state */
+.char-card-s3.selected {
+  border: 2px solid #FFD700;
+  background: rgba(255, 215, 0, 0.2);
+  box-shadow: 0 0 12px rgba(255, 215, 0, 0.5);
+  transform: scale(1.05);
+  animation: card-select-bounce 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+@keyframes card-select-bounce {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+  100% { transform: scale(1.05); }
+}
+
+/* Hover state (not selected) */
+.char-card-s3:hover:not(.selected) {
+  border-color: #B8860B;
+  transform: translateY(-1px);
+  background: rgba(255, 255, 255, 0.65);
+}
+
+/* Companion Feedback Text */
+.companion-feedback-wrapper {
+  min-height: 20px;
+  margin-top: 10px;
+  text-align: center;
+}
+
+.companion-feedback-text {
+  font-family: 'Lato', sans-serif;
+  font-size: 12px;
+  font-style: italic;
+  color: #B8860B;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.companion-feedback-text.visible {
+  opacity: 1;
+}
+
+/* Bouncing Companion Emoji (Screen 4) */
+.bouncing-companion-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+  margin-bottom: 6px;
+  height: 48px;
+}
+
+.bouncing-emoji {
+  font-size: 36px; /* Size 36px centered */
+  line-height: 1;
+  transform-origin: bottom center;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.15));
+  display: inline-block;
+  animation: bounce-on-load 1.2s ease-out; /* Bounce animation on load */
+}
+
+@keyframes bounce-on-load {
+  0% { transform: translateY(0); }
+  20% { transform: translateY(-20px); }
+  40% { transform: translateY(0); }
+  60% { transform: translateY(-10px); }
+  80% { transform: translateY(0); }
+  100% { transform: translateY(0); }
+}
+
+.typing-bounce {
+  animation: companion-type-bounce 0.8s ease-out;
+}
+
+@keyframes companion-type-bounce {
+  0%, 100% { transform: translateY(0) scale(1); }
+  30% { transform: translateY(-18px) scale(0.9, 1.1); }
+  50% { transform: translateY(0) scale(1.05, 0.95); }
+  70% { transform: translateY(-6px) scale(0.98, 1.02); }
+}
+
+.emoji-sparkle-fixed {
+  position: absolute;
+  top: -5px;
+  right: -25px;
+  font-size: 20px;
+  animation: sparkle-pulse 1.5s infinite alternate ease-in-out;
+  pointer-events: none;
+}
+
+@keyframes sparkle-pulse {
+  0% { transform: scale(0.8) rotate(0deg); opacity: 0.5; }
+  100% { transform: scale(1.2) rotate(15deg); opacity: 1; }
+}
+
+/* Companion Listening Subtitle */
+.companion-listening-wrapper {
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.companion-listening-text {
+  font-family: 'Lato', sans-serif;
+  font-style: italic;
+  font-size: 12px;
+  color: #B8860B; /* Lato Italic #B8860B 12px */
+}
+
+/* Main Question */
+.page-question-s4 {
+  font-family: 'Dancing Script', cursive;
+  font-size: 26px;
+  color: #2C1503; /* Dancing Script #2C1503 26px */
+  text-align: center;
+  margin-bottom: 8px;
+  line-height: 1.2;
+}
+
+/* Hint Text */
+.hint-text-s4 {
+  font-family: 'Lato', sans-serif;
+  font-style: italic;
+  font-size: 12px;
+  color: #8B7355; /* Lato Italic #8B7355 12px */
+  text-align: center;
+  margin-bottom: 12px;
+  line-height: 1.3;
+}
+
+/* Page Content Wrapper for S4 */
+.page-content-wrapper-s4 {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+}
+
+/* Textarea Styled with ruled lines (Screen 4) */
+.textarea-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.lined-textarea {
+  width: 85%; /* Width: 85% of page */
+  height: 140px; /* Height: 140px */
+  border: none; /* No border */
+  background-color: transparent; /* Background: transparent */
+  background-image: linear-gradient(rgba(44, 21, 3, 0.15) 1px, transparent 1px); /* Horizontal ruled lines background */
+  background-size: 100% 32px;
+  line-height: 32px; /* Line height 32px */
+  padding: 0 5px;
+  font-family: 'Dancing Script', cursive; /* Font: Dancing Script */
+  font-size: 18px; /* Size: 18px */
+  color: #2C1503; /* Color: #2C1503 */
+  resize: none; /* Resize: none */
+  outline: none;
+  margin: 0 auto;
+  display: block;
+}
+
+.lined-textarea::placeholder {
+  color: rgba(44, 21, 3, 0.4);
+  font-style: italic;
+  font-family: 'Dancing Script', cursive; /* Placeholder: "Dear Diary..." */
+}
+
+.word-counter {
+  font-family: 'Lato', sans-serif;
+  font-size: 11px; /* Lato #8B7355 11px */
+  color: #8B7355;
+  text-align: right;
+  width: 85%;
+  margin: 4px auto 10px auto;
+}
+
+/* Quote Fade-In Component (Screen 4) */
+.quote-container {
+  text-align: center;
+  margin-top: auto;
+  margin-bottom: 10px;
+  opacity: 0;
+  animation: quote-fade-in 1.5s ease-out forwards;
+  animation-delay: 2s; /* Fades in after 2 seconds */
+}
+
+.anne-quote {
+  font-family: 'Lato', sans-serif;
+  font-style: italic;
+  font-size: 11px; /* Lato Italic #8B7355 11px */
+  color: #8B7355;
+}
+
+@keyframes quote-fade-in {
+  to {
+    opacity: 1;
+  }
+}
+
+/* Screen 4: Filled Gold Button */
+.btn-finish {
+  background-color: #FFD700; /* Background: #FFD700 */
+  color: #1A0A00; /* Color: #1A0A00 */
+  font-family: 'Lato', sans-serif;
+  font-weight: 700; /* Lato Bold 14px */
+  font-size: 14px;
+  padding: 14px 40px; /* Padding: 14px 40px */
+  border: none;
+  border-radius: 6px; /* Border radius: 6px */
+  cursor: pointer;
+  outline: none;
+  width: auto;
+  margin: 0 auto;
+  display: block;
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.5); /* Glow: 0 0 20px rgba(255,215,0,0.5) */
+  animation: btn-finish-pulse 2s infinite ease-in-out; /* Subtle pulse animation */
+  transition: all 0.3s ease;
+}
+
+.btn-finish:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 25px rgba(255, 215, 0, 0.85);
+  filter: brightness(1.05);
+}
+
+.btn-finish:active {
+  transform: translateY(0);
+}
+
+@keyframes btn-finish-pulse {
+  0% { box-shadow: 0 0 15px rgba(255, 215, 0, 0.4); }
+  50% { box-shadow: 0 0 25px rgba(255, 215, 0, 0.7); }
+  100% { box-shadow: 0 0 15px rgba(255, 215, 0, 0.4); }
+}
+
+.page-footer-s4 {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+  width: 100%;
+}
+
+.page-footer-s4 .btn-back {
+  align-self: center;
+}
+
+/* Progress dots override on Screen 4 */
+.progress-dots-container.all-filled .progress-dot {
+  background-color: #FFD700 !important;
+  border-color: #FFD700 !important;
+  box-shadow: 0 0 8px #FFD700 !important;
+}
+
+/* Final submit overlays */
+.gold-flash-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: #FFD700;
+  z-index: 100000;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.gold-flash-overlay.flash {
+  animation: gold-flash-anim 0.3s ease-out forwards;
+}
+
+@keyframes gold-flash-anim {
+  0% { opacity: 0; }
+  30% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+.diary-born-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(10, 5, 0, 0.95); /* Dark overlay background */
+  z-index: 99999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.5s ease;
+  pointer-events: all;
+}
+
+.diary-born-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.diary-born-message {
+  font-family: 'Dancing Script', cursive;
+  font-size: 24px;
+  color: #FFD700; /* Dancing Script #FFD700 24px */
+  text-align: center;
+  padding: 20px;
+  line-height: 1.5;
+}
+
+.btn-finish:hover {
+  box-shadow: 0 6px 20px rgba(212, 175, 55, 0.55);
+  transform: translateY(-2px);
+  filter: brightness(1.06);
+}
+
+.btn-finish:active {
+  transform: translateY(0);
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+  .book-container {
+    height: 520px;
+  }
+  .diary-page {
+    padding: 30px 24px 30px 42px;
+  }
+  .page-question {
+    font-size: 22px;
+    margin-bottom: 16px;
+  }
+  .character-grid {
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+  .char-emoji {
+    font-size: 22px;
+  }
+  .char-name {
+    font-size: 11px;
+  }
+  .lined-textarea {
+    height: 120px;
+  }
+  .btn-next {
+    padding: 8px 18px;
+    font-size: 10px;
+  }
+}
+
+/* ==========================================================================
+   Screen 1 Specific Premium Styles & Animations
+   ========================================================================== */
+
+/* Fade-in & slide-up load animations */
+.onboarding-wrapper {
+  opacity: 0;
+  animation: s1-fade-in-wrapper 1s ease-out forwards;
+}
+
+@keyframes s1-fade-in-wrapper {
+  to {
+    opacity: 1;
+  }
+}
+
+.book-container {
+  transform: translateY(40px);
+  opacity: 0;
+  animation: s1-slide-up-book 0.8s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  animation-delay: 0.2s;
+}
+
+@keyframes s1-slide-up-book {
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Day 1 Label */
+.page-step-label {
+  display: block;
+  font-family: 'Lato', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #D4AF37; /* gold */
+  margin-top: 15px;
+  margin-bottom: 8px;
+}
+
+/* Custom Handwriting Question spacing */
+.page-question.handwriting {
+  font-family: 'Dancing Script', cursive;
+  color: #2C1503; /* ink brown */
+  font-size: 28px;
+  min-height: 40px; /* height placeholder to avoid layout shifting when typewriter starts */
+  margin-bottom: 24px;
+}
+
+/* Underline name input styled as a diary line */
+.underline-input-wrapper-s1 {
+  position: relative;
+  margin: 30px auto;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.underline-input-s1 {
+  width: 70%; /* 70% width of diary page */
+  border: none;
+  background: transparent;
+  color: #2C1503; /* ink brown */
+  font-family: 'Dancing Script', cursive; /* types in user's handwriting */
+  font-size: 24px;
+  font-weight: 600;
+  padding: 10px 0;
+  text-align: center;
+  outline: none;
+}
+
+.underline-input-s1::placeholder {
+  color: rgba(44, 21, 3, 0.35);
+  font-style: italic;
+  font-family: 'Dancing Script', cursive;
+}
+
+/* Animated underline line */
+.underline-line {
+  height: 1px;
+  background-color: #B8860B; /* gold/bronze line */
+  width: 0%;
+  transition: width 1s cubic-bezier(0.25, 1, 0.5, 1);
+  transition-delay: 1s; /* slides in from left to right after page entry */
+}
+
+/* When the page is active, expand the line */
+.diary-page.active .underline-line {
+  width: 70%;
+}
+
+/* Outlined Gold Next Button */
+.btn-next-outline {
+  background-color: transparent;
+  border: 1px solid #FFD700; /* border: 1px solid #FFD700 */
+  color: #FFD700; /* color: #FFD700 */
+  font-family: 'Lato', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.8px;
+  padding: 12px 40px; /* padding: 12px 40px */
+  border-radius: 4px; /* border-radius: 4px */
+  cursor: pointer;
+  outline: none;
+  transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.btn-next-outline:hover {
+  background-color: #FFD700; /* fills gold */
+  color: #1A0A00; /* text turns #1A0A00 */
+  box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
+}
+
+.btn-next-outline.disabled {
+  opacity: 0.35;
+  pointer-events: none;
+  border-color: rgba(255, 215, 0, 0.35);
+  color: rgba(255, 215, 0, 0.35);
+}
+
+/* Page Footer for Screen 1 */
+.page-footer-s1 {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  position: relative;
+  padding-top: 10px;
+}
+
+/* Very Bottom Skip Link (Right Aligned) */
+.skip-link-s1 {
+  position: absolute;
+  bottom: -24px;
+  right: 0;
+  background: transparent;
+  border: none;
+  color: #8B7355; /* color #8B7355 */
+  font-family: 'Lato', sans-serif;
+  font-size: 10px; /* very small */
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  outline: none;
+  text-decoration: none;
+  border-bottom: 1px dashed rgba(139, 115, 85, 0.4);
+  padding-bottom: 2px;
+  transition: all 0.3s ease;
+}
+
+.skip-link-s1:hover {
+  color: #FFD700;
+  border-bottom-color: #FFD700;
+}
+
+/* Interactive sparkles when typing */
+.sparkle {
+  position: absolute;
+  pointer-events: none;
+  width: 6px;
+  height: 6px;
+  background-color: #FFD700;
+  border-radius: 50%;
+  box-shadow: 0 0 8px #FFD700, 0 0 4px rgba(255, 215, 0, 0.8);
+  z-index: 1000;
+  animation: sparkle-shoot 0.8s ease-out forwards;
+}
+
+@keyframes sparkle-shoot {
+  100% {
+    transform: translate(var(--dx), var(--dy)) scale(0) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+/* ==========================================================================
+   Screen 2 Specific Premium Styles & Animations
+   ========================================================================== */
+
+/* Personalized name greeting */
+.page-greeting-wrapper-s2 {
+  text-align: center;
+  margin-top: 15px;
+  margin-bottom: 8px;
+  opacity: 0;
+  animation: s2-glow-fade 1.2s ease-out forwards;
+  animation-delay: 0.6s;
+}
+
+@keyframes s2-glow-fade {
+  0% {
+    opacity: 0;
+    text-shadow: 0 0 15px rgba(184, 134, 11, 0);
+  }
+  50% {
+    opacity: 1;
+    text-shadow: 0 0 15px rgba(184, 134, 11, 0.8), 0 0 8px rgba(184, 134, 11, 0.4);
+  }
+  100% {
+    opacity: 1;
+    text-shadow: 0 0 4px rgba(184, 134, 11, 0.2);
+  }
+}
+
+.page-greeting-s2 {
+  font-family: 'Lato', sans-serif;
+  font-style: italic;
+  font-weight: 700;
+  font-size: 13px; /* Size: 13px */
+  color: #B8860B; /* Color: #B8860B */
+}
+
+/* Hint Text styling */
+.page-hint-s2 {
+  font-family: 'Lato', sans-serif;
+  font-style: italic;
+  color: #8B7355; /* Color: #8B7355 */
+  font-size: 12px; /* Size: 12px */
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+/* Underline diary name input styled as a diary line */
+.underline-input-wrapper-s2 {
+  position: relative;
+  margin: 20px auto 35px auto;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.underline-input-s2 {
+  width: 70%; /* Width: 70% of page */
+  border: none;
+  background: transparent;
+  color: #2C1503; /* Color: #2C1503 */
+  font-family: 'Dancing Script', cursive; /* Font: Dancing Script */
+  font-size: 24px;
+  font-weight: 600;
+  padding: 10px 0;
+  text-align: center;
+  outline: none;
+}
+
+.underline-input-s2::placeholder {
+  color: rgba(44, 21, 3, 0.35);
+  font-style: italic;
+  font-family: 'Dancing Script', cursive;
+}
+
+/* When the page is active, expand the line */
+.diary-page.active .underline-input-wrapper-s2 .underline-line {
+  width: 70%;
+}
+
+/* Suggestion Chips custom pill styling */
+.chips-container {
+  display: flex;
+  gap: 10px; /* Gap: 10px */
+  justify-content: center;
+  margin-bottom: 30px;
+}
+
+.suggestion-chip {
+  background-color: transparent; /* Background: transparent */
+  border: 1px solid #B8860B; /* Border: 1px solid #B8860B */
+  color: #B8860B; /* Color: #B8860B */
+  font-family: 'Lato', sans-serif; /* Font: Lato */
+  font-size: 12px; /* 12px */
+  font-weight: 700;
+  padding: 5px 16px; /* Padding: 5px 16px */
+  border-radius: 20px; /* Border radius: 20px */
+  cursor: pointer;
+  opacity: 0;
+  transform: scale(0.3);
+  transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* 3 chips pop in one by one with a small bounce when active */
+.diary-page.active .suggestion-chip {
+  animation: s2-chip-bounce-in 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.diary-page.active .suggestion-chip:nth-child(1) { animation-delay: 1.8s; }
+.diary-page.active .suggestion-chip:nth-child(2) { animation-delay: 2.0s; }
+.diary-page.active .suggestion-chip:nth-child(3) { animation-delay: 2.2s; }
+
+@keyframes s2-chip-bounce-in {
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.suggestion-chip:hover {
+  background-color: #B8860B; /* background #B8860B */
+  color: #1A0A00; /* color #1A0A00 */
+}
+
+/* Quill Indicator Animation */
+.quill-icon {
+  position: absolute;
+  right: 18%; /* sat slightly right of input center */
+  top: 6px;
+  font-size: 20px;
+  opacity: 0;
+  transform: rotate(-30deg) scale(0.8);
+  pointer-events: none;
+  transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.quill-icon.active {
+  opacity: 1;
+  transform: rotate(0deg) scale(1.15);
+  animation: s2-quill-write 0.8s infinite ease-in-out;
+}
+
+@keyframes s2-quill-write {
+  0% { transform: rotate(0deg) translate(0, 0); }
+  25% { transform: rotate(-8deg) translate(-2px, -1px); }
+  50% { transform: rotate(0deg) translate(-1px, 1px); }
+  75% { transform: rotate(-5deg) translate(-2px, 0); }
+  100% { transform: rotate(0deg) translate(0, 0); }
+}
+
+/* Page Footer for Screen 2 */
+.page-footer-s2 {
+  margin-top: auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  position: relative;
+  padding-top: 10px;
+}
+
+/* Skip Link for Screen 2 (Muted at bottom right) */
+.skip-link-s2 {
+  position: absolute;
+  bottom: -24px;
+  right: 0;
+  background: transparent;
+  border: none;
+  color: #8B7355; /* color #8B7355 */
+  font-family: 'Lato', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  outline: none;
+  text-decoration: none;
+  border-bottom: 1px dashed rgba(139, 115, 85, 0.4);
+  padding-bottom: 2px;
+  transition: all 0.3s ease;
+}
+
+.skip-link-s2:hover {
+  color: #FFD700;
+  border-bottom-color: #FFD700;
+}
+
+/* Active buttons glow for Screen 2 Next outline */
+.btn-next-outline:not(.disabled) {
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.25);
+  animation: s2-gold-pulse 1.5s infinite alternate;
+}
+
+@keyframes s2-gold-pulse {
+  0% { box-shadow: 0 0 8px rgba(255, 215, 0, 0.2); }
+  100% { box-shadow: 0 0 15px rgba(255, 215, 0, 0.45); }
+}

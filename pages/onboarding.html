@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- SEO Optimization Meta Tags -->
+  <title>Onboarding — Dear Diary</title>
+  <meta name="description" content="Configure your companion and begin your journaling journey with Dear Diary. A secure space for your daily reflections.">
+  <meta name="robots" content="noindex, nofollow">
+
+  <!-- Google Fonts Link -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Lato:ital,wght@0,300;0,400;0,700;1,400&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+
+  <!-- Onboarding Style Sheet Link -->
+  <link rel="stylesheet" href="../css/onboarding.css">
+</head>
+<body>
+
+  <!-- Full-Screen Transition Overlay (Fades to black on final submit) -->
+  <div id="transition-overlay" class="transition-overlay"></div>
+
+  <!-- Onboarding Outer Content Container -->
+  <div class="onboarding-wrapper">
+    
+    <!-- Top Monogram branding header -->
+    <header class="onboarding-header">
+      <div class="brand-logo" aria-label="db logo">db</div>
+    </header>
+
+    <!-- 4 Step Progress Dots (Top Center) -->
+    <div class="progress-dots-container" aria-label="Step Progress">
+      <div class="progress-dot active" data-step="1"></div>
+      <div class="progress-dot" data-step="2"></div>
+      <div class="progress-dot" data-step="3"></div>
+      <div class="progress-dot" data-step="4"></div>
+    </div>
+
+    <!-- 3D Book Container -->
+    <div class="book-container">
+      
+      <!-- Stationary Spiral Ring Binding (Z-Index: 100) -->
+      <div class="spiral-binding" aria-hidden="true">
+        <div class="spiral-ring"></div>
+        <div class="spiral-ring"></div>
+        <div class="spiral-ring"></div>
+        <div class="spiral-ring"></div>
+        <div class="spiral-ring"></div>
+        <div class="spiral-ring"></div>
+        <div class="spiral-ring"></div>
+        <div class="spiral-ring"></div>
+        <div class="spiral-ring"></div>
+        <div class="spiral-ring"></div>
+        <div class="spiral-ring"></div>
+        <div class="spiral-ring"></div>
+      </div>
+
+      <!-- ====================================================================
+           SCREEN 1: User Name Customization Page
+           ==================================================================== -->
+      <div class="diary-page active" id="page-1">
+        <!-- Sheet punch holes matching spiral rings -->
+        <div class="page-holes" aria-hidden="true">
+          <div class="page-hole"></div><div class="page-hole"></div><div class="page-hole"></div>
+          <div class="page-hole"></div><div class="page-hole"></div><div class="page-hole"></div>
+          <div class="page-hole"></div><div class="page-hole"></div><div class="page-hole"></div>
+          <div class="page-hole"></div><div class="page-hole"></div><div class="page-hole"></div>
+        </div>
+
+        <span class="page-step-label">Day 1</span>
+        <h2 class="page-question handwriting" id="typewriter-q1"></h2>
+
+        <div class="page-content-wrapper">
+          <div class="underline-input-wrapper-s1">
+            <input type="text" id="user-name-input" class="underline-input-s1" placeholder="Your name..." autocomplete="off" maxlength="25">
+            <div class="underline-line" id="underline-anim-s1"></div>
+          </div>
+        </div>
+
+        <footer class="page-footer-s1">
+          <button class="btn-next-outline disabled" id="btn-next-1">Next &rarr;</button>
+          <button class="skip-link-s1" id="btn-skip-1">Skip for now</button>
+        </footer>
+      </div>
+
+      <!-- ====================================================================
+           SCREEN 2: Diary Name Customization Page
+           ==================================================================== -->
+      <div class="diary-page" id="page-2">
+        <div class="page-holes" aria-hidden="true">
+          <div class="page-hole"></div><div class="page-hole"></div><div class="page-hole"></div>
+          <div class="page-hole"></div><div class="page-hole"></div><div class="page-hole"></div>
+          <div class="page-hole"></div><div class="page-hole"></div><div class="page-hole"></div>
+          <div class="page-hole"></div><div class="page-hole"></div><div class="page-hole"></div>
+        </div>
+
+        <div class="page-greeting-wrapper-s2">
+          <span id="greeting-name-s2" class="page-greeting-s2">Nice to meet you! 🌟</span>
+        </div>
+
+        <h2 class="page-question handwriting" id="typewriter-q2"></h2>
+        
+        <p class="page-hint-s2">Give it a name that feels like yours</p>
+
+        <div class="page-content-wrapper">
+          <div class="underline-input-wrapper-s2">
+            <input type="text" id="diary-name-input" class="underline-input-s2" placeholder="My diary's name..." autocomplete="off" maxlength="25">
+            <div class="underline-line"></div>
+            <span id="quill-indicator" class="quill-icon" aria-hidden="true">✒️</span>
+          </div>
+
+          <!-- Quick Autofill Suggestions -->
+          <div class="chips-container" aria-label="Diary suggestions">
+            <button class="suggestion-chip">Luna</button>
+            <button class="suggestion-chip">Echo</button>
+            <button class="suggestion-chip">Sol</button>
+          </div>
+        </div>
+
+        <footer class="page-footer-s2">
+          <button class="btn-back" id="btn-back-2">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+            Back
+          </button>
+          <button class="btn-next-outline disabled" id="btn-next-2">Next &rarr;</button>
+          <button class="skip-link-s2" id="btn-skip-2">Skip for now</button>
+        </footer>
+      </div>
+
+      <!-- ====================================================================
+           SCREEN 3: Companion Selection Grid Page
+           ==================================================================== -->
+      <div class="diary-page" id="page-3">
+        <div class="page-holes" aria-hidden="true">
+          <div class="page-hole"></div><div class="page-hole"></div><div class="page-hole"></div>
+          <div class="page-hole"></div><div class="page-hole"></div><div class="page-hole"></div>
+          <div class="page-hole"></div><div class="page-hole"></div><div class="page-hole"></div>
+          <div class="page-hole"></div><div class="page-hole"></div><div class="page-hole"></div>
+        </div>
+
+        <div class="page-greeting-wrapper-s3">
+          <span id="diary-ready-title-s3" class="page-greeting-s3">Your diary is ready! 🌟</span>
+        </div>
+
+        <h2 class="page-question handwriting" id="typewriter-q3"></h2>
+        
+        <p class="page-hint-s3">Pick your companion. They will always be with you.</p>
+
+        <div class="page-content-wrapper">
+          <!-- 3x2 Interactive Card Grid -->
+          <div class="character-grid-s3" aria-label="Companion Selection">
+            <!-- Owl Ollie -->
+            <div class="char-card-s3" data-name="Ollie" data-emoji="🦉">
+              <span class="char-emoji-s3">🦉</span>
+              <span class="char-name-s3">Ollie</span>
+              <span class="char-desc-s3">Wise</span>
+            </div>
+            
+            <!-- Cat Luna -->
+            <div class="char-card-s3" data-name="Luna" data-emoji="🐱">
+              <span class="char-emoji-s3">🐱</span>
+              <span class="char-name-s3">Luna</span>
+              <span class="char-desc-s3">Cozy</span>
+            </div>
+
+            <!-- Star Stella -->
+            <div class="char-card-s3" data-name="Stella" data-emoji="🌟">
+              <span class="char-emoji-s3">🌟</span>
+              <span class="char-name-s3">Stella</span>
+              <span class="char-desc-s3">Magical</span>
+            </div>
+
+            <!-- Bear Bruno -->
+            <div class="char-card-s3" data-name="Bruno" data-emoji="🐻">
+              <span class="char-emoji-s3">🐻</span>
+              <span class="char-name-s3">Bruno</span>
+              <span class="char-desc-s3">Warm</span>
+            </div>
+
+            <!-- Fox Finn -->
+            <div class="char-card-s3" data-name="Finn" data-emoji="🦊">
+              <span class="char-emoji-s3">🦊</span>
+              <span class="char-name-s3">Finn</span>
+              <span class="char-desc-s3">Playful</span>
+            </div>
+
+            <!-- Penguin Pip -->
+            <div class="char-card-s3" data-name="Pip" data-emoji="🐧">
+              <span class="char-emoji-s3">🐧</span>
+              <span class="char-name-s3">Pip</span>
+              <span class="char-desc-s3">Loyal</span>
+            </div>
+          </div>
+
+          <!-- Selection feedback text -->
+          <div class="companion-feedback-wrapper">
+            <span id="companion-feedback-text" class="companion-feedback-text"></span>
+          </div>
+        </div>
+
+        <footer class="page-footer-s3">
+          <button class="btn-back" id="btn-back-3">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+            Back
+          </button>
+          <button class="btn-next-outline disabled" id="btn-next-3">Next &rarr;</button>
+          <button class="skip-link-s3" id="btn-skip-3">Skip for now</button>
+        </footer>
+      </div>
+
+      <!-- ====================================================================
+           SCREEN 4: First Entry & Finish Page
+           ==================================================================== -->
+      <div class="diary-page" id="page-4">
+        <div class="page-holes" aria-hidden="true">
+          <div class="page-hole"></div><div class="page-hole"></div><div class="page-hole"></div>
+          <div class="page-hole"></div><div class="page-hole"></div><div class="page-hole"></div>
+          <div class="page-hole"></div><div class="page-hole"></div><div class="page-hole"></div>
+          <div class="page-hole"></div><div class="page-hole"></div><div class="page-hole"></div>
+        </div>
+
+        <!-- Bouncing Selected Companion Emojis -->
+        <div class="bouncing-companion-container">
+          <div class="emoji-wrapper" style="position: relative; display: inline-block;">
+            <div id="companion-bouncing-emoji" class="bouncing-emoji">🦉</div>
+            <span id="emoji-sparkle" class="emoji-sparkle-fixed" style="display: none;">✨</span>
+          </div>
+        </div>
+
+        <!-- Companion Listening Subtitle -->
+        <div class="companion-listening-wrapper">
+          <span id="companion-listening-text" class="companion-listening-text">Ollie is listening 🥺</span>
+        </div>
+
+        <!-- Main Question -->
+        <h2 class="page-question-s4">Write your first line<br>to your diary...</h2>
+
+        <!-- Hint Text -->
+        <div class="hint-text-s4">It can be anything.<br>Even just hello.</div>
+
+        <div class="page-content-wrapper-s4">
+          <div class="textarea-wrapper">
+            <textarea id="first-entry-input" class="lined-textarea" placeholder="Dear Diary..." autocomplete="off" maxlength="300"></textarea>
+          </div>
+          <!-- Reactive word tracker -->
+          <div id="word-counter" class="word-counter">0 / 50 words</div>
+
+          <!-- Fading Anne Frank Quote -->
+          <div class="quote-container">
+            <p class="anne-quote">"Every story starts with one word 🕯️"</p>
+          </div>
+        </div>
+
+        <footer class="page-footer-s4">
+          <button class="btn-finish" id="btn-finish">Begin My Journey ✨</button>
+          <button class="btn-back" id="btn-back-4">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+            Back
+          </button>
+        </footer>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Overlays for final finish sequence -->
+  <div id="gold-flash-overlay" class="gold-flash-overlay"></div>
+  <div id="diary-born-overlay" class="diary-born-overlay">
+    <div id="diary-born-message" class="diary-born-message"></div>
+  </div>
+
+  <!-- Onboarding Script Link -->
+  <script src="../js/onboarding.js"></script>
+</body>
+</html>

@@ -1,0 +1,1522 @@
+/* ==========================================================================
+   Dear Diary - Diary Workspace CSS Stylesheet
+   ========================================================================== */
+
+/* Core Layout & Design Tokens */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: #1A0A00;
+  color: #FFFAF0;
+  font-family: 'Lato', sans-serif;
+  overflow-x: hidden;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+.fade-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: #000000;
+  z-index: 9999;
+  opacity: 1;
+  pointer-events: none;
+  transition: opacity 0.8s ease-out;
+}
+
+.fade-overlay.fade-out {
+  opacity: 0;
+}
+
+.diary-wrapper {
+  max-width: 480px;
+  margin: 0 auto;
+  min-height: 100vh;
+  padding: 0 16px 80px 16px; /* space for fixed bottom navigation */
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.diary-view {
+  display: none;
+  flex-direction: column;
+  flex-grow: 1;
+  animation: view-fade-in 0.4s ease-out forwards;
+}
+
+.diary-view.active {
+  display: flex;
+}
+
+@keyframes view-fade-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ==========================================================================
+   DIARY HOME SCREEN VIEW
+   ========================================================================== */
+.diary-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 0 12px 0;
+  border-bottom: 1px solid rgba(184, 134, 11, 0.2);
+  margin-bottom: 16px;
+}
+
+.btn-back-header {
+  font-family: 'Lato', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  text-transform: uppercase;
+  color: #8B7355;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: color 0.2s ease;
+}
+
+.btn-back-header:hover {
+  color: #FFD700;
+}
+
+.diary-title {
+  font-family: 'Dancing Script', cursive;
+  font-size: 22px; /* Dancing Script #FFD700 22px */
+  font-weight: 700;
+  color: #FFD700;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.btn-add-entry {
+  width: 36px; /* Gold circle 36px */
+  height: 36px;
+  border-radius: 50%;
+  background-color: #FFD700;
+  border: none;
+  cursor: pointer;
+  outline: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.2s ease;
+}
+
+.btn-add-entry:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.7);
+}
+
+.btn-add-entry:active {
+  transform: scale(0.95);
+}
+
+.plus-icon {
+  font-size: 22px;
+  font-weight: 700;
+  color: #1A0A00;
+  line-height: 1;
+}
+
+/* --------------------------------------------------------------------------
+   CALENDAR STRIP
+   -------------------------------------------------------------------------- */
+.calendar-strip-container {
+  width: 100%;
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+
+.calendar-strip {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  padding: 6px 0;
+  -webkit-overflow-scrolling: touch;
+}
+
+.calendar-strip::-webkit-scrollbar {
+  display: none; /* Hide scrollbar but keep scroll functionality */
+}
+
+.date-item {
+  flex-shrink: 0;
+  width: 44px; /* Width per item: 44px */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  position: relative;
+  cursor: pointer;
+}
+
+.day-name {
+  font-family: 'Lato', sans-serif;
+  font-size: 10px; /* Day name Mon Tue Wed etc Lato #8B7355 10px */
+  color: #8B7355;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.date-num {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  font-family: 'Lato', sans-serif;
+  font-weight: 700;
+  font-size: 16px; /* Date number Lato Bold #FFFAF0 16px */
+  color: #FFFAF0;
+  transition: all 0.3s ease;
+}
+
+/* Today: Gold circle behind number */
+.date-item.today .date-num {
+  background-color: #FFD700; /* #FFD700 background */
+  color: #1A0A00; /* #1A0A00 text */
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
+}
+
+/* Active day selection highlight */
+.date-item.selected:not(.today) .date-num {
+  border: 1.5px solid #FFD700;
+  color: #FFD700;
+}
+
+/* Small mood emoji below date if entry exists */
+.date-mood-flag {
+  font-size: 12px;
+  margin-top: -2px;
+  min-height: 14px;
+}
+
+/* Past entry dates: Small gold dot below number (if no emoji flag) */
+.date-dot-flag {
+  width: 5px;
+  height: 5px;
+  background-color: #FFD700;
+  border-radius: 50%;
+  margin-top: 1px;
+  box-shadow: 0 0 4px #FFD700;
+}
+
+/* --------------------------------------------------------------------------
+   ENTRIES LIST
+   -------------------------------------------------------------------------- */
+.entries-list-container {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.entries-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Scrollable entries area */
+.entries-list-container {
+  overflow-y: auto;
+  max-height: calc(100vh - 210px);
+}
+
+.entries-list-container::-webkit-scrollbar {
+  width: 4px;
+}
+
+.entries-list-container::-webkit-scrollbar-thumb {
+  background-color: rgba(184, 134, 11, 0.25);
+  border-radius: 2px;
+}
+
+.entry-card {
+  background-color: #F2E0BC; /* Background #F2E0BC */
+  border-radius: 12px; /* Border radius 12px */
+  padding: 14px; /* Padding 14px */
+  margin-bottom: 12px; /* Margin bottom 12px */
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.entry-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(242, 224, 188, 0.15);
+}
+
+.entry-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.entry-date-label {
+  font-family: 'Lato', sans-serif;
+  font-size: 11px; /* date and time Lato #8B7355 11px */
+  color: #8B7355;
+  font-weight: 700;
+}
+
+.entry-card-mood {
+  font-size: 18px; /* mood emoji */
+}
+
+.entry-preview {
+  font-family: 'Dancing Script', cursive;
+  font-size: 15px; /* Entry preview 2 lines Dancing Script #2C1503 15px */
+  color: #2C1503;
+  line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2; /* Limit to 2 lines */
+  -webkit-box-orient: vertical;
+  white-space: normal;
+}
+
+.entry-card-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.page-style-badge {
+  border: 1px solid #B8860B; /* Small pill #B8860B border */
+  color: #B8860B; /* Text #B8860B 10px Lato */
+  font-family: 'Lato', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 12px;
+  letter-spacing: 0.5px;
+}
+
+.attachments-badge {
+  font-size: 12px;
+  color: #8B7355;
+  font-family: 'Lato', sans-serif;
+  font-weight: 700;
+}
+
+/* Empty State */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 60px 20px;
+  flex-grow: 1;
+}
+
+.diary-illustration {
+  font-size: 60px; /* Diary page illustration center */
+  margin-bottom: 16px;
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.4));
+  animation: illustration-float 2.5s infinite alternate ease-in-out;
+}
+
+@keyframes illustration-float {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-8px); }
+}
+
+.empty-title {
+  font-family: 'Dancing Script', cursive;
+  font-size: 20px; /* "Your story starts here" Dancing Script #FFD700 20px */
+  color: #FFD700;
+  margin-bottom: 8px;
+}
+
+.empty-sub {
+  font-family: 'Lato', sans-serif;
+  font-size: 13px; /* "Tap + to write your first entry" Lato #8B7355 13px */
+  color: #8B7355;
+}
+
+/* ==========================================================================
+   NEW ENTRY CANVAS VIEW (Full Screen Slide Up)
+   ========================================================================== */
+.new-entry-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: #1A0A00;
+  z-index: 1500;
+  display: flex;
+  flex-direction: column;
+  transform: translateY(100%); /* Slides up from bottom */
+  transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+  overflow: hidden;
+}
+
+.new-entry-screen.active {
+  transform: translateY(0);
+}
+
+.editor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 16px;
+  background-color: #1A0A00;
+  border-bottom: 1px solid rgba(184, 134, 11, 0.2);
+  flex-shrink: 0;
+}
+
+.btn-close-editor {
+  background: transparent;
+  border: none;
+  color: #8B7355; /* Close: #8B7355 Lato 13px */
+  font-family: 'Lato', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  cursor: pointer;
+  outline: none;
+}
+
+.editor-date-label {
+  font-family: 'Lato', sans-serif;
+  color: #B8860B; /* Today's date Lato #B8860B 12px */
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.btn-save-entry {
+  background: transparent;
+  border: none;
+  color: #FFD700; /* Save: #FFD700 Lato Bold 13px */
+  font-family: 'Lato', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  cursor: pointer;
+  outline: none;
+}
+
+/* --------------------------------------------------------------------------
+   PAGE STYLE SELECTOR
+   -------------------------------------------------------------------------- */
+.page-style-selector {
+  background-color: rgba(44, 21, 3, 0.3);
+  padding: 8px 16px;
+  border-bottom: 1px solid rgba(184, 134, 11, 0.1);
+  overflow-x: auto;
+  flex-shrink: 0;
+}
+
+.style-row {
+  display: flex;
+  gap: 12px;
+  width: max-content;
+}
+
+.style-option-btn {
+  background: transparent;
+  border: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  outline: none;
+}
+
+.style-preview {
+  width: 50px; /* Preview box 50x36px */
+  height: 36px;
+  border-radius: 4px;
+  border: 1px solid rgba(184, 134, 11, 0.3);
+  transition: all 0.2s ease;
+}
+
+.style-name {
+  font-family: 'Lato', sans-serif;
+  font-size: 10px; /* Name below 10px Lato */
+  color: #8B7355;
+  font-weight: 700;
+}
+
+.style-option-btn.active .style-preview {
+  border: 2px solid #FFD700; /* Selected: gold border */
+  box-shadow: 0 0 8px rgba(255, 215, 0, 0.4);
+}
+
+.style-option-btn.active .style-name {
+  color: #FFD700;
+}
+
+/* Style Preview colors */
+.classic-preview { background-color: #FFF8E7; }
+.vintage-preview { background-color: #F2E0BC; background-image: radial-gradient(#E8D4AE 20%, transparent 20%), radial-gradient(#E8D4AE 20%, transparent 20%); background-size: 4px 4px; background-position: 0 0, 2px 2px; }
+.ruled-preview { background-color: #FFF8E7; background-image: linear-gradient(rgba(184,134,11,0.2) 1px, transparent 1px); background-size: 100% 8px; }
+.blank-preview { background-color: #FFFDF5; }
+.dotted-preview { background-color: #FFFDF5; background-image: radial-gradient(rgba(44, 21, 3, 0.2) 1px, transparent 1px); background-size: 6px 6px; }
+
+/* --------------------------------------------------------------------------
+   DIARY PAGE EDITOR AREA
+   -------------------------------------------------------------------------- */
+.diary-page-canvas {
+  flex-grow: 1;
+  width: 100%;
+  position: relative;
+  overflow-y: auto;
+  box-shadow: inset 15px 0 30px rgba(0, 0, 0, 0.08), inset -5px 0 10px rgba(0, 0, 0, 0.05);
+  transition: background-color 0.4s ease, background-image 0.4s ease;
+  padding: 30px 20px 80px 20px; /* bottom padding is for typing toolbar clearance */
+}
+
+/* Page style classes for canvas */
+.diary-page-canvas.classic-style {
+  background-color: #FFF8E7; /* Classic: plain cream #FFF8E7 */
+}
+
+.diary-page-canvas.vintage-style {
+  background-color: #F2E0BC; /* Vintage: aged #F2E0BC with texture */
+  background-image: radial-gradient(rgba(184, 134, 11, 0.05) 20%, transparent 20%), 
+                    radial-gradient(rgba(184, 134, 11, 0.05) 20%, transparent 20%);
+  background-size: 8px 8px;
+  background-position: 0 0, 4px 4px;
+}
+
+.diary-page-canvas.ruled-style {
+  background-color: #FFF8E7;
+  /* Ruled: lines every 32px */
+  background-image: linear-gradient(rgba(184, 134, 11, 0.15) 1px, transparent 1px);
+  background-size: 100% 32px;
+}
+
+.diary-page-canvas.blank-style {
+  background-color: #FFFDF5; /* Blank: clean white #FFFDF5 */
+}
+
+.diary-page-canvas.dotted-style {
+  background-color: #FFFDF5;
+  /* Dotted: dot grid pattern */
+  background-image: radial-gradient(rgba(44, 21, 3, 0.15) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* Notebook punches & spiral binding overlay (left side) */
+.spiral-binding-editor {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 20px;
+  width: 14px;
+  z-index: 10;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.spiral-binding-editor .spiral-ring {
+  width: 22px;
+  height: 6px;
+  background: linear-gradient(180deg, #FFE066 0%, #D4AF37 40%, #B8860B 80%, #704F00 100%);
+  border-radius: 3px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  margin-bottom: 2px;
+}
+
+/* Punch Holes background indicators */
+.diary-page-canvas::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 26px;
+  width: 6px;
+  background-image: radial-gradient(#1A0A00 50%, transparent 50%); /* hole indicators */
+  background-size: 100% 40px; /* space spacing */
+  opacity: 0.12;
+  z-index: 9;
+  pointer-events: none;
+}
+
+/* Page curl shadow at corners */
+.diary-page-canvas::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, transparent 70%, rgba(0, 0, 0, 0.05) 100%);
+  z-index: 15;
+  pointer-events: none;
+}
+
+/* Text Editor Div */
+.text-editor {
+  width: 100%;
+  padding-left: 50px; /* clear spirals punches (aligned with 70px absolute from page margin) */
+  outline: none;
+  min-height: 400px; /* Min height 400px */
+  color: #2C1503; /* Color #2C1503 */
+  font-size: 18px; /* Size 18px */
+  line-height: 32px; /* Line height 32px */
+  position: relative;
+  z-index: 5;
+  white-space: pre-wrap;
+}
+
+/* Font styles implementations */
+.text-editor.font-dancing {
+  font-family: 'Dancing Script', cursive; /* Default Dancing Script */
+}
+
+.text-editor.font-playfair {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-weight: 700;
+}
+
+.text-editor.font-lato {
+  font-family: 'Lato', sans-serif;
+  font-weight: 400;
+  font-size: 15px; /* scale size down slightly for lato */
+}
+
+.text-editor.font-courier {
+  font-family: 'Courier Prime', monospace;
+  font-size: 16px;
+  line-height: 28px;
+}
+
+/* Text Editor custom placeholder overlay */
+.text-editor:empty::before {
+  content: attr(placeholder);
+  color: rgba(184, 134, 11, 0.5); /* Placeholder color #B8860B80 */
+  font-style: italic;
+  pointer-events: none;
+  display: block;
+}
+
+/* --------------------------------------------------------------------------
+   FONT SELECTOR BUTTON & OTHER FLOATING TRIGGERS
+   -------------------------------------------------------------------------- */
+.btn-font-selector {
+  position: absolute;
+  right: 20px;
+  top: 130px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: #B8860B;
+  color: #FFF8E7;
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  font-size: 15px;
+  border: none;
+  cursor: pointer;
+  outline: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  z-index: 50;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.btn-font-selector:hover {
+  transform: scale(1.1);
+  background-color: #FFD700;
+  color: #1A0A00;
+}
+
+.editor-word-count {
+  position: absolute;
+  left: 20px;
+  bottom: 60px; /* just above writing toolbar */
+  font-family: 'Lato', sans-serif;
+  font-size: 11px; /* Lato #8B7355 11px */
+  color: #8B7355;
+  font-weight: 700;
+  z-index: 50;
+  pointer-events: none;
+}
+
+/* --------------------------------------------------------------------------
+   WRITING TOOLBAR (Fixed above keyboard)
+   -------------------------------------------------------------------------- */
+.writing-toolbar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 48px;
+  background-color: #1A0A00; /* Background #1A0A00 */
+  border-top: 1px solid #B8860B; /* Border top 1px #B8860B */
+  padding: 8px 16px; /* Padding 8px 16px */
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  z-index: 100;
+}
+
+.format-btn, .toolbar-tool-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  outline: none;
+  font-family: 'Lato', sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+  color: #FFD700; /* Icons in a row gold #FFD700 */
+  width: 32px;
+  height: 32px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.format-btn:hover, .toolbar-tool-btn:hover {
+  background-color: rgba(255, 215, 0, 0.15);
+}
+
+.format-btn:active, .toolbar-tool-btn:active {
+  background-color: rgba(255, 215, 0, 0.3);
+}
+
+/* --------------------------------------------------------------------------
+   PHOTO ATTACHMENTS (Polaroid style)
+   -------------------------------------------------------------------------- */
+.attachments-canvas, .decorations-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none; /* Let clicks pass through to text editor */
+  z-index: 20;
+}
+
+.polaroid-card {
+  position: absolute;
+  width: 180px;
+  background-color: #FFFFFF;
+  padding: 10px 10px 14px 10px;
+  border-radius: 2px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25); /* Box shadow depth */
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  pointer-events: auto; /* draggable clicks */
+  cursor: grab;
+  transform: rotate(var(--tilt)); /* Slight random tilt -3deg to +3deg */
+  z-index: 30;
+  animation: polaroid-drop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; /* Polaroid drop animation */
+}
+
+@keyframes polaroid-drop {
+  from { transform: translateY(-50px) rotate(0deg) scale(1.1); opacity: 0; }
+  to { transform: translateY(0) rotate(var(--tilt)) scale(1); opacity: 1; }
+}
+
+.polaroid-card:active {
+  cursor: grabbing;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+  z-index: 100;
+}
+
+.polaroid-image {
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+  border: 1px solid rgba(0,0,0,0.08);
+}
+
+.polaroid-caption-input {
+  width: 100%;
+  border: none;
+  background: transparent;
+  outline: none;
+  font-family: 'Dancing Script', cursive; /* Dancing Script #2C1503 */
+  font-size: 13px;
+  color: #2C1503;
+  text-align: center;
+  margin-top: 8px;
+  border-bottom: 1.5px dashed transparent;
+  padding-bottom: 2px;
+  transition: border-bottom-color 0.2s ease;
+}
+
+.polaroid-caption-input:focus {
+  border-bottom-color: rgba(44, 21, 3, 0.25);
+}
+
+/* Polaroid delete button */
+.polaroid-delete-btn {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: #B8860B;
+  color: #FFF8E7;
+  border: none;
+  font-size: 12px;
+  line-height: 20px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.polaroid-card:hover .polaroid-delete-btn {
+  opacity: 1;
+}
+
+/* --------------------------------------------------------------------------
+   DECORATION STICKERS
+   -------------------------------------------------------------------------- */
+.sticker-item {
+  position: absolute;
+  font-size: 28px;
+  cursor: grab;
+  pointer-events: auto;
+  user-select: none;
+  display: inline-block;
+  z-index: 35;
+  animation: sticker-place-bounce 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; /* bounce on place */
+}
+
+@keyframes sticker-place-bounce {
+  0% { transform: scale(0.3); opacity: 0; }
+  70% { transform: scale(1.3); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.sticker-item:active {
+  cursor: grabbing;
+  z-index: 100;
+}
+
+/* Sticker delete popup */
+.sticker-delete-trigger {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #B8860B;
+  color: #FFF8E7;
+  font-size: 9px;
+  font-family: 'Lato', sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: none;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  cursor: pointer;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s ease;
+}
+
+.sticker-item:hover .sticker-delete-trigger {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* ==========================================================================
+   BOTTOM SHEETS CONTROLS
+   ========================================================================== */
+.bottom-sheet-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(10, 5, 0, 0.5);
+  z-index: 1800;
+  display: flex;
+  align-items: flex-end;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s;
+}
+
+.bottom-sheet-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.bottom-sheet-card {
+  width: 100%;
+  background-color: #1A0A00;
+  border-top: 1.5px solid #B8860B;
+  border-radius: 20px 20px 0 0;
+  padding: 20px 16px 30px 16px;
+  transform: translateY(100%);
+  transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.bottom-sheet-overlay.active .bottom-sheet-card {
+  transform: translateY(0);
+}
+
+.sheet-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.sheet-header h3 {
+  font-family: 'Lato', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: #FFD700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.btn-close-sheet {
+  background: transparent;
+  border: none;
+  font-size: 24px;
+  color: #8B7355;
+  cursor: pointer;
+  outline: none;
+}
+
+.btn-close-sheet:hover {
+  color: #FFD700;
+}
+
+/* Font styles list */
+.fonts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.font-option-btn {
+  background: rgba(44, 21, 3, 0.3);
+  border: 1px solid rgba(184, 134, 11, 0.25);
+  border-radius: 10px;
+  padding: 14px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  outline: none;
+  color: #FFFAF0;
+  transition: all 0.2s ease;
+}
+
+.font-option-btn:hover {
+  border-color: #B8860B;
+  background-color: rgba(44, 21, 3, 0.5);
+}
+
+.font-option-btn.active {
+  border-color: #FFD700;
+  background-color: rgba(255, 215, 0, 0.05);
+}
+
+.font-preview {
+  font-size: 15px;
+}
+
+.font-dancing-preview { font-family: 'Dancing Script', cursive; font-size: 18px; }
+.font-playfair-preview { font-family: 'Playfair Display', serif; font-style: italic; }
+.font-lato-preview { font-family: 'Lato', sans-serif; }
+.font-courier-preview { font-family: 'Courier Prime', monospace; }
+
+.checkmark {
+  font-size: 16px;
+  color: #FFD700;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.font-option-btn.active .checkmark {
+  opacity: 1; /* Selected gold checkmark */
+}
+
+/* Sticker sheet grid */
+.stickers-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.sticker-btn {
+  background: rgba(44, 21, 3, 0.3);
+  border: 1px solid rgba(184, 134, 11, 0.25);
+  border-radius: 10px;
+  padding: 12px 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  outline: none;
+  font-family: 'Lato', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  color: #8B7355;
+  text-transform: uppercase;
+  transition: all 0.2s ease;
+}
+
+.sticker-btn:hover {
+  border-color: #FFD700;
+  color: #FFD700;
+  background-color: rgba(255, 215, 0, 0.05);
+}
+
+/* ==========================================================================
+   VOICE WRITING TRANSCRIPTION OVERLAY
+   ========================================================================== */
+.voice-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: #1A0A00; /* Background #1A0A00 */
+  z-index: 2100;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  transform: translateY(100%); /* Slides up fullscreen */
+  transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.voice-overlay.active {
+  transform: translateY(0);
+}
+
+.voice-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 400px;
+  padding: 24px;
+  text-align: center;
+  gap: 30px;
+}
+
+.voice-companion-avatar {
+  font-size: 60px; /* Character emoji large 60px */
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));
+}
+
+.voice-listening-title {
+  font-family: 'Dancing Script', cursive;
+  font-size: 24px; /* "I am listening..." Dancing Script #FFD700 24px */
+  color: #FFD700;
+}
+
+/* Pulsing mic keyframe waves */
+.mic-pulse-container {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.btn-mic-record {
+  position: relative;
+  width: 80px; /* Gold circle 80px */
+  height: 80px;
+  border-radius: 50%;
+  background-color: #FFD700;
+  border: none;
+  cursor: pointer;
+  outline: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+  z-index: 10;
+  transition: transform 0.2s ease;
+}
+
+.mic-icon {
+  font-size: 32px;
+  color: #1A0A00;
+}
+
+/* Waves animation classes */
+.mic-wave {
+  position: absolute;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background-color: #FFD700;
+  opacity: 0;
+  z-index: 5;
+  transform: scale(1);
+}
+
+.voice-overlay.recording .mic-wave {
+  animation: mic-pulsate-wave 1.6s infinite ease-out;
+}
+
+.voice-overlay.recording .mic-wave:nth-child(2) {
+  animation-delay: 0.8s;
+}
+
+@keyframes mic-pulsate-wave {
+  0% { transform: scale(1); opacity: 0.4; }
+  100% { transform: scale(1.6); opacity: 0; }
+}
+
+.btn-mic-record:hover {
+  transform: scale(1.05);
+}
+
+.transcription-card {
+  width: 100%;
+  background-color: #F2E0BC; /* aged paper card */
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  min-height: 100px;
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px solid rgba(44, 21, 3, 0.1);
+}
+
+.transcription-text {
+  font-family: 'Dancing Script', cursive; /* Dancing Script #2C1503 */
+  font-size: 16px;
+  color: #2C1503;
+  line-height: 1.45;
+  text-align: left;
+}
+
+.btn-stop-voice {
+  background-color: #8B1E0B; /* Stop button: red circle */
+  color: #FFF8E7;
+  font-family: 'Lato', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 12px 30px;
+  border-radius: 20px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(139, 30, 11, 0.4);
+  transition: transform 0.2s ease;
+}
+
+.btn-stop-voice:hover {
+  transform: scale(1.05);
+  background-color: #aa260e;
+}
+
+/* ==========================================================================
+   MOOD BEFORE SAVE POPUP
+   ========================================================================== */
+.save-mood-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(10, 5, 0, 0.85);
+  z-index: 2200;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s;
+}
+
+.save-mood-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.mood-popup-card {
+  background-color: #1A0A00;
+  border: 1.5px solid #B8860B;
+  border-radius: 16px;
+  padding: 24px;
+  text-align: center;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7);
+  width: 90%;
+  max-width: 320px;
+  transform: scale(0.9);
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.save-mood-overlay.active .mood-popup-card {
+  transform: scale(1);
+}
+
+.mood-popup-label {
+  font-family: 'Dancing Script', cursive;
+  font-size: 20px; /* "How were you feeling?" Dancing Script #FFD700 24px */
+  color: #FFD700;
+  margin-bottom: 16px;
+}
+
+.mood-emojis-row-popup {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 8px;
+}
+
+.popup-mood-btn {
+  background: transparent;
+  border: none;
+  font-size: 32px;
+  cursor: pointer;
+  outline: none;
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.popup-mood-btn:hover {
+  transform: scale(1.2);
+}
+
+.popup-mood-btn:active {
+  transform: scale(0.95);
+}
+
+/* ==========================================================================
+   ENTRY DETAILED VIEW OVERLAY SCREEN
+   ========================================================================== */
+.entry-detail-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: #1A0A00;
+  z-index: 1400;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%); /* Slides in from right */
+  transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+  overflow: hidden;
+}
+
+.entry-detail-screen.active {
+  transform: translateX(0);
+}
+
+.detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 16px;
+  background-color: #1A0A00;
+  border-bottom: 1px solid rgba(184, 134, 11, 0.2);
+  flex-shrink: 0;
+}
+
+.btn-close-detail {
+  background: transparent;
+  border: none;
+  color: #8B7355;
+  font-family: 'Lato', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  cursor: pointer;
+  outline: none;
+}
+
+.detail-date-label {
+  font-family: 'Lato', sans-serif;
+  color: #B8860B;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.btn-edit-entry {
+  background: transparent;
+  border: none;
+  color: #FFD700;
+  font-family: 'Lato', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  cursor: pointer;
+  outline: none;
+}
+
+/* Detail footer */
+.detail-footer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 44px;
+  background-color: #1A0A00;
+  border-top: 1px solid rgba(184, 134, 11, 0.2);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+  z-index: 100;
+}
+
+.detail-mood-display, .detail-word-count {
+  font-family: 'Lato', sans-serif;
+  font-size: 11px;
+  color: #8B7355;
+  font-weight: 700;
+}
+
+/* ==========================================================================
+   DRAGGABLE FLOATING COMPANION & BOTTOM NAVIGATION (SYNC WITH HOME)
+   ========================================================================== */
+.floating-companion {
+  position: fixed;
+  right: 20px;
+  bottom: 80px;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: grab;
+  z-index: 999;
+  user-select: none;
+  touch-action: none;
+  opacity: 0;
+  transform: translateX(50px) scale(0.8);
+  transition: opacity 0.8s cubic-bezier(0.25, 1, 0.5, 1), transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.floating-companion.loaded {
+  opacity: 1;
+  transform: translateX(0) scale(1);
+}
+
+.floating-companion:active {
+  cursor: grabbing;
+}
+
+.floating-companion-emoji {
+  font-size: 45px;
+  line-height: 1;
+  animation: companion-float-smooth 2s infinite alternate ease-in-out;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));
+}
+
+@keyframes companion-float-smooth {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-3px); }
+}
+
+.floating-speech-bubble {
+  position: absolute;
+  bottom: 70px;
+  right: 0;
+  background-color: #FFD700;
+  color: #1A0A00;
+  font-family: 'Dancing Script', cursive;
+  font-weight: 700;
+  font-size: 16px;
+  padding: 8px 14px;
+  border-radius: 12px;
+  border-bottom-right-radius: 1px;
+  white-space: nowrap;
+  box-shadow: 0 4px 15px rgba(255, 215, 0, 0.35);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px) scale(0.8);
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  z-index: 1000;
+  pointer-events: none;
+}
+
+.floating-speech-bubble::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  right: 15px;
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 6px solid #FFD700;
+}
+
+.floating-speech-bubble.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0) scale(1);
+}
+
+/* Bottom Tab Bar fixed navigation */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 65px;
+  background-color: #1A0A00;
+  border-top: 1px solid #B8860B;
+  z-index: 1000;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  align-items: center;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
+}
+
+.nav-tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  color: #8B7355;
+  font-family: 'Lato', sans-serif;
+  height: 100%;
+  position: relative;
+  transition: color 0.3s ease;
+}
+
+.tab-icon {
+  font-size: 18px;
+  margin-bottom: 2px;
+  transition: transform 0.2s ease;
+}
+
+.tab-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.tab-dot {
+  position: absolute;
+  top: 5px;
+  width: 4px;
+  height: 4px;
+  background-color: #FFD700;
+  border-radius: 50%;
+  box-shadow: 0 0 6px #FFD700;
+  opacity: 0;
+  transform: scale(0.5);
+  transition: all 0.3s ease;
+}
+
+.nav-tab.active {
+  color: #FFD700;
+}
+
+.nav-tab.active .tab-dot {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.nav-tab.active .tab-icon {
+  transform: translateY(2px) scale(1.05);
+}
+
+.center-diary-tab {
+  overflow: visible;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  z-index: 1010;
+}
+
+.diary-circle {
+  position: absolute;
+  bottom: 12px;
+  width: 58px;
+  height: 58px;
+  background-color: #FFD700;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+  animation: diary-center-pulse 2s infinite ease-in-out;
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.diary-icon {
+  font-size: 24px;
+  color: #1A0A00;
+}
+
+.diary-circle:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 25px rgba(255, 215, 0, 0.85);
+}
+
+.diary-circle:active {
+  transform: scale(0.95);
+}
+
+@keyframes diary-center-pulse {
+  0% { box-shadow: 0 0 15px rgba(255, 215, 0, 0.4); }
+  50% { box-shadow: 0 0 25px rgba(255, 215, 0, 0.65); }
+  100% { box-shadow: 0 0 15px rgba(255, 215, 0, 0.4); }
+}
+
+/* ==========================================================================
+   PAGE FLIP ANIMATIONS & TRANSITIONS
+   ========================================================================== */
+.new-entry-screen.page-flip-close {
+  animation: page-flip-out 0.8s cubic-bezier(0.645, 0.045, 0.355, 1) forwards;
+  transform-origin: left center;
+}
+
+@keyframes page-flip-out {
+  0% { transform: rotateY(0deg) scale(1); opacity: 1; }
+  50% { transform: rotateY(-90deg) scale(0.95); opacity: 0.5; }
+  100% { transform: rotateY(-180deg) scale(0.9); opacity: 0; }
+}

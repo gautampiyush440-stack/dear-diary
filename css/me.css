@@ -1,0 +1,2094 @@
+/* ==========================================================================
+   Dear Diary - My Space Profile (me.html) Premium Stylesheet
+   ========================================================================== */
+
+/* Design Tokens & Theme Colors */
+:root {
+  --bg: #1A0A00;
+  --accent: #FFD700;
+  --accent-dark: #B8860B;
+  --text: #FFFAF0;
+  --text-muted: #8B7355;
+  --card-bg: #1C0A00;
+  --card-border: #B8860B;
+  --hero-bg: #2C1503;
+  --paper-bg: #F2E0BC;
+  --paper-text: #2C1503;
+}
+
+/* Theme vintage warm mapping */
+body.theme-vintage {
+  --bg: #F5ECD7;
+  --accent: #8B5A2B;
+  --accent-dark: #5C3D2E;
+  --text: #3D2B1F;
+  --text-muted: #8B7355;
+  --card-bg: #FFFDF9;
+  --card-border: #8B5A2B;
+  --hero-bg: #E3D2B4;
+  --paper-bg: #FFFDF9;
+  --paper-text: #3D2B1F;
+}
+
+/* Theme midnight journal mapping */
+body.theme-midnight {
+  --bg: #0D1117;
+  --accent: #7C5CBF;
+  --accent-dark: #503790;
+  --text: #C9D1D9;
+  --text-muted: #586069;
+  --card-bg: #161B22;
+  --card-border: #30363D;
+  --hero-bg: #21262D;
+  --paper-bg: #0D1117;
+  --paper-text: #C9D1D9;
+}
+
+/* Base resets */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: 'Lato', sans-serif;
+  overflow-x: hidden;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.4s ease, color 0.4s ease;
+}
+
+/* Fade overlay */
+.fade-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: #000000;
+  z-index: 9999;
+  opacity: 1;
+  pointer-events: none;
+  transition: opacity 0.8s ease-out;
+}
+
+.fade-overlay.fade-out {
+  opacity: 0;
+}
+
+.me-wrapper {
+  max-width: 480px;
+  margin: 0 auto;
+  min-height: 100vh;
+  padding: 0 0 90px 0; /* Nav offset */
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+/* ==========================================================================
+   PROFILE MAIN SCREEN VIEW
+   ========================================================================== */
+.me-header {
+  padding: 20px 0 12px 0;
+  border-bottom: 1px solid rgba(184, 134, 11, 0.2);
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.me-title {
+  font-family: 'Dancing Script', cursive;
+  font-size: 24px; /* Dancing Script #FFD700 24px */
+  font-weight: 700;
+  color: var(--accent);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  line-height: 1.2;
+}
+
+.me-main {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 0 16px;
+}
+
+/* --------------------------------------------------------------------------
+   PROFILE HERO SECTION
+   -------------------------------------------------------------------------- */
+.profile-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding-top: 30px; /* Padding top 30px */
+  gap: 8px;
+}
+
+.hero-character-wrapper {
+  width: 110px;
+  height: 110px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.hero-companion-emoji {
+  font-size: 80px; /* Character emoji: 80px font size */
+  line-height: 1;
+  animation: companion-slow-bounce 2s infinite alternate ease-in-out; /* Slow bounce animation */
+  transform-origin: bottom center;
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.35));
+}
+
+@keyframes companion-slow-bounce {
+  0% { transform: translateY(0) scale(1); }
+  100% { transform: translateY(-8px) scale(0.96, 1.04); }
+}
+
+.hero-companion-name {
+  font-family: 'Lato', sans-serif;
+  font-weight: 700;
+  font-size: 14px; /* Lato Bold #B8860B 14px */
+  color: var(--accent-dark);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.hero-user-name {
+  font-family: 'Dancing Script', cursive;
+  font-size: 24px; /* User name: "[name]'s Diary" Dancing Script #FFD700 24px */
+  font-weight: 700;
+  color: var(--accent);
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
+.hero-diary-name {
+  font-family: 'Lato', sans-serif;
+  font-style: italic; /* Diary name: "[diaryName]" Lato Italic #8B7355 13px */
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.relationship-badge {
+  background-color: var(--hero-bg); /* Background #2C1503 default */
+  border: 1px solid var(--accent); /* Border 1px solid #FFD700 */
+  border-radius: 20px; /* Rounded pill */
+  padding: 6px 16px; /* Padding 6px 16px */
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.2);
+  margin-top: 4px;
+}
+
+#relationship-label {
+  font-family: 'Lato', sans-serif;
+  font-weight: 700;
+  font-size: 12px; /* "💛 Friend — Level 3" Lato Bold #FFD700 12px */
+  color: var(--accent);
+}
+
+/* --------------------------------------------------------------------------
+   STATS ROW
+   -------------------------------------------------------------------------- */
+.stats-row {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  margin: 20px 0; /* Margin 20px 16px */
+  background-color: var(--card-bg); /* Background #1C0A00 */
+  border: 1px solid var(--card-border); /* Border 1px solid #B8860B */
+  border-radius: 16px; /* Border radius 16px */
+  padding: 16px; /* Padding 16px */
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+.stat-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  text-align: center;
+}
+
+.stat-number {
+  font-family: 'Lato', sans-serif;
+  font-weight: 700;
+  font-size: 22px; /* Number: Lato Bold #FFD700 22px */
+  color: var(--accent);
+}
+
+.stat-label {
+  font-family: 'Lato', sans-serif;
+  font-size: 11px; /* Label: Lato #8B7355 11px */
+  color: var(--text-muted);
+}
+
+.stat-divider {
+  width: 1px;
+  height: 28px;
+  background-color: var(--card-border); /* Vertical gold lines between stats */
+  opacity: 0.5;
+}
+
+/* --------------------------------------------------------------------------
+   MENU SECTIONS
+   -------------------------------------------------------------------------- */
+.menu-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 20px; /* Gap between sections 20px */
+}
+
+.menu-section-title {
+  font-family: 'Lato', sans-serif;
+  font-weight: 700;
+  font-size: 12px; /* Title: Lato Bold #B8860B 12px */
+  color: var(--accent-dark);
+  letter-spacing: 1px; /* Letter spacing 1px */
+  text-transform: uppercase; /* Uppercase */
+  margin-left: 4px;
+}
+
+.menu-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.menu-item {
+  background-color: var(--card-bg); /* Background #1C0A00 */
+  border: none;
+  border-radius: 12px; /* Border radius 12px */
+  padding: 14px 16px; /* Padding 14px 16px */
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  outline: none;
+  width: 100%;
+  text-align: left;
+  transition: background-color 0.2s ease;
+  border-left: 0px solid var(--accent);
+}
+
+.menu-item:hover {
+  background-color: rgba(255, 215, 0, 0.04);
+}
+
+/* Active menu item has gold left border */
+.menu-item.active-left {
+  border-left: 3px solid var(--accent);
+  border-top-left-radius: 1px;
+  border-bottom-left-radius: 1px;
+}
+
+.menu-icon {
+  font-size: 20px; /* Left: emoji icon 20px */
+  margin-right: 12px;
+}
+
+.menu-label {
+  flex-grow: 1;
+  font-family: 'Lato', sans-serif;
+  font-size: 14px; /* Center: label Lato #FFFAF0 14px */
+  color: var(--text);
+  font-weight: 700;
+}
+
+.menu-arrow {
+  color: var(--text-muted); /* Right: "→" #8B7355 */
+  font-size: 16px;
+  font-weight: 700;
+}
+
+/* Section 2: Achievements specific badge preview column row */
+.menu-item.preview-item {
+  cursor: pointer;
+}
+
+.badges-preview-row {
+  display: flex;
+  gap: 6px;
+  margin-right: 10px;
+}
+
+.small-badge-preview {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1px solid var(--accent); /* Small badge circles gold border */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 12px;
+  background-color: var(--hero-bg);
+}
+
+.view-all-trigger {
+  font-family: 'Lato', sans-serif;
+  font-size: 12px; /* "View all [n] badges →" Lato #B8860B 12px right */
+  color: var(--accent-dark);
+  font-weight: 700;
+}
+
+/* Section 3: Premium Gold Shimmer Card */
+.premium-shimmer-card {
+  background: linear-gradient(135deg, var(--hero-bg) 0%, var(--bg) 100%); /* Background gradient #2C1503 to #1A0A00 */
+  border: 1px solid var(--accent); /* Border 1px solid #FFD700 */
+  border-radius: 16px; /* Border radius 16px */
+  padding: 16px; /* Padding 16px */
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.3); /* Box shadow gold glow */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Shimmer overlay animation */
+.premium-shimmer-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -150%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 215, 0, 0.15) 50%, transparent 100%);
+  animation: shine-glint 4s infinite ease-in-out;
+  transform: skewX(-20deg);
+}
+
+@keyframes shine-glint {
+  0% { left: -150%; }
+  50% { left: 150%; }
+  100% { left: 150%; }
+}
+
+.premium-card-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.premium-emoji {
+  font-size: 24px; /* 👑 emoji 24px */
+}
+
+.premium-card-left h4 {
+  font-family: 'Lato', sans-serif;
+  font-weight: 700;
+  font-size: 14px; /* "Golden Diary" Lato Bold #FFD700 14px */
+  color: var(--accent);
+}
+
+.premium-card-left p {
+  font-family: 'Lato', sans-serif;
+  font-size: 11px; /* "Upgrade your experience" Lato #8B7355 11px */
+  color: var(--text-muted);
+}
+
+.btn-upgrade-gold {
+  background-color: var(--accent); /* Gold filled small button */
+  border: none;
+  color: #1A0A00;
+  font-family: 'Lato', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 6px 14px; /* Padding 6px 14px */
+  border-radius: 6px; /* Border radius 6px */
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 5;
+}
+
+.btn-upgrade-gold:hover {
+  filter: brightness(1.06);
+  box-shadow: 0 2px 10px rgba(255, 215, 0, 0.35);
+}
+
+/* Settings Ghost mode toggle item */
+.menu-item.toggle-item {
+  cursor: default;
+  display: flex;
+  justify-content: space-between;
+}
+
+.menu-item.toggle-item:hover {
+  background-color: var(--card-bg);
+}
+
+.toggle-switch-wrapper {
+  position: relative;
+  width: 44px;
+  height: 24px;
+}
+
+.toggle-checkbox {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-switch-label {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #555; /* Off: #555 gray */
+  border-radius: 24px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.toggle-switch-label::before {
+  content: '';
+  position: absolute;
+  left: 3px;
+  bottom: 3px;
+  width: 18px;
+  height: 18px;
+  background-color: #FFFFFF;
+  border-radius: 50%;
+  transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+.toggle-checkbox:checked + .toggle-switch-label {
+  background-color: var(--accent); /* On: #FFD700 gold */
+}
+
+.toggle-checkbox:checked + .toggle-switch-label::before {
+  transform: translateX(20px);
+}
+
+/* Sign out button at bottom of page */
+.btn-sign-out {
+  background: transparent;
+  border: none;
+  font-family: 'Lato', sans-serif;
+  font-size: 14px; /* Lato #C4826A 14px */
+  color: #C4826A;
+  font-weight: 700;
+  text-align: center; /* Center aligned */
+  padding: 10px;
+  margin: 20px 0 30px 0; /* Margin 20px 16px equivalent */
+  cursor: pointer;
+  outline: none;
+  width: 100%;
+}
+
+.btn-sign-out:hover {
+  color: #d19580;
+  text-decoration: underline;
+}
+
+/* ==========================================================================
+   DRAGGABLE COMPANION
+   ========================================================================== */
+.floating-companion {
+  position: fixed;
+  right: 20px;
+  bottom: 80px;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: grab;
+  z-index: 999;
+  user-select: none;
+  touch-action: none;
+  opacity: 0;
+  transform: translateX(50px) scale(0.8);
+  transition: opacity 0.8s cubic-bezier(0.25, 1, 0.5, 1), transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.floating-companion.loaded {
+  opacity: 1;
+  transform: translateX(0) scale(1);
+}
+
+.floating-companion:active {
+  cursor: grabbing;
+}
+
+.floating-companion-emoji {
+  font-size: 45px;
+  line-height: 1;
+  animation: companion-float-smooth 2s infinite alternate ease-in-out;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));
+}
+
+.floating-speech-bubble {
+  position: absolute;
+  bottom: 70px;
+  right: 0;
+  background-color: var(--accent);
+  color: #1A0A00;
+  font-family: 'Dancing Script', cursive;
+  font-weight: 700;
+  font-size: 16px;
+  padding: 8px 14px;
+  border-radius: 12px;
+  border-bottom-right-radius: 1px;
+  white-space: nowrap;
+  box-shadow: 0 4px 15px rgba(255, 215, 0, 0.35);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px) scale(0.8);
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  z-index: 1000;
+  pointer-events: none;
+}
+
+.floating-speech-bubble::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  right: 15px;
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 6px solid var(--accent);
+}
+
+.floating-speech-bubble.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0) scale(1);
+}
+
+/* ==========================================================================
+   SUB-SCREEN OVERLAYS (SLIDES UP FULL SCREEN)
+   ========================================================================== */
+.me-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: var(--bg);
+  z-index: 1200;
+  display: flex;
+  flex-direction: column;
+  transform: translateY(100%); /* Screens slide up smoothly */
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.4s ease;
+  overflow-y: auto;
+}
+
+.me-overlay.active {
+  transform: translateY(0);
+}
+
+.overlay-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(184, 134, 11, 0.2);
+  background-color: rgba(18, 5, 0, 0.3);
+  position: sticky;
+  top: 0;
+  z-index: 1300;
+  width: 100%;
+}
+
+.btn-overlay-back {
+  background: transparent;
+  border: none;
+  color: var(--accent); /* Back button left */
+  font-family: 'Lato', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  outline: none;
+}
+
+.overlay-title {
+  font-family: 'Dancing Script', cursive;
+  font-size: 22px; /* Center title */
+  color: var(--accent);
+}
+
+.overlay-content {
+  flex-grow: 1;
+  padding: 20px;
+  max-width: 480px;
+  width: 100%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding-bottom: 60px;
+}
+
+.overlay-content.flex-column {
+  flex-direction: column;
+}
+
+.text-center {
+  text-align: center;
+  align-items: center;
+}
+
+/* --------------------------------------------------------------------------
+   1. CHARACTER STUDIO SCREEN STYLES
+   -------------------------------------------------------------------------- */
+.studio-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 10px;
+  gap: 12px;
+}
+
+.studio-companion-circle {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background-color: var(--card-bg);
+  border: 2px solid var(--accent);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+}
+
+.bouncing-emoji {
+  font-size: 80px;
+  animation: companion-slow-bounce 2s infinite alternate ease-in-out;
+}
+
+.studio-input-wrapper {
+  position: relative;
+  width: 180px;
+}
+
+.companion-underline-input {
+  border: none;
+  background: transparent;
+  color: var(--paper-text);
+  border-bottom: 1.5px solid var(--accent-dark); /* Editable underline style */
+  font-family: 'Dancing Script', cursive; /* Dancing Script 20px */
+  font-size: 20px;
+  font-weight: 700;
+  text-align: center;
+  width: 100%;
+  padding: 4px 0;
+  outline: none;
+}
+
+.companion-underline-input:focus + .underline-focus-bar {
+  width: 100%;
+}
+
+.underline-focus-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0%;
+  height: 1.5px;
+  background-color: var(--accent);
+  transition: width 0.3s ease;
+}
+
+.studio-section-title {
+  font-family: 'Lato', sans-serif;
+  font-weight: 700;
+  font-size: 14px; /* Title: "Choose Your Companion" */
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+
+.companion-selection-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.companion-card {
+  background-color: var(--card-bg); /* Background #1C0A00 */
+  border: 1px solid var(--card-border);
+  border-radius: 12px; /* Border radius 12px */
+  padding: 14px; /* Padding 14px */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.companion-card.selected {
+  border-color: var(--accent); /* Selected: gold border glow */
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+}
+
+.companion-card-emoji {
+  font-size: 36px; /* Emoji 36px */
+  margin-bottom: 4px;
+}
+
+.companion-card-name {
+  font-family: 'Lato', sans-serif;
+  font-weight: 700; /* Lato Bold */
+  font-size: 12px; /* 12px */
+  color: var(--text);
+  margin-bottom: 1px;
+}
+
+.companion-card-trait {
+  font-family: 'Lato', sans-serif;
+  font-size: 10px; /* Trait Lato 10px */
+  color: var(--text-muted);
+}
+
+/* Locked Cards Style */
+.companion-card.locked {
+  cursor: not-allowed;
+}
+
+.lock-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(10, 5, 0, 0.8); /* Dark overlay */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  z-index: 10;
+}
+
+.lock-icon {
+  font-size: 18px; /* 🔒 icon */
+}
+
+.lock-text {
+  font-family: 'Lato', sans-serif;
+  font-size: 9px; /* "Unlock at day 7" small */
+  color: var(--accent-dark);
+}
+
+.pro-badge, .elite-badge {
+  font-family: 'Lato', sans-serif;
+  font-size: 9px;
+  font-weight: 700;
+  background-color: var(--accent);
+  color: #1A0A00;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+/* Outfits shelf preview */
+.outfits-locked-shelf {
+  background-color: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  padding: 14px;
+  position: relative;
+  overflow: hidden;
+}
+
+.outfits-shelf-banner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: var(--accent); /* Gold text */
+  font-family: 'Lato', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  z-index: 20;
+}
+
+.outfits-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.outfit-card {
+  background-color: rgba(44, 21, 3, 0.4);
+  padding: 10px;
+  text-align: center;
+  border-radius: 8px;
+  font-family: 'Lato', sans-serif;
+  font-size: 11px;
+}
+
+.outfit-card.blurred {
+  filter: blur(2px) brightness(0.5); /* Blurred grids */
+}
+
+/* --------------------------------------------------------------------------
+   2. THEME GALLERY SCREEN STYLES
+   -------------------------------------------------------------------------- */
+.current-theme-card {
+  background-color: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.current-theme-card .card-meta {
+  font-family: 'Lato', sans-serif;
+  font-size: 11px; /* Lato #B8860B 11px */
+  color: var(--accent-dark);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.current-theme-name {
+  font-family: 'Lato', sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--accent);
+}
+
+.current-theme-desc {
+  font-family: 'Lato', sans-serif;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.themes-section-title {
+  font-family: 'Lato', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+
+.themes-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.theme-card {
+  background-color: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 16px; /* Rounded 16px */
+  padding: 12px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: all 0.3s ease;
+}
+
+.theme-card.selected {
+  border-color: var(--accent);
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+}
+
+.theme-gradient-preview {
+  height: 50px; /* Height 100px adjusted for card preview padding ratios */
+  border-radius: 8px;
+  width: 100%;
+}
+
+/* Gradients representations */
+.golden-preview { background: linear-gradient(135deg, #1A0A00 0%, #FFD700 100%); }
+.vintage-preview { background: linear-gradient(135deg, #F5ECD7 0%, #5C3D2E 100%); }
+.midnight-preview { background: linear-gradient(135deg, #0D1117 0%, #7C5CBF 100%); }
+.bloom-preview { background: linear-gradient(135deg, #FFF0F5 0%, #DB7093 100%); }
+.autumn-preview { background: linear-gradient(135deg, #2D1B00 0%, #D2691E 100%); }
+.frost-preview { background: linear-gradient(135deg, #E0F7FA 0%, #00ACC1 100%); }
+.ocean-preview { background: linear-gradient(135deg, #E0F2F1 0%, #00796B 100%); }
+.galaxy-preview { background: linear-gradient(135deg, #020024 0%, #090979 100%); }
+.forest-preview { background: linear-gradient(135deg, #122212 0%, #2e7d32 100%); }
+
+.theme-card-name {
+  font-family: 'Lato', sans-serif;
+  font-weight: 700; /* Lato Bold 12px */
+  font-size: 12px;
+  color: var(--text);
+}
+
+/* checkmark overlay indicator */
+.checkmark-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background-color: var(--accent);
+  color: #1A0A00;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 10px;
+  font-weight: 700;
+  opacity: 0;
+  transform: scale(0.5);
+  transition: all 0.3s ease;
+}
+
+.theme-card.selected .checkmark-badge {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.toast-notification {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background-color: var(--accent);
+  color: #1A0A00;
+  font-family: 'Lato', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  padding: 10px 24px;
+  border-radius: 20px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+  z-index: 2500;
+  opacity: 0;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  pointer-events: none;
+}
+
+.toast-notification.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* --------------------------------------------------------------------------
+   3. MY BADGES (ACHIEVEMENTS) SCREEN STYLES
+   -------------------------------------------------------------------------- */
+.badges-count-banner {
+  background-color: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  padding: 12px;
+  text-align: center;
+  font-family: 'Lato', sans-serif;
+  font-size: 13px; /* Lato #B8860B 13px */
+  font-weight: 700;
+  color: var(--accent-dark);
+}
+
+.badges-scroll-area {
+  flex-grow: 1;
+}
+
+.badges-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 3 columns */
+  gap: 16px;
+  width: 100%;
+}
+
+.badge-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 4px;
+  cursor: pointer;
+}
+
+.badge-circle {
+  width: 70px; /* Circle 70px */
+  height: 70px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 32px;
+  background-color: var(--card-bg);
+  box-shadow: 0 3px 6px rgba(0,0,0,0.3);
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+/* Earned badge */
+.badge-item.earned .badge-circle {
+  border: 2px solid var(--accent); /* full color gold border */
+}
+
+/* Locked badge */
+.badge-item.locked {
+  opacity: 0.4; /* locked: grayscale opacity 0.4 */
+}
+
+.badge-item.locked .badge-circle {
+  filter: grayscale(1);
+  border: 1px dashed var(--text-muted);
+}
+
+.badge-name {
+  font-family: 'Lato', sans-serif;
+  font-size: 10px; /* Lato 10px */
+  color: var(--text);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+/* Detail Popup Sheet modal */
+.badge-popup-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(10, 5, 0, 0.9);
+  z-index: 2200;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 24px;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+
+.badge-popup-modal.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.badge-popup-card {
+  background-color: var(--paper-bg);
+  color: var(--paper-text);
+  width: 100%;
+  max-width: 320px;
+  border-radius: 16px;
+  padding: 30px 20px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+  position: relative;
+  transform: scale(0.9);
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.2);
+}
+
+.badge-popup-modal.active .badge-popup-card {
+  transform: scale(1);
+}
+
+.btn-close-popup {
+  position: absolute;
+  top: 10px;
+  right: 14px;
+  font-size: 26px;
+  background: transparent;
+  border: none;
+  color: rgba(44, 21, 3, 0.4);
+  cursor: pointer;
+  outline: none;
+}
+
+.badge-popup-emoji-circle {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background-color: rgba(44, 21, 3, 0.05);
+  border: 1.5px solid var(--accent-dark);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 32px;
+}
+
+.badge-popup-name {
+  font-family: 'Lato', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.badge-popup-desc {
+  font-family: 'Lato', sans-serif;
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.badge-popup-status {
+  font-family: 'Lato', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent-dark);
+}
+
+/* --------------------------------------------------------------------------
+   4. MONTHLY MIRROR SCREEN STYLES
+   -------------------------------------------------------------------------- */
+.mirror-month-picker {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--card-bg);
+  border: 0.5px solid rgba(184, 134, 11, 0.2);
+  border-radius: 12px;
+  padding: 10px 16px;
+}
+
+.btn-mirror-arrow {
+  background: transparent;
+  border: none;
+  color: var(--accent);
+  font-family: 'Lato', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  outline: none;
+}
+
+.mirror-month-label {
+  font-family: 'Lato', sans-serif;
+  font-weight: 700;
+  font-size: 14px; /* Lato #FFD700 14px */
+  color: var(--accent);
+}
+
+.mirror-card {
+  background-color: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mirror-card-title {
+  font-family: 'Lato', sans-serif;
+  font-weight: 700;
+  font-size: 13px; /* Lato Bold #FFD700 13px */
+  color: var(--accent);
+  border-bottom: 0.5px solid rgba(184, 134, 11, 0.15);
+  padding-bottom: 4px;
+}
+
+/* Mood Graph Colums */
+.mood-week-graph {
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-end;
+  height: 100px;
+  padding-top: 10px;
+}
+
+.mood-graph-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+}
+
+.col-bar {
+  width: 14px;
+  border-radius: 6px 6px 0 0;
+  transition: height 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+  height: 0px;
+}
+
+/* Mood height bars colors */
+.col-bar.sad { background-color: #6B7280; height: 20px; } /* 😔 #6B7280 */
+.col-bar.worried { background-color: #9CA3AF; height: 35px; } /* 😕 #9CA3AF */
+.col-bar.neutral { background-color: #F59E0B; height: 50px; } /* 😐 #F59E0B */
+.col-bar.happy { background-color: #10B981; height: 68px; } /* 🙂 #10B981 */
+.col-bar.joyful { background-color: #FFD700; height: 85px; } /* 😄 #FFD700 */
+
+.col-bar.empty {
+  height: 2px !important;
+  background-color: rgba(139, 115, 85, 0.2); /* thin line */
+  border-radius: 0;
+}
+
+.col-day {
+  font-family: 'Lato', sans-serif;
+  font-size: 9px;
+  color: var(--text-muted);
+}
+
+/* Word Cloud container styling */
+.word-cloud-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  min-height: 80px;
+}
+
+.cloud-word {
+  font-family: 'Dancing Script', cursive;
+  color: var(--accent);
+  line-height: 1;
+}
+
+/* Best Memory parchment styles */
+.best-memory-paper {
+  background-color: var(--paper-bg);
+  border-radius: 8px;
+  padding: 14px;
+  color: var(--paper-text);
+  box-shadow: inset 0 0 20px rgba(0,0,0,0.06);
+}
+
+.best-memory-empty {
+  font-family: 'Lato', sans-serif;
+  font-size: 11px;
+  color: var(--text-muted);
+  font-style: italic;
+  text-align: center;
+}
+
+.best-memory-date {
+  font-family: 'Lato', sans-serif;
+  font-size: 10px;
+  color: #8B7355;
+}
+
+.best-memory-text {
+  font-family: 'Dancing Script', cursive;
+  font-size: 15px;
+  line-height: 1.4;
+  margin-top: 4px;
+  border-left: 2px solid rgba(44, 21, 3, 0.15);
+  padding-left: 10px;
+}
+
+/* Heatmap habit grid */
+.heatmap-calendar-header {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+  font-size: 9px;
+  color: var(--text-muted);
+}
+
+.heatmap-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+.heatmap-cell {
+  aspect-ratio: 1;
+  border-radius: 2px;
+  transition: background-color 0.3s;
+}
+
+/* Writing Habity cell levels intensity */
+.heatmap-cell.level-0 { background-color: #1C0A00; } /* No entry: #1C0A00 */
+.heatmap-cell.level-1 { background-color: rgba(184, 134, 11, 0.25); } /* 1 entry: #B8860B40 equivalent ratio */
+.heatmap-cell.level-2 { background-color: rgba(184, 134, 11, 0.5); } /* 2 entries: #B8860B80 */
+.heatmap-cell.level-3 { background-color: #FFD700; } /* 3+ entries: #FFD700 */
+
+/* Relationship growth simple chart */
+.growth-chart-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 4px 0;
+}
+
+.growth-meter-bar {
+  height: 6px;
+  background-color: rgba(139, 115, 85, 0.2);
+  border-radius: 3px;
+  position: relative;
+}
+
+.growth-meter-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent-dark), var(--accent));
+  border-radius: 3px;
+  width: 0%;
+  transition: width 0.8s ease;
+}
+
+.growth-marker {
+  position: absolute;
+  top: -3px;
+  width: 12px;
+  height: 12px;
+  background-color: #FFFFFF;
+  border: 2px solid var(--accent);
+  border-radius: 50%;
+  box-shadow: 0 0 6px var(--accent);
+  transform: translateX(-50%);
+  transition: left 0.8s ease;
+}
+
+.growth-labels {
+  display: flex;
+  justify-content: space-between;
+  font-family: 'Lato', sans-serif;
+  font-size: 9px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+/* --------------------------------------------------------------------------
+   5. TIME CAPSULE SCREEN STYLES
+   -------------------------------------------------------------------------- */
+.capsule-write-section {
+  background-color: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.capsule-section-title {
+  font-family: 'Lato', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--accent);
+  border-bottom: 0.5px solid rgba(184, 134, 11, 0.15);
+  padding-bottom: 4px;
+}
+
+.capsule-writing-paper {
+  background-color: var(--paper-bg);
+  border-radius: 8px;
+  box-shadow: inset 0 0 20px rgba(0,0,0,0.08);
+  position: relative;
+  overflow: hidden;
+  padding: 8px;
+}
+
+.capsule-textarea {
+  width: 100%;
+  height: 150px; /* Textarea 150-200px */
+  border: none;
+  background-color: transparent;
+  line-height: 28px;
+  font-family: 'Dancing Script', cursive; /* Dancing Script #2C1503 */
+  font-size: 16px;
+  color: var(--paper-text);
+  outline: none;
+  resize: none;
+  padding: 0 6px;
+  z-index: 2;
+  position: relative;
+}
+
+.capsule-textarea::placeholder {
+  color: rgba(44, 21, 3, 0.4);
+  font-style: italic;
+}
+
+.delivery-picker-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.delivery-picker-row label {
+  font-family: 'Lato', sans-serif;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.capsule-date-picker {
+  background-color: rgba(44, 21, 3, 0.3);
+  border: 1px solid var(--card-border);
+  color: var(--text);
+  border-radius: 6px;
+  padding: 6px 10px;
+  outline: none;
+  font-family: 'Lato', sans-serif;
+  font-size: 12px;
+}
+
+.btn-seal-gold {
+  background: linear-gradient(135deg, #FFE875 0%, #D4AF37 50%, #B8860B 100%);
+  border: none;
+  color: #1A0A00;
+  font-family: 'Lato', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  outline: none;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.2);
+}
+
+.capsules-list-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.capsules-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.capsule-card {
+  background-color: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.wax-seal-icon {
+  font-size: 24px;
+  color: #a30000;
+}
+
+.capsule-meta-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.capsule-meta-info h4 {
+  font-family: 'Lato', sans-serif;
+  font-size: 12px;
+  color: var(--accent);
+}
+
+.capsule-meta-info p {
+  font-family: 'Lato', sans-serif;
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+.capsule-empty-msg {
+  font-family: 'Lato', sans-serif;
+  font-size: 11px;
+  color: var(--text-muted);
+  font-style: italic;
+  text-align: center;
+  padding: 8px 0;
+}
+
+/* Wax seal stamp scale animation on seal capsule click */
+.wax-seal-animation {
+  animation: wax-stamp-bounce 0.8s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+@keyframes wax-stamp-bounce {
+  0% { transform: scale(3); opacity: 0; }
+  60% { transform: scale(0.9); opacity: 1; }
+  80% { transform: scale(1.1); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* --------------------------------------------------------------------------
+   6. YEAR IN DIARY SCREEN STYLES
+   -------------------------------------------------------------------------- */
+.year-selector-row {
+  display: flex;
+  justify-content: center;
+}
+
+.year-dropdown-wrapper {
+  position: relative;
+  width: 90px;
+}
+
+.select-diary-year {
+  background-color: var(--card-bg);
+  border: 1px solid var(--card-border);
+  color: var(--accent);
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-family: 'Lato', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  outline: none;
+  width: 100%;
+  text-align: center;
+  appearance: none;
+  cursor: pointer;
+}
+
+.year-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.year-stat-card {
+  background-color: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 2px;
+}
+
+.year-stat-card.full-width {
+  grid-column: span 2;
+}
+
+.year-stat-val {
+  font-family: 'Lato', sans-serif;
+  font-weight: 700;
+  font-size: 22px;
+  color: var(--text);
+}
+
+.year-stat-val.gold {
+  color: var(--accent);
+  font-family: 'Dancing Script', cursive;
+  font-size: 24px;
+}
+
+.year-stat-label {
+  font-family: 'Lato', sans-serif;
+  font-size: 10px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.year-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.year-sec-title {
+  font-family: 'Lato', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent-dark);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  border-bottom: 0.5px solid rgba(184, 134, 11, 0.15);
+  padding-bottom: 4px;
+}
+
+.year-entries-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.year-entry-preview-card {
+  background-color: var(--card-bg);
+  border: 0.5px solid rgba(184, 134, 11, 0.15);
+  border-radius: 8px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.year-entry-preview-card h4 {
+  font-family: 'Lato', sans-serif;
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+.year-entry-preview-card p {
+  font-family: 'Dancing Script', cursive;
+  font-size: 14px;
+  color: var(--accent);
+}
+
+.year-empty-text {
+  font-family: 'Lato', sans-serif;
+  font-size: 11px;
+  color: var(--text-muted);
+  font-style: italic;
+  text-align: center;
+}
+
+/* Yearly average mood bar graphs */
+.year-mood-chart {
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-end;
+  height: 80px;
+  background-color: rgba(44, 21, 3, 0.15);
+  border-radius: 8px;
+  padding: 10px 4px;
+}
+
+.year-bar-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+}
+
+.year-bar-fill {
+  width: 6px;
+  background-color: var(--accent);
+  border-radius: 2px 2px 0 0;
+  height: 10px;
+  transition: height 0.6s ease;
+}
+
+.month-label {
+  font-family: 'Lato', sans-serif;
+  font-size: 8px;
+  color: var(--text-muted);
+}
+
+.word-of-year-card {
+  background-color: var(--card-bg);
+  border: 1px solid var(--accent);
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+}
+
+.year-word-shimmer {
+  font-family: 'Dancing Script', cursive;
+  font-size: 32px;
+  color: var(--accent);
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+  animation: glow-glint-gold 2s infinite alternate ease-in-out;
+}
+
+@keyframes glow-glint-gold {
+  0% { text-shadow: 0 0 5px rgba(255,215,0,0.2); }
+  100% { text-shadow: 0 0 18px rgba(255,215,0,0.8); }
+}
+
+.char-journey-timeline {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--card-bg);
+  border-radius: 12px;
+  padding: 12px;
+}
+
+.timeline-step {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.timeline-emoji {
+  font-size: 28px;
+}
+
+.timeline-info h4 {
+  font-family: 'Lato', sans-serif;
+  font-size: 12px;
+  color: var(--accent);
+}
+
+.timeline-info p {
+  font-family: 'Lato', sans-serif;
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+.btn-share-year {
+  background: linear-gradient(135deg, #FFE875 0%, #D4AF37 50%, #B8860B 100%);
+  border: none;
+  color: #1A0A00;
+  font-family: 'Lato', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  outline: none;
+}
+
+/* --------------------------------------------------------------------------
+   7. SETTINGS & PIN LOCK NUMPAD STYLES
+   -------------------------------------------------------------------------- */
+.time-picker-card, .privacy-actions-card {
+  background-color: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.time-label {
+  font-family: 'Lato', sans-serif;
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.reminder-time-input {
+  background-color: rgba(44, 21, 3, 0.3);
+  border: 1px solid var(--card-border);
+  color: var(--text);
+  border-radius: 6px;
+  padding: 8px 12px;
+  outline: none;
+  font-family: 'Lato', sans-serif;
+  font-size: 14px;
+}
+
+.privacy-actions-card h3 {
+  font-family: 'Lato', sans-serif;
+  font-size: 12px;
+  color: var(--accent);
+  text-transform: uppercase;
+}
+
+.privacy-actions-card p {
+  font-family: 'Lato', sans-serif;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.privacy-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.btn-privacy-outline {
+  background-color: transparent;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  font-family: 'Lato', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  outline: none;
+}
+
+.btn-privacy-danger {
+  background-color: transparent;
+  border: 1px solid #c62828;
+  color: #c62828;
+  font-family: 'Lato', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  outline: none;
+}
+
+.help-card, .about-hero, .about-dedication {
+  background-color: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.help-card h3 {
+  font-family: 'Lato', sans-serif;
+  font-size: 13px;
+  color: var(--accent);
+  margin-bottom: 12px;
+}
+
+.faq-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.faq-item h4 {
+  font-family: 'Lato', sans-serif;
+  font-size: 12px;
+  color: var(--text);
+  margin-bottom: 2px;
+}
+
+.faq-item p {
+  font-family: 'Lato', sans-serif;
+  font-size: 11px;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.about-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.about-app-logo {
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  font-size: 40px;
+  color: var(--accent);
+  text-shadow: 0 2px 6px rgba(255, 215, 0, 0.2);
+}
+
+.about-hero h3 {
+  font-family: 'Dancing Script', cursive;
+  font-size: 22px;
+  color: var(--accent);
+}
+
+.version-label {
+  font-family: 'Lato', sans-serif;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.about-dedication {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 4px;
+}
+
+.dedication-header {
+  font-family: 'Dancing Script', cursive;
+  font-size: 18px;
+  color: var(--accent);
+}
+
+.dedication-dates {
+  font-family: 'Lato', sans-serif;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.dedication-text {
+  font-family: 'Lato', sans-serif;
+  font-size: 12px;
+  color: var(--text);
+  line-height: 1.45;
+  margin-top: 4px;
+}
+
+.about-footer {
+  font-family: 'Lato', sans-serif;
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 10px;
+}
+
+/* PIN Lock NumPad Pad Overlay */
+.numpad-overlay {
+  z-index: 1500 !important;
+}
+
+.pinpad-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-grow: 1;
+  gap: 20px;
+  padding: 20px;
+}
+
+.pin-instructions {
+  font-family: 'Lato', sans-serif;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.pin-dots-row {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 10px;
+}
+
+.pin-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1.5px solid var(--accent);
+  background-color: transparent;
+  transition: background-color 0.2s ease;
+}
+
+.pin-dot.filled {
+  background-color: var(--accent);
+  box-shadow: 0 0 8px var(--accent);
+}
+
+.numpad-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  width: 100%;
+  max-width: 280px;
+}
+
+.num-btn {
+  aspect-ratio: 1.4;
+  background-color: var(--card-bg);
+  border: 1px solid var(--card-border);
+  color: var(--text);
+  border-radius: 50%;
+  font-family: 'Lato', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  cursor: pointer;
+  outline: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+
+.num-btn:active {
+  background-color: var(--accent);
+  color: #1A0A00;
+  transform: scale(0.95);
+}
+
+.num-btn.danger {
+  color: #ff3333;
+  border-color: #ff3333;
+}
+
+.num-btn.ok {
+  color: #2e7d32;
+  border-color: #2e7d32;
+}
+
+/* ==========================================================================
+   DOUBLE CONFIRM DATA WIPING DIALOGS
+   ========================================================================== */
+.confirm-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(10, 5, 0, 0.95);
+  z-index: 2000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 24px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.4s ease, visibility 0.4s;
+}
+
+.confirm-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.confirm-card {
+  background-color: var(--paper-bg);
+  color: var(--paper-text);
+  width: 100%;
+  max-width: 380px;
+  border-radius: 16px;
+  padding: 30px 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+  position: relative;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  transform: translateY(20px) scale(0.9);
+  transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+  overflow: hidden;
+}
+
+.confirm-overlay.active .confirm-card {
+  transform: translateY(0) scale(1);
+}
+
+.confirm-icon {
+  font-size: 40px;
+  animation: danger-pulse 1s infinite alternate;
+}
+
+@keyframes danger-pulse {
+  0% { transform: scale(1.0); }
+  100% { transform: scale(1.15); }
+}
+
+.confirm-title {
+  font-family: 'Lato', sans-serif;
+  font-weight: 700;
+  font-size: 20px;
+  color: #c62828;
+}
+
+.confirm-desc {
+  font-family: 'Lato', sans-serif;
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+
+.confirm-actions-row {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+  margin-top: 10px;
+}
+
+.btn-confirm-action {
+  flex: 1;
+  font-family: 'Lato', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  outline: none;
+}
+
+.btn-confirm-action.danger {
+  background-color: #c62828;
+  border: none;
+  color: #FFFFFF;
+}
+
+.btn-confirm-action.outline {
+  background-color: transparent;
+  border: 1px solid var(--card-border);
+  color: var(--card-border);
+}
+
+.btn-confirm-action:hover {
+  filter: brightness(1.08);
+}
+
+.btn-confirm-action.outline:hover {
+  background-color: rgba(184, 134, 11, 0.08);
+}

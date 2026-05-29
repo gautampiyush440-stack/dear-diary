@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- SEO Optimization Meta Tags -->
+  <title>Home — Dear Diary</title>
+  <meta name="description" content="Welcome back to your secure digital diary journal. Check your streak progress, read daily reflections, and interact with your companion.">
+  <meta name="robots" content="noindex, nofollow">
+
+  <!-- Google Fonts Link -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Lato:ital,wght@0,300;0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+  <!-- Home Style Sheet Link -->
+  <link rel="stylesheet" href="../css/home.css">
+</head>
+<body>
+
+  <!-- Full-Screen Entry Overlay (Fades out from black on load) -->
+  <div id="fade-overlay" class="fade-overlay"></div>
+
+  <!-- Dashboard Main Page Wrapper -->
+  <div class="home-wrapper">
+
+    <!-- Top Dashboard Header -->
+    <header class="home-header">
+      <!-- Left: Greeting -->
+      <div class="greeting-container">
+        <h1 id="time-greeting" class="time-greeting">Good Day, Friend</h1>
+      </div>
+      <!-- Right: Logo & Notifications -->
+      <div class="header-right">
+        <div class="brand-logo-small" aria-label="db logo">db</div>
+        <button id="btn-bell" class="btn-bell" aria-label="Notifications">
+          <span class="bell-icon">🔔</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Empty Notifications Dropdown Panel -->
+    <div id="notifications-panel" class="notifications-panel">
+      <div class="panel-header">
+        <h3>Notifications</h3>
+      </div>
+      <div class="panel-body">
+        <p>No new notifications 🕯️</p>
+      </div>
+    </div>
+
+    <!-- Scrollable Content Container -->
+    <main class="home-main">
+
+      <!-- STREAK CARD -->
+      <div class="streak-card dashboard-card">
+        <div class="streak-card-top">
+          <div class="streak-info-left">
+            <span class="streak-emoji">🔥</span>
+            <div>
+              <h2 id="streak-title" class="streak-title">0 Day Streak</h2>
+              <p class="streak-sub">Keep it going!</p>
+            </div>
+          </div>
+          <!-- Milestone Circular Ring Progress -->
+          <div class="streak-progress-right">
+            <svg class="progress-ring" width="54" height="54">
+              <circle class="progress-ring-bg" stroke="rgba(139, 115, 85, 0.25)" stroke-width="4.5" fill="transparent" r="21" cx="27" cy="27" />
+              <circle id="progress-ring-circle" class="progress-ring-fill" stroke="#FFD700" stroke-width="4.5" fill="transparent" r="21" cx="27" cy="27" />
+            </svg>
+            <span id="progress-percent-label" class="progress-percent-label">0%</span>
+          </div>
+        </div>
+        <div class="streak-divider"></div>
+        <div class="streak-card-bottom">
+          <span class="snap-emoji">📸</span>
+          <div class="snap-info">
+            <h3 id="snap-streak-title" class="snap-streak-title">0 Snap Streak</h3>
+            <p class="snap-sub">Snap today!</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ANNE FRANK CARD -->
+      <div id="anne-frank-card" class="anne-frank-card dashboard-card">
+        <div class="card-meta">
+          <span class="author-label">Anne Frank • <span id="anne-frank-date">May 29, 2026</span></span>
+          <span class="candle-icon">🕯️</span>
+        </div>
+        <blockquote class="quote-text">
+          "How wonderful it is that nobody need wait a single moment before starting to improve the world."
+        </blockquote>
+        <div class="read-more-wrapper">
+          <span class="read-more-trigger">Read more →</span>
+        </div>
+      </div>
+
+      <!-- AI COMPANION CARD -->
+      <div class="companion-card dashboard-card">
+        <div class="companion-avatar-container">
+          <span id="companion-emoji" class="companion-emoji">🦉</span>
+        </div>
+        <div class="companion-says-wrapper">
+          <h3 id="companion-says-label" class="companion-says-label">Ollie says:</h3>
+          <p id="companion-speech" class="companion-speech">Ready to make a memory? 🌟</p>
+        </div>
+      </div>
+
+      <!-- DAILY PROMPT CARD -->
+      <div id="prompt-card" class="prompt-card dashboard-card">
+        <span class="prompt-emoji">✍️</span>
+        <div class="prompt-content">
+          <h3 class="prompt-says-label">Today's prompt:</h3>
+          <p class="prompt-question">What made you smile today?</p>
+        </div>
+        <div class="prompt-action">
+          <span class="write-trigger">Write →</span>
+        </div>
+      </div>
+
+      <!-- MOOD SELECTOR -->
+      <div class="mood-selector-container dashboard-card">
+        <span class="mood-label">How are you feeling?</span>
+        <div class="mood-emojis-row">
+          <button class="mood-emoji-btn" data-mood="sad" aria-label="Sad">😔</button>
+          <button class="mood-emoji-btn" data-mood="worried" aria-label="Worried">😕</button>
+          <button class="mood-emoji-btn" data-mood="neutral" aria-label="Neutral">😐</button>
+          <button class="mood-emoji-btn" data-mood="happy" aria-label="Happy">🙂</button>
+          <button class="mood-emoji-btn" data-mood="joyful" aria-label="Joyful">😄</button>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- Draggable Floating Character -->
+    <div id="floating-companion" class="floating-companion">
+      <span id="floating-companion-emoji" class="floating-companion-emoji">🦉</span>
+      <!-- Speech bubble tooltip -->
+      <div id="floating-speech-bubble" class="floating-speech-bubble">
+        Hi Friend! 📖
+      </div>
+    </div>
+
+    <!-- Bottom Fixed Navigation Tab Bar -->
+    <nav class="bottom-nav">
+      <!-- Home Tab -->
+      <a href="home.html" class="nav-tab active">
+        <span class="tab-dot"></span>
+        <span class="tab-icon">🏠</span>
+        <span class="tab-label">Home</span>
+      </a>
+
+      <!-- Snap Tab -->
+      <a href="snap.html" class="nav-tab">
+        <span class="tab-dot"></span>
+        <span class="tab-icon">📸</span>
+        <span class="tab-label">Snap</span>
+      </a>
+
+      <!-- Elevated Center Diary Tab -->
+      <a href="diary.html" class="nav-tab center-diary-tab">
+        <div class="diary-circle" aria-label="Open Diary">
+          <span class="diary-icon">📖</span>
+        </div>
+      </a>
+
+      <!-- Play Tab -->
+      <a href="play.html" class="nav-tab">
+        <span class="tab-dot"></span>
+        <span class="tab-icon">🎮</span>
+        <span class="tab-label">Play</span>
+      </a>
+
+      <!-- Me Tab -->
+      <a href="me.html" class="nav-tab">
+        <span class="tab-dot"></span>
+        <span class="tab-icon">👤</span>
+        <span class="tab-label">Me</span>
+      </a>
+    </nav>
+
+  </div>
+
+  <!-- Anne Frank Corner Details Expansion Overlay Modal -->
+  <div id="quote-expand-overlay" class="quote-expand-overlay">
+    <div class="modal-card">
+      <button id="btn-close-quote" class="btn-close-quote" aria-label="Close modal">&times;</button>
+      <div class="modal-meta">
+        <span>Anne Frank Corner</span>
+        <span>🕯️</span>
+      </div>
+      <h2 class="modal-quote">
+        "How wonderful it is that nobody need wait a single moment before starting to improve the world."
+      </h2>
+      <div class="modal-context">
+        <p>This quote comes from Anne Frank's diary, written during her time in hiding in the Secret Annex. It serves as a powerful reminder of our individual capacity to make a positive difference in our lives and the lives of others, starting this very second.</p>
+        <p>Writing in a journal is a personal step toward clarifying your thoughts and starting to change your world. Every entry is a testament to your growth.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Home Script Link -->
+  <script src="../js/home.js"></script>
+</body>
+</html>

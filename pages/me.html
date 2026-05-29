@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- SEO Optimization Meta Tags -->
+  <title>My Space — Dear Diary</title>
+  <meta name="description" content="Manage your companion, customize themes, track achievements, write time capsules, view journal mirror charts, and review settings.">
+  <meta name="robots" content="noindex, nofollow">
+
+  <!-- Google Fonts Link -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Lato:ital,wght@0,300;0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+  <!-- Me Style Sheet Link -->
+  <link rel="stylesheet" href="../css/me.css">
+</head>
+<body>
+
+  <!-- Full-Screen Entry Overlay (Fades out from black on load) -->
+  <div id="fade-overlay" class="fade-overlay"></div>
+
+  <!-- Main Profile Page Wrapper -->
+  <div class="me-wrapper">
+
+    <!-- Top Profile Header -->
+    <header class="me-header">
+      <h1 class="me-title">Me 👤</h1>
+    </header>
+
+    <!-- Scrollable Content Container -->
+    <main class="me-main">
+
+      <!-- PROFILE HERO SECTION -->
+      <section class="profile-hero">
+        <div class="hero-character-wrapper">
+          <div id="hero-companion-emoji" class="hero-companion-emoji">🦉</div>
+        </div>
+        <h2 id="hero-companion-name" class="hero-companion-name">Ollie</h2>
+        <h1 id="hero-user-display" class="hero-user-name">Friend's Diary</h1>
+        <p id="hero-diary-display" class="hero-diary-name">My Diary</p>
+        
+        <div class="relationship-badge">
+          <span id="relationship-label">💛 Friend — Level 3</span>
+        </div>
+      </section>
+
+      <!-- STATS ROW -->
+      <section class="stats-row">
+        <div class="stat-item">
+          <span id="stat-entries-count" class="stat-number">0</span>
+          <span class="stat-label">Entries</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <span id="stat-streak-count" class="stat-number">1</span>
+          <span class="stat-label">Streak</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <span id="stat-coins-count" class="stat-number">0</span>
+          <span class="stat-label">Coins</span>
+        </div>
+      </section>
+
+      <!-- MENU SECTION 1 — MY DIARY -->
+      <section class="menu-section">
+        <h3 class="menu-section-title">MY DIARY</h3>
+        <div class="menu-list">
+          <button class="menu-item" data-overlay="character-studio">
+            <span class="menu-icon">📖</span>
+            <span class="menu-label">Character Studio</span>
+            <span class="menu-arrow">→</span>
+          </button>
+          <button class="menu-item" data-overlay="theme-gallery">
+            <span class="menu-icon">🎨</span>
+            <span class="menu-label">Theme Gallery</span>
+            <span class="menu-arrow">→</span>
+          </button>
+          <button class="menu-item" data-overlay="time-capsule">
+            <span class="menu-icon">🕰️</span>
+            <span class="menu-label">Time Capsule</span>
+            <span class="menu-arrow">→</span>
+          </button>
+          <button class="menu-item" data-overlay="monthly-mirror">
+            <span class="menu-icon">🪞</span>
+            <span class="menu-label">Monthly Mirror</span>
+            <span class="menu-arrow">→</span>
+          </button>
+          <button class="menu-item" data-overlay="year-in-diary">
+            <span class="menu-icon">📊</span>
+            <span class="menu-label">Year in Diary</span>
+            <span class="menu-arrow">→</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- MENU SECTION 2 — ACHIEVEMENTS -->
+      <section class="menu-section">
+        <h3 class="menu-section-title">ACHIEVEMENTS</h3>
+        <div class="menu-list">
+          <div class="menu-item preview-item" data-overlay="achievements">
+            <span class="menu-icon">🏆</span>
+            <div class="badges-preview-row" id="badges-preview-row">
+              <!-- Small circles, emoji inside loaded via JS -->
+            </div>
+            <span class="view-all-trigger" id="btn-view-badges">View all 0 badges →</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- MENU SECTION 3 — PREMIUM -->
+      <section class="menu-section">
+        <h3 class="menu-section-title">PREMIUM</h3>
+        <div class="premium-shimmer-card">
+          <div class="premium-card-left">
+            <span class="premium-emoji">👑</span>
+            <div>
+              <h4>Golden Diary</h4>
+              <p>Upgrade your experience</p>
+            </div>
+          </div>
+          <button id="btn-upgrade-premium" class="btn-upgrade-gold">Upgrade →</button>
+        </div>
+      </section>
+
+      <!-- MENU SECTION 4 — SETTINGS -->
+      <section class="menu-section">
+        <h3 class="menu-section-title">SETTINGS</h3>
+        <div class="menu-list">
+          <button class="menu-item" data-overlay="settings-notifications">
+            <span class="menu-icon">🔔</span>
+            <span class="menu-label">Notifications</span>
+            <span class="menu-arrow">→</span>
+          </button>
+          <button class="menu-item" data-overlay="settings-privacy">
+            <span class="menu-icon">🔒</span>
+            <span class="menu-label">Privacy & Security</span>
+            <span class="menu-arrow">→</span>
+          </button>
+          <button class="menu-item" data-overlay="settings-language">
+            <span class="menu-icon">🌍</span>
+            <span class="menu-label">Language</span>
+            <span class="menu-arrow">→</span>
+          </button>
+          <div class="menu-item toggle-item">
+            <span class="menu-icon">👻</span>
+            <span class="menu-label">Ghost Mode</span>
+            <div class="toggle-switch-wrapper">
+              <input type="checkbox" id="ghost-mode-toggle" class="toggle-checkbox">
+              <label for="ghost-mode-toggle" class="toggle-switch-label"></label>
+            </div>
+          </div>
+          <button class="menu-item" data-overlay="settings-help">
+            <span class="menu-icon">❓</span>
+            <span class="menu-label">Help & Support</span>
+            <span class="menu-arrow">→</span>
+          </button>
+          <button class="menu-item" data-overlay="settings-about">
+            <span class="menu-icon">📖</span>
+            <span class="menu-label">About Dear Diary</span>
+            <span class="menu-arrow">→</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- SIGN OUT -->
+      <button id="btn-sign-out" class="btn-sign-out">Sign Out</button>
+
+    </main>
+
+    <!-- Draggable Floating Character -->
+    <div id="floating-companion" class="floating-companion">
+      <span id="floating-companion-emoji" class="floating-companion-emoji">🦉</span>
+      <!-- Speech bubble tooltip -->
+      <div id="floating-speech-bubble" class="floating-speech-bubble">
+        Need help? 👤
+      </div>
+    </div>
+
+    <!-- Bottom Fixed Navigation Tab Bar -->
+    <nav class="bottom-nav">
+      <!-- Home Tab -->
+      <a href="home.html" class="nav-tab">
+        <span class="tab-dot"></span>
+        <span class="tab-icon">🏠</span>
+        <span class="tab-label">Home</span>
+      </a>
+
+      <!-- Snap Tab -->
+      <a href="snap.html" class="nav-tab">
+        <span class="tab-dot"></span>
+        <span class="tab-icon">📸</span>
+        <span class="tab-label">Snap</span>
+      </a>
+
+      <!-- Elevated Center Diary Tab -->
+      <a href="diary.html" class="nav-tab center-diary-tab">
+        <div class="diary-circle" aria-label="Open Diary">
+          <span class="diary-icon">📖</span>
+        </div>
+      </a>
+
+      <!-- Play Tab -->
+      <a href="play.html" class="nav-tab">
+        <span class="tab-dot"></span>
+        <span class="tab-icon">🎮</span>
+        <span class="tab-label">Play</span>
+      </a>
+
+      <!-- Me Tab (Active) -->
+      <a href="me.html" class="nav-tab active">
+        <span class="tab-dot"></span>
+        <span class="tab-icon">👤</span>
+        <span class="tab-label">Me</span>
+      </a>
+    </nav>
+
+  </div>
+
+  <!-- ====================================================================
+       CHARACTER STUDIO OVERLAY SCREEN (Slides up full screen)
+       ==================================================================== -->
+  <div id="overlay-character-studio" class="me-overlay">
+    <header class="overlay-header">
+      <button class="btn-overlay-back" data-target="character-studio">← Back</button>
+      <h2 class="overlay-title">Character Studio 🎭</h2>
+    </header>
+
+    <div class="overlay-content">
+      <div class="studio-hero">
+        <div class="studio-companion-circle">
+          <div id="studio-companion-emoji" class="bouncing-emoji">🦉</div>
+        </div>
+        <div class="studio-input-wrapper">
+          <input type="text" id="input-companion-name" class="companion-underline-input" placeholder="Companion's name..." autocomplete="off">
+          <div class="underline-focus-bar"></div>
+        </div>
+      </div>
+
+      <div class="studio-selection-section">
+        <h3 class="studio-section-title">Choose Your Companion</h3>
+        <div class="companion-selection-grid" id="companion-grid-container">
+          <!-- Ollie - Wise (Free) -->
+          <div class="companion-card unlocked selected" data-name="Ollie" data-emoji="🦉">
+            <span class="companion-card-emoji">🦉</span>
+            <h4 class="companion-card-name">Ollie</h4>
+            <p class="companion-card-trait">Wise</p>
+          </div>
+          
+          <!-- Luna - Cozy -->
+          <div class="companion-card locked" data-name="Luna" data-emoji="🐱">
+            <div class="lock-overlay">
+              <span class="lock-icon">🔒</span>
+              <span class="lock-text">Unlock at day 7</span>
+            </div>
+            <span class="companion-card-emoji">🐱</span>
+            <h4 class="companion-card-name">Luna</h4>
+            <p class="companion-card-trait">Cozy</p>
+          </div>
+
+          <!-- Stella - Magical -->
+          <div class="companion-card locked" data-name="Stella" data-emoji="🌟">
+            <div class="lock-overlay">
+              <span class="lock-icon">🔒</span>
+              <span class="lock-text">Unlock at day 7</span>
+            </div>
+            <span class="companion-card-emoji">🌟</span>
+            <h4 class="companion-card-name">Stella</h4>
+            <p class="companion-card-trait">Magical</p>
+          </div>
+
+          <!-- Bruno - Warm -->
+          <div class="companion-card locked" data-name="Bruno" data-emoji="🐻">
+            <div class="lock-overlay">
+              <span class="lock-icon">🔒</span>
+              <span class="lock-text">Unlock at day 7</span>
+            </div>
+            <span class="companion-card-emoji">🐻</span>
+            <h4 class="companion-card-name">Bruno</h4>
+            <p class="companion-card-trait">Warm</p>
+          </div>
+
+          <!-- Finn - Playful -->
+          <div class="companion-card locked" data-name="Finn" data-emoji="🦊">
+            <div class="lock-overlay">
+              <span class="lock-icon">🔒</span>
+              <span class="lock-text">Unlock at day 7</span>
+            </div>
+            <span class="companion-card-emoji">🦊</span>
+            <h4 class="companion-card-name">Finn</h4>
+            <p class="companion-card-trait">Playful</p>
+          </div>
+
+          <!-- Pip - Loyal -->
+          <div class="companion-card locked" data-name="Pip" data-emoji="🐧">
+            <div class="lock-overlay">
+              <span class="lock-icon">🔒</span>
+              <span class="lock-text">Unlock at day 7</span>
+            </div>
+            <span class="companion-card-emoji">🐧</span>
+            <h4 class="companion-card-name">Pip</h4>
+            <p class="companion-card-trait">Loyal</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="studio-outfits-section">
+        <h3 class="studio-section-title">Outfits</h3>
+        <div class="outfits-locked-shelf">
+          <span class="outfits-shelf-banner">Available in Premium 👑</span>
+          <div class="outfits-grid">
+            <div class="outfit-card blurred">🎩 Cozy Hat</div>
+            <div class="outfit-card blurred">👓 Glasses</div>
+            <div class="outfit-card blurred">🧣 Warm Scarf</div>
+            <div class="outfit-card blurred">🎀 Bowtie</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================================================================
+       THEME GALLERY OVERLAY SCREEN (Slides up full screen)
+       ==================================================================== -->
+  <div id="overlay-theme-gallery" class="me-overlay">
+    <header class="overlay-header">
+      <button class="btn-overlay-back" data-target="theme-gallery">← Back</button>
+      <h2 class="overlay-title">Theme Gallery 🎨</h2>
+    </header>
+
+    <div class="overlay-content">
+      <div class="current-theme-card">
+        <span class="card-meta">Current Theme</span>
+        <h3 id="current-theme-name" class="current-theme-name">✨ Premium Golden</h3>
+        <p class="current-theme-desc">Rich gold accents on dark ink background</p>
+      </div>
+
+      <div class="themes-grid-section">
+        <h3 class="themes-section-title">Choose Theme</h3>
+        <div class="themes-grid">
+          
+          <!-- Free 1: Premium Golden -->
+          <div class="theme-card unlocked selected" data-theme="premium-golden">
+            <div class="theme-gradient-preview golden-preview"></div>
+            <span class="theme-card-name">✨ Premium Golden</span>
+            <span class="checkmark-badge">✓</span>
+          </div>
+
+          <!-- Free 2: Vintage Warm -->
+          <div class="theme-card unlocked" data-theme="vintage-warm">
+            <div class="theme-gradient-preview vintage-preview"></div>
+            <span class="theme-card-name">🕯️ Vintage Warm</span>
+            <span class="checkmark-badge">✓</span>
+          </div>
+
+          <!-- Free 3: Midnight Journal -->
+          <div class="theme-card unlocked" data-theme="midnight-journal">
+            <div class="theme-gradient-preview midnight-preview"></div>
+            <span class="theme-card-name">🌙 Midnight Journal</span>
+            <span class="checkmark-badge">✓</span>
+          </div>
+
+          <!-- Pro 1: Soft Bloom -->
+          <div class="theme-card locked">
+            <div class="lock-overlay">
+              <span class="lock-icon">🔒</span>
+              <span class="pro-badge">PRO</span>
+            </div>
+            <div class="theme-gradient-preview bloom-preview"></div>
+            <span class="theme-card-name">🌸 Soft Bloom</span>
+          </div>
+
+          <!-- Pro 2: Autumn Pages -->
+          <div class="theme-card locked">
+            <div class="lock-overlay">
+              <span class="lock-icon">🔒</span>
+              <span class="pro-badge">PRO</span>
+            </div>
+            <div class="theme-gradient-preview autumn-preview"></div>
+            <span class="theme-card-name">🍂 Autumn Pages</span>
+          </div>
+
+          <!-- Elite 1: Winter Frost -->
+          <div class="theme-card locked">
+            <div class="lock-overlay">
+              <span class="lock-icon">🔒</span>
+              <span class="elite-badge">ELITE</span>
+            </div>
+            <div class="theme-gradient-preview frost-preview"></div>
+            <span class="theme-card-name">❄️ Winter Frost</span>
+          </div>
+
+          <!-- Elite 2: Ocean Calm -->
+          <div class="theme-card locked">
+            <div class="lock-overlay">
+              <span class="lock-icon">🔒</span>
+              <span class="elite-badge">ELITE</span>
+            </div>
+            <div class="theme-gradient-preview ocean-preview"></div>
+            <span class="theme-card-name">🌊 Ocean Calm</span>
+          </div>
+
+          <!-- Elite 3: Galaxy Night -->
+          <div class="theme-card locked">
+            <div class="lock-overlay">
+              <span class="lock-icon">🔒</span>
+              <span class="elite-badge">ELITE</span>
+            </div>
+            <div class="theme-gradient-preview galaxy-preview"></div>
+            <span class="theme-card-name">🌌 Galaxy Night</span>
+          </div>
+
+          <!-- Elite 4: Forest Green -->
+          <div class="theme-card locked">
+            <div class="lock-overlay">
+              <span class="lock-icon">🔒</span>
+              <span class="elite-badge">ELITE</span>
+            </div>
+            <div class="theme-gradient-preview forest-preview"></div>
+            <span class="theme-card-name">🌿 Forest Green</span>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================================================================
+       ACHIEVEMENTS BOARD OVERLAY SCREEN (Slides up full screen)
+       ==================================================================== -->
+  <div id="overlay-achievements" class="me-overlay">
+    <header class="overlay-header">
+      <button class="btn-overlay-back" data-target="achievements">← Back</button>
+      <h2 class="overlay-title">My Badges 🏆</h2>
+    </header>
+
+    <div class="overlay-content">
+      <div class="badges-count-banner">
+        <span id="badges-earned-tracker">0 / 20 earned</span>
+      </div>
+
+      <div class="badges-scroll-area">
+        <div class="badges-grid" id="badges-grid-container">
+          <!-- 20 Badges generated dynamically via JS -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================================================================
+       MONTHLY MIRROR OVERLAY SCREEN (Slides up full screen)
+       ==================================================================== -->
+  <div id="overlay-monthly-mirror" class="me-overlay">
+    <header class="overlay-header">
+      <button class="btn-overlay-back" data-target="monthly-mirror">← Back</button>
+      <h2 class="overlay-title">Monthly Mirror 🪞</h2>
+    </header>
+
+    <div class="overlay-content">
+      
+      <!-- Month Selector Row -->
+      <div class="mirror-month-picker">
+        <button id="btn-mirror-prev" class="btn-mirror-arrow">←</button>
+        <span id="mirror-month-label" class="mirror-month-label">May 2026</span>
+        <button id="btn-mirror-next" class="btn-mirror-arrow">→</button>
+      </div>
+
+      <!-- 1. MOOD GRAPH -->
+      <section class="mirror-card">
+        <h3 class="mirror-card-title">Your Mood Journey</h3>
+        <div class="mood-week-graph" id="week-mood-chart">
+          <!-- 7 columns for Mon-Sun average moods -->
+          <div class="mood-graph-col">
+            <div class="col-bar empty"></div>
+            <span class="col-day">M</span>
+          </div>
+          <div class="mood-graph-col">
+            <div class="col-bar empty"></div>
+            <span class="col-day">T</span>
+          </div>
+          <div class="mood-graph-col">
+            <div class="col-bar empty"></div>
+            <span class="col-day">W</span>
+          </div>
+          <div class="mood-graph-col">
+            <div class="col-bar empty"></div>
+            <span class="col-day">T</span>
+          </div>
+          <div class="mood-graph-col">
+            <div class="col-bar empty"></div>
+            <span class="col-day">F</span>
+          </div>
+          <div class="mood-graph-col">
+            <div class="col-bar empty"></div>
+            <span class="col-day">S</span>
+          </div>
+          <div class="mood-graph-col">
+            <div class="col-bar empty"></div>
+            <span class="col-day">S</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. WORD CLOUD -->
+      <section class="mirror-card">
+        <h3 class="mirror-card-title">Your Words</h3>
+        <div class="word-cloud-wrapper" id="word-cloud-container">
+          <!-- Dyn words generated or "Write more to see your words!" -->
+        </div>
+      </section>
+
+      <!-- 3. BEST MEMORY -->
+      <section class="mirror-card">
+        <h3 class="mirror-card-title">Best Memory 🌟</h3>
+        <div class="best-memory-paper" id="best-memory-container">
+          <p class="best-memory-empty">Write entries with happy moods to reveal your best memory card! 🕯️</p>
+        </div>
+      </section>
+
+      <!-- 4. WRITING HEATMAP -->
+      <section class="mirror-card">
+        <h3 class="mirror-card-title">Writing Habit 🔥</h3>
+        <div class="heatmap-calendar-header">
+          <span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span>
+        </div>
+        <div class="heatmap-grid" id="heatmap-grid-container">
+          <!-- 35 boxes matching 5 weeks matrix -->
+        </div>
+      </section>
+
+      <!-- 5. RELATIONSHIP GROWTH -->
+      <section class="mirror-card">
+        <h3 class="mirror-card-title">Your Bond 💛</h3>
+        <div class="growth-chart-wrapper">
+          <div class="growth-meter-bar">
+            <div class="growth-meter-fill" id="relationship-growth-fill" style="width: 60%;"></div>
+            <span class="growth-marker" id="growth-marker-point" style="left: 60%;"></span>
+          </div>
+          <div class="growth-labels">
+            <span>Stranger</span>
+            <span>Friend</span>
+            <span>Soulmate</span>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <!-- ====================================================================
+       TIME CAPSULE OVERLAY SCREEN (Slides up full screen)
+       ==================================================================== -->
+  <div id="overlay-time-capsule" class="me-overlay">
+    <header class="overlay-header">
+      <button class="btn-overlay-back" data-target="time-capsule">← Back</button>
+      <h2 class="overlay-title">Time Capsule 🕰️</h2>
+    </header>
+
+    <div class="overlay-content flex-column">
+      
+      <!-- Write capsule section -->
+      <div class="capsule-write-section">
+        <h3 class="capsule-section-title">Write to Future You</h3>
+        <div class="capsule-writing-paper">
+          <div class="ruled-lines-background"></div>
+          <textarea id="capsule-writing-area" class="capsule-textarea" placeholder="Dear future me,&#10;Today I want to tell you..."></textarea>
+        </div>
+
+        <div class="delivery-picker-row">
+          <label for="input-capsule-date">Deliver on:</label>
+          <input type="date" id="input-capsule-date" class="capsule-date-picker">
+        </div>
+
+        <button id="btn-seal-capsule" class="btn-seal-gold">Seal & Send 🕯️</button>
+      </div>
+
+      <!-- Sealed capsules list -->
+      <div class="capsules-list-section">
+        <h3 class="capsule-section-title">Sealed Capsules</h3>
+        <div class="capsules-list" id="sealed-capsules-list">
+          <!-- Sealed cards list -->
+          <p class="capsule-empty-msg">No sealed capsules. Seal one to reveal it here!</p>
+        </div>
+      </div>
+
+      <!-- Delivered capsules list -->
+      <div class="capsules-list-section">
+        <h3 class="capsule-section-title">Delivered 💌</h3>
+        <div class="capsules-list" id="delivered-capsules-list">
+          <!-- Delivered list items -->
+          <p class="capsule-empty-msg">No delivered capsules yet. Patience is a virtue...</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ====================================================================
+       YEAR IN DIARY OVERLAY SCREEN (Slides up full screen)
+       ==================================================================== -->
+  <div id="overlay-year-in-diary" class="me-overlay">
+    <header class="overlay-header">
+      <button class="btn-overlay-back" data-target="year-in-diary">← Back</button>
+      <h2 class="overlay-title">Year in Diary 📊</h2>
+    </header>
+
+    <div class="overlay-content">
+      
+      <!-- Year Selector -->
+      <div class="year-selector-row">
+        <div class="year-dropdown-wrapper">
+          <select id="select-diary-year" class="select-diary-year">
+            <option value="2026">2026 ▼</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- BIG STATS CARDS -->
+      <div class="year-stats-grid">
+        <div class="year-stat-card">
+          <span class="year-stat-val" id="year-total-entries">0</span>
+          <span class="year-stat-label">Total Entries</span>
+        </div>
+        <div class="year-stat-card">
+          <span class="year-stat-val" id="year-total-words">0</span>
+          <span class="year-stat-label">Words Written</span>
+        </div>
+        <div class="year-stat-card">
+          <span class="year-stat-val" id="year-total-snaps">0</span>
+          <span class="year-stat-label">Snaps Taken</span>
+        </div>
+        <div class="year-stat-card">
+          <span class="year-stat-val" id="year-longest-streak">1</span>
+          <span class="year-stat-label">Longest Streak</span>
+        </div>
+      </div>
+
+      <!-- ADDITIONAL METRICS -->
+      <div class="year-stats-grid">
+        <div class="year-stat-card full-width">
+          <span class="year-stat-val gold" id="year-fav-mood">Neutral</span>
+          <span class="year-stat-label">Favorite Mood</span>
+        </div>
+        <div class="year-stat-card full-width">
+          <span class="year-stat-val gold" id="year-active-month">May</span>
+          <span class="year-stat-label">Most Active Month</span>
+        </div>
+      </div>
+
+      <!-- TOP ENTRIES -->
+      <section class="year-section">
+        <h3 class="year-sec-title">Your Best Memories</h3>
+        <div class="year-entries-list" id="year-best-entries-container">
+          <!-- Top entries -->
+          <p class="year-empty-text">No best memories found. Keep writing reflections!</p>
+        </div>
+      </section>
+
+      <!-- MOOD JOURNEY -->
+      <section class="year-section">
+        <h3 class="year-sec-title">Mood Journey (Yearly Average)</h3>
+        <div class="year-mood-chart" id="year-mood-chart-container">
+          <!-- 12 months average bar bars -->
+          <div class="year-bar-col">
+            <div class="year-bar-fill" style="height: 10%;"></div>
+            <span class="month-label">Jan</span>
+          </div>
+          <div class="year-bar-col">
+            <div class="year-bar-fill" style="height: 10%;"></div>
+            <span class="month-label">Feb</span>
+          </div>
+          <div class="year-bar-col">
+            <div class="year-bar-fill" style="height: 10%;"></div>
+            <span class="month-label">Mar</span>
+          </div>
+          <div class="year-bar-col">
+            <div class="year-bar-fill" style="height: 10%;"></div>
+            <span class="month-label">Apr</span>
+          </div>
+          <div class="year-bar-col">
+            <div class="year-bar-fill" style="height: 10%;"></div>
+            <span class="month-label">May</span>
+          </div>
+          <div class="year-bar-col">
+            <div class="year-bar-fill" style="height: 10%;"></div>
+            <span class="month-label">Jun</span>
+          </div>
+          <div class="year-bar-col">
+            <div class="year-bar-fill" style="height: 10%;"></div>
+            <span class="month-label">Jul</span>
+          </div>
+          <div class="year-bar-col">
+            <div class="year-bar-fill" style="height: 10%;"></div>
+            <span class="month-label">Aug</span>
+          </div>
+          <div class="year-bar-col">
+            <div class="year-bar-fill" style="height: 10%;"></div>
+            <span class="month-label">Sep</span>
+          </div>
+          <div class="year-bar-col">
+            <div class="year-bar-fill" style="height: 10%;"></div>
+            <span class="month-label">Oct</span>
+          </div>
+          <div class="year-bar-col">
+            <div class="year-bar-fill" style="height: 10%;"></div>
+            <span class="month-label">Nov</span>
+          </div>
+          <div class="year-bar-col">
+            <div class="year-bar-fill" style="height: 10%;"></div>
+            <span class="month-label">Dec</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- WORD OF THE YEAR -->
+      <section class="year-section">
+        <h3 class="year-sec-title">Word of the Year</h3>
+        <div class="word-of-year-card">
+          <h2 id="year-word-display" class="year-word-shimmer">Today</h2>
+        </div>
+      </section>
+
+      <!-- CHARACTER JOURNEY -->
+      <section class="year-section">
+        <h3 class="year-sec-title">Character Journey</h3>
+        <div class="char-journey-timeline" id="char-journey-timeline">
+          <div class="timeline-step">
+            <span class="timeline-emoji" id="timeline-char-emoji">🦉</span>
+            <div class="timeline-info">
+              <h4 id="timeline-char-name">Ollie</h4>
+              <p>Your companion watchman</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <button id="btn-share-year" class="btn-share-gold">Share My Year 🌟</button>
+
+    </div>
+  </div>
+
+  <!-- ====================================================================
+       SETTINGS - NOTIFICATIONS SCREEN OVERLAY (Slides up full screen)
+       ==================================================================== -->
+  <div id="overlay-settings-notifications" class="me-overlay">
+    <header class="overlay-header">
+      <button class="btn-overlay-back" data-target="settings-notifications">← Back</button>
+      <h2 class="overlay-title">Notifications 🔔</h2>
+    </header>
+
+    <div class="overlay-content">
+      <div class="menu-list">
+        <div class="menu-item toggle-item">
+          <span class="menu-icon">✍️</span>
+          <span class="menu-label">Daily Writing Reminder</span>
+          <div class="toggle-switch-wrapper">
+            <input type="checkbox" id="notify-writing" class="toggle-checkbox" checked>
+            <label for="notify-writing" class="toggle-switch-label"></label>
+          </div>
+        </div>
+        <div class="menu-item toggle-item">
+          <span class="menu-icon">📸</span>
+          <span class="menu-label">Daily Snap Reminder</span>
+          <div class="toggle-switch-wrapper">
+            <input type="checkbox" id="notify-snaps" class="toggle-checkbox" checked>
+            <label for="notify-snaps" class="toggle-switch-label"></label>
+          </div>
+        </div>
+        <div class="menu-item toggle-item">
+          <span class="menu-icon">🔥</span>
+          <span class="menu-label">Streak Alerts</span>
+          <div class="toggle-switch-wrapper">
+            <input type="checkbox" id="notify-streaks" class="toggle-checkbox" checked>
+            <label for="notify-streaks" class="toggle-switch-label"></label>
+          </div>
+        </div>
+        <div class="menu-item toggle-item">
+          <span class="menu-icon">🤖</span>
+          <span class="menu-label">AI Check-ins</span>
+          <div class="toggle-switch-wrapper">
+            <input type="checkbox" id="notify-checkins" class="toggle-checkbox" checked>
+            <label for="notify-checkins" class="toggle-switch-label"></label>
+          </div>
+        </div>
+        <div class="menu-item toggle-item">
+          <span class="menu-icon">🎉</span>
+          <span class="menu-label">Special Events</span>
+          <div class="toggle-switch-wrapper">
+            <input type="checkbox" id="notify-events" class="toggle-checkbox" checked>
+            <label for="notify-events" class="toggle-switch-label"></label>
+          </div>
+        </div>
+      </div>
+
+      <div class="time-picker-card">
+        <label for="input-reminder-time" class="time-label">Remind me at:</label>
+        <input type="time" id="input-reminder-time" class="reminder-time-input" value="21:00">
+        <button id="btn-save-reminders" class="btn-save-gold">Save Settings</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================================================================
+       SETTINGS - PRIVACY & SECURITY SCREEN OVERLAY (Slides up full screen)
+       ==================================================================== -->
+  <div id="overlay-settings-privacy" class="me-overlay">
+    <header class="overlay-header">
+      <button class="btn-overlay-back" data-target="settings-privacy">← Back</button>
+      <h2 class="overlay-title">Privacy & Security 🔒</h2>
+    </header>
+
+    <div class="overlay-content">
+      <div class="menu-list">
+        <div class="menu-item toggle-item">
+          <span class="menu-icon">🔑</span>
+          <span class="menu-label">Diary Lock PIN</span>
+          <div class="toggle-switch-wrapper">
+            <input type="checkbox" id="pin-lock-toggle" class="toggle-checkbox">
+            <label for="pin-lock-toggle" class="toggle-switch-label"></label>
+          </div>
+        </div>
+      </div>
+
+      <div class="privacy-actions-card">
+        <h3>Data & Storage</h3>
+        <p>Manage and backup your diary entries locally</p>
+        <div class="privacy-buttons">
+          <button id="btn-export-diary" class="btn-privacy-outline">Export My Diary</button>
+          <button id="btn-trigger-wipe" class="btn-privacy-danger">Delete All Data</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================================================================
+       SETTINGS - LANGUAGE OVERLAY SCREEN (Slides up full screen)
+       ==================================================================== -->
+  <div id="overlay-settings-language" class="me-overlay">
+    <header class="overlay-header">
+      <button class="btn-overlay-back" data-target="settings-language">← Back</button>
+      <h2 class="overlay-title">Language 🌍</h2>
+    </header>
+
+    <div class="overlay-content">
+      <div class="menu-list">
+        <div class="menu-item active-left">
+          <span class="menu-icon">🇺🇸</span>
+          <span class="menu-label">English (Default)</span>
+          <span class="checkmark-badge show">✓</span>
+        </div>
+        <div class="menu-item blurred">
+          <span class="menu-icon">🇪🇸</span>
+          <span class="menu-label">Español (Coming soon)</span>
+        </div>
+        <div class="menu-item blurred">
+          <span class="menu-icon">🇫🇷</span>
+          <span class="menu-label">Français (Coming soon)</span>
+        </div>
+        <div class="menu-item blurred">
+          <span class="menu-icon">🇩🇪</span>
+          <span class="menu-label">Deutsch (Coming soon)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================================================================
+       SETTINGS - HELP & SUPPORT OVERLAY SCREEN (Slides up full screen)
+       ==================================================================== -->
+  <div id="overlay-settings-help" class="me-overlay">
+    <header class="overlay-header">
+      <button class="btn-overlay-back" data-target="settings-help">← Back</button>
+      <h2 class="overlay-title">Help & Support ❓</h2>
+    </header>
+
+    <div class="overlay-content">
+      <div class="help-card">
+        <h3>Frequently Asked Questions</h3>
+        <div class="faq-list">
+          <div class="faq-item">
+            <h4>Is my diary secure?</h4>
+            <p>Yes, all your logs, entries, snaps, and configurations are stored purely locally on your device's browser localStorage. No data ever leaves your device.</p>
+          </div>
+          <div class="faq-item">
+            <h4>How do I unlock other companions?</h4>
+            <p>Maintain your daily reflections writing streak for 7 days to unlock Luna, Bruno, Finn, Pip, and Stella in the Character Studio!</p>
+          </div>
+          <div class="faq-item">
+            <h4>How does Time Capsule work?</h4>
+            <p>You can write a letter to your future self and choose a delivery date. The capsule will lock securely with a wax seal, and only open on that exact day.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================================================================
+       SETTINGS - ABOUT OVERLAY SCREEN (Slides up full screen)
+       ==================================================================== -->
+  <div id="overlay-settings-about" class="me-overlay">
+    <header class="overlay-header">
+      <button class="btn-overlay-back" data-target="settings-about">← Back</button>
+      <h2 class="overlay-title">About Dear Diary 📖</h2>
+    </header>
+
+    <div class="overlay-content text-center">
+      <div class="about-hero">
+        <span class="about-app-logo">db</span>
+        <h3>Dear Diary</h3>
+        <span class="version-label">Version 1.0</span>
+      </div>
+
+      <div class="about-dedication">
+        <p class="dedication-header">"Inspired by Anne Frank"</p>
+        <p class="dedication-dates">May 29, 2026 • (1929 - 1945) 🕯️</p>
+        <p class="dedication-text">This journal app is dedicated to the enduring spirit of reflection, growth, and hope represented by Anne Frank's diary. May your private words help you understand your world better.</p>
+      </div>
+
+      <div class="about-footer">
+        <p>Made with 💛 for you.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================================================================
+       DIARY PIN LOCK NUMBER PAD SCREEN (Slides up full screen)
+       ==================================================================== -->
+  <div id="overlay-pin-pad" class="me-overlay numpad-overlay">
+    <header class="overlay-header">
+      <button id="btn-close-pinpad" class="btn-overlay-back">← Cancel</button>
+      <h2 class="overlay-title" id="pin-pad-title">Set Lock PIN</h2>
+    </header>
+
+    <div class="pinpad-container">
+      <p class="pin-instructions" id="pin-pad-instructions">Enter a 4-digit PIN to secure your diary</p>
+      
+      <div class="pin-dots-row">
+        <span class="pin-dot"></span>
+        <span class="pin-dot"></span>
+        <span class="pin-dot"></span>
+        <span class="pin-dot"></span>
+      </div>
+
+      <!-- Gold Number Pad Grid -->
+      <div class="numpad-grid">
+        <button class="num-btn" data-val="1">1</button>
+        <button class="num-btn" data-val="2">2</button>
+        <button class="num-btn" data-val="3">3</button>
+        <button class="num-btn" data-val="4">4</button>
+        <button class="num-btn" data-val="5">5</button>
+        <button class="num-btn" data-val="6">6</button>
+        <button class="num-btn" data-val="7">7</button>
+        <button class="num-btn" data-val="8">8</button>
+        <button class="num-btn" data-val="9">9</button>
+        <button class="num-btn danger" data-val="clear">C</button>
+        <button class="num-btn" data-val="0">0</button>
+        <button class="num-btn ok" data-val="ok">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================================================================
+       SIGN OUT DATA WIPE DIALOG MODAL
+       ==================================================================== -->
+  <div id="sign-out-confirm-modal" class="confirm-overlay">
+    <div class="confirm-card">
+      <div class="confirm-icon">⚠️</div>
+      <h2 class="confirm-title">Are you sure?</h2>
+      <p class="confirm-desc">Signing out deletes all streaks, entries, snaps, coins, and settings from localStorage. This action cannot be undone.</p>
+      
+      <div class="confirm-actions-row">
+        <button id="btn-cancel-signout" class="btn-confirm-action outline">No, Keep</button>
+        <button id="btn-confirm-signout" class="btn-confirm-action danger">Yes, Erase All</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Global Badge Detail Popup Sheet -->
+  <div id="badge-detail-popup" class="badge-popup-modal">
+    <div class="badge-popup-card">
+      <button id="btn-close-badge-popup" class="btn-close-popup">&times;</button>
+      <div class="badge-popup-emoji-circle" id="popup-badge-emoji-box">🏆</div>
+      <h3 id="popup-badge-title" class="badge-popup-name">First Entry</h3>
+      <p id="popup-badge-desc" class="badge-popup-desc">Write your first line to your diary</p>
+      <span id="popup-badge-status" class="badge-popup-status">Unlocked on May 29, 2026</span>
+    </div>
+  </div>
+
+  <!-- Me Script Link -->
+  <script src="../js/me.js"></script>
+</body>
+</html>
