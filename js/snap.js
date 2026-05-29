@@ -3,20 +3,15 @@
  */
 document.addEventListener('DOMContentLoaded', () => {
   // ---------------------------------------------------------
-  // LOCALSTORAGE RETRIEVAL
+  // PROFILE STATE & FALLBACK RETRIEVAL
   // ---------------------------------------------------------
-  const userName = localStorage.getItem('user_name') || 'Friend';
-  const companionEmoji = localStorage.getItem('companion_emoji') || '🦉';
-  const companionName = localStorage.getItem('companion_name') || 'Ollie';
+  let userName = localStorage.getItem('user_name') || 'Friend';
+  let companionEmoji = localStorage.getItem('companion_emoji') || '🦉';
+  let companionName = localStorage.getItem('companion_name') || 'Ollie';
 
-  let snaps = JSON.parse(localStorage.getItem('diary_snaps')) || [];
-  let entries = JSON.parse(localStorage.getItem('diary_entries')) || [];
-  
-  let snapStreak = parseInt(localStorage.getItem('snapStreak'), 10);
-  if (isNaN(snapStreak)) {
-    snapStreak = 1;
-    localStorage.setItem('snapStreak', '1');
-  }
+  let snaps = [];
+  let entries = [];
+  let snapStreak = 1;
 
   // Active snap state trackers
   let activeSnapId = null;
@@ -108,28 +103,44 @@ document.addEventListener('DOMContentLoaded', () => {
   const floatingEmoji = document.getElementById('floating-companion-emoji');
 
   // ---------------------------------------------------------
-  // INITIALIZATIONS
-  // ---------------------------------------------------------
-  if (floatingEmoji) floatingEmoji.textContent = companionEmoji;
-  if (cameraCompanionEmoji) cameraCompanionEmoji.textContent = companionEmoji;
-  if (companionCelebrateEmoji) companionCelebrateEmoji.textContent = companionEmoji;
-  if (detailCompanionEmoji) detailCompanionEmoji.textContent = companionEmoji;
+  // Initialize snaps database
+  async function initSnaps() {
+    try {
+      const profile = await API.getProfile();
+      userName = profile.username || userName;
+      companionEmoji = profile.companionEmoji || companionEmoji;
+      companionName = profile.companionName || companionName;
 
-  // Fade overlay entry removal
-  setTimeout(() => {
-    const fadeOverlay = document.getElementById('fade-overlay');
-    if (fadeOverlay) {
-      fadeOverlay.classList.add('fade-out');
-      setTimeout(() => fadeOverlay.remove(), 800);
+      localStorage.setItem('user_name', userName);
+      localStorage.setItem('companion_name', companionName);
+      localStorage.setItem('companion_emoji', companionEmoji);
+
+      const res = await API.getSnaps();
+      snaps = res.snaps || [];
+      snapStreak = res.streak || 0;
+      snaps.forEach(s => {
+        if (!s.imageData && s.src) s.imageData = s.src;
+      });
+      localStorage.setItem('diary_snaps', JSON.stringify(snaps));
+
+      entries = await API.getEntries();
+      localStorage.setItem('diary_entries', JSON.stringify(entries));
+    } catch (err) {
+      console.warn('API error loading snaps state fallback:', err);
+      snaps = JSON.parse(localStorage.getItem('diary_snaps')) || [];
+      entries = JSON.parse(localStorage.getItem('diary_entries')) || [];
+      snapStreak = parseInt(localStorage.getItem('snapStreak'), 10) || 1;
     }
-  }, 50);
 
-  // Load static dashboard companion floats
-  setTimeout(() => {
-    if (floatingCompanion) floatingCompanion.classList.add('loaded');
-  }, 300);
+    if (floatingEmoji) floatingEmoji.textContent = companionEmoji;
+    if (cameraCompanionEmoji) cameraCompanionEmoji.textContent = companionEmoji;
+    if (companionCelebrateEmoji) companionCelebrateEmoji.textContent = companionEmoji;
+    if (detailCompanionEmoji) detailCompanionEmoji.textContent = companionEmoji;
 
-  renderSnapHome();
+    renderSnapHome();
+  }
+
+  initSnaps();
 
   // ---------------------------------------------------------
   // SNAP FEED & PROGRESS LOGIC
@@ -233,7 +244,14 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!todaySnapCard || !notSnappedState || !snappedState) return;
 
     const todayKey = formatDateKey(new Date());
-    const snappedToday = snaps.some(s => formatDateKey(new Date(s.id)) === todayKey);
+    const snappedToday = snaps.some(s => {
+      if (s.date === todayKey) return true;
+      try {
+        const dObj = new Date(s.id);
+        if (!isNaN(dObj.getTime()) && formatDateKey(dObj) === todayKey) return true;
+      } catch (e) {}
+      return false;
+    });
 
     if (snappedToday) {
       todaySnapCard.classList.add('snapped');
@@ -282,7 +300,14 @@ document.addEventListener('DOMContentLoaded', () => {
       const dateKey = formatDateKey(cellDate);
 
       // Search if a snap entry matches this cell date
-      const snapOnDay = snaps.find(s => formatDateKey(new Date(s.id)) === dateKey);
+      const snapOnDay = snaps.find(s => {
+        if (s.date === dateKey) return true;
+        try {
+          const dObj = new Date(s.id);
+          if (!isNaN(dObj.getTime()) && formatDateKey(dObj) === dateKey) return true;
+        } catch (e) {}
+        return false;
+      });
 
       const cell = document.createElement('div');
       cell.classList.add('grid-day-cell');
@@ -440,6 +465,77 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // Image Compression Utility
+  function compressImage(dataUrl, maxWidth = 800, maxHeight = 600, quality = 0.7) {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > maxWidth) {
+            height = Math.round((height * maxWidth) / width);
+            width = maxWidth;
+          }
+        } else {
+          if (height > maxHeight) {
+            width = Math.round((width * maxHeight) / height);
+            height = maxHeight;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+
+        const compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
+        resolve(compressedDataUrl);
+      };
+      img.onerror = () => {
+        resolve(dataUrl);
+      };
+      img.src = dataUrl;
+    });
+  }
+
+  // File Upload Fallback
+  const btnUploadTrigger = document.getElementById('btn-upload-file-trigger');
+  const snapFileInput = document.getElementById('snap-file-input');
+
+  if (btnUploadTrigger && snapFileInput) {
+    btnUploadTrigger.addEventListener('click', () => {
+      snapFileInput.click();
+    });
+
+    snapFileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = async (event) => {
+          const imgDataUrl = event.target.result;
+          
+          // Clear camera stream
+          stopWebcam();
+          
+          // Show spinner or feedback if helpful, then compress
+          const compressed = await compressImage(imgDataUrl);
+          
+          // Load preview review screen
+          reviewPhotoImg.src = compressed;
+          photoReviewScreen.classList.add('active');
+          
+          // Reset file input
+          snapFileInput.value = '';
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  }
+
   // Filter Selection scroller Click Triggers
   const filterOptions = document.querySelectorAll('.filter-option');
   filterOptions.forEach(opt => {
@@ -515,8 +611,10 @@ document.addEventListener('DOMContentLoaded', () => {
       const imgDataUrl = canvas.toDataURL('image/jpeg');
 
       // 3. Show review screen
-      reviewPhotoImg.src = imgDataUrl;
-      photoReviewScreen.classList.add('active');
+      compressImage(imgDataUrl).then(compressed => {
+        reviewPhotoImg.src = compressed;
+        photoReviewScreen.classList.add('active');
+      });
     });
   }
 
@@ -529,28 +627,51 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Save Captured Snap to diary
   if (btnSaveSnap) {
-    btnSaveSnap.addEventListener('click', () => {
+    btnSaveSnap.addEventListener('click', async () => {
       const imgDataUrl = reviewPhotoImg.src;
 
       const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
       const todayFormatted = new Date().toLocaleDateString('en-US', options);
+      const todayDateStr = new Date().toISOString().split('T')[0];
 
-      // Create new snap object serialization
-      const newSnap = {
-        id: Date.now(),
-        date: todayFormatted,
-        imageData: imgDataUrl,
-        filtered: activeFilter,
-        decorations: [],
-        linkedEntry: null,
-        favorite: false
-      };
-
-      snaps.push(newSnap);
-      localStorage.setItem('diary_snaps', JSON.stringify(snaps));
-
-      // Increment snap streak
-      updateStreaksOnSave();
+      try {
+        const res = await API.uploadSnap(imgDataUrl, todayDateStr);
+        if (res.streak) {
+          snapStreak = res.streak;
+          localStorage.setItem('snapStreak', String(snapStreak));
+        }
+        
+        // Refresh local cache list
+        const refreshed = await API.getSnaps();
+        snaps = refreshed.snaps || [];
+        snaps.forEach(s => {
+          if (!s.imageData && s.src) s.imageData = s.src;
+        });
+        try {
+          localStorage.setItem('diary_snaps', JSON.stringify(snaps));
+        } catch (storageErr) {
+          console.error('LocalStorage write failed:', storageErr);
+        }
+      } catch (err) {
+        console.warn('API upload snap failed, running local fallback:', err);
+        const newSnap = {
+          id: Date.now(),
+          date: todayFormatted,
+          imageData: imgDataUrl,
+          filtered: activeFilter,
+          decorations: [],
+          linkedEntry: null,
+          favorite: false
+        };
+        snaps.push(newSnap);
+        try {
+          localStorage.setItem('diary_snaps', JSON.stringify(snaps));
+        } catch (storageErr) {
+          console.error('LocalStorage write failed:', storageErr);
+          alert('Local storage is full! Please sign in to sync snaps to the cloud server instead. ☁️');
+        }
+        updateStreaksOnSave();
+      }
 
       // Close camera overlays
       photoReviewScreen.classList.remove('active');
@@ -646,7 +767,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // ---------------------------------------------------------
   function openSnapDetail(id) {
     activeSnapId = id;
-    const snap = snaps.find(s => s.id === id);
+    const snap = snaps.find(s => s.id == id);
     if (!snap) return;
 
     // Load detailed data
@@ -664,10 +785,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Render decorations static positions
     detailStickersWrapper.innerHTML = '';
-    activeStickers = snap.decorations || [];
+    const tempStickers = snap.decorations || [];
+    activeStickers = [];
     
-    activeStickers.forEach(dec => {
-      appendStickerToDetail(dec.type, dec.left, dec.top);
+    tempStickers.forEach(dec => {
+      appendStickerToDetail(dec.type, dec.left, dec.top, false);
+      activeStickers.push(dec);
     });
 
     snapDetailScreen.classList.add('active');
@@ -684,7 +807,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (btnDetailDelete) {
     btnDetailDelete.addEventListener('click', () => {
       if (confirm('Remove this memory?')) {
-        snaps = snaps.filter(s => s.id !== activeSnapId);
+        snaps = snaps.filter(s => s.id != activeSnapId);
         localStorage.setItem('diary_snaps', JSON.stringify(snaps));
         
         snapDetailScreen.classList.remove('active');
@@ -697,7 +820,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Detailed Favorite Click Toggles
   if (btnDetailFavorite) {
     btnDetailFavorite.addEventListener('click', () => {
-      const snap = snaps.find(s => s.id === activeSnapId);
+      const snap = snaps.find(s => s.id == activeSnapId);
       if (!snap) return;
 
       snap.favorite = !snap.favorite;
@@ -734,7 +857,7 @@ document.addEventListener('DOMContentLoaded', () => {
       appendStickerToDetail(stickerEmoji, `${leftPercent}%`, `${topPercent}%`);
       
       // Save sticker to snap array database
-      const snap = snaps.find(s => s.id === activeSnapId);
+      const snap = snaps.find(s => s.id == activeSnapId);
       if (snap) {
         if (!snap.decorations) snap.decorations = [];
         snap.decorations = activeStickers;
@@ -745,7 +868,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  function appendStickerToDetail(type, left = '50%', top = '40%') {
+  function appendStickerToDetail(type, left = '50%', top = '40%', shouldSave = true) {
     const sticker = document.createElement('div');
     sticker.classList.add('sticker-item');
     sticker.style.left = left;
@@ -753,7 +876,9 @@ document.addEventListener('DOMContentLoaded', () => {
     sticker.textContent = type;
 
     const stickerObj = { type, left, top };
-    activeStickers.push(stickerObj);
+    if (shouldSave) {
+      activeStickers.push(stickerObj);
+    }
 
     // Tap sticker deletion triggers
     const delBtn = document.createElement('button');
@@ -783,11 +908,22 @@ document.addEventListener('DOMContentLoaded', () => {
     let localStartX = 0;
     let localStartY = 0;
 
+    // Prevent default browser dragging ghosts
+    element.addEventListener('dragstart', (e) => {
+      e.preventDefault();
+    });
+
     element.addEventListener('pointerdown', (e) => {
+      // Don't drag if clicking delete button
+      if (e.target.classList.contains('sticker-delete-btn') || e.target.classList.contains('sticker-delete-trigger')) {
+        return;
+      }
+
       localDragging = true;
       element.setPointerCapture(e.pointerId);
       
       e.stopPropagation();
+      e.preventDefault();
 
       const rect = element.getBoundingClientRect();
       localStartX = e.clientX - rect.left;
@@ -824,7 +960,7 @@ document.addEventListener('DOMContentLoaded', () => {
       element.releasePointerCapture(e.pointerId);
 
       // Save changes back to snaps array database
-      const snap = snaps.find(s => s.id === activeSnapId);
+      const snap = snaps.find(s => s.id == activeSnapId);
       if (snap) {
         snap.decorations = activeStickers;
         localStorage.setItem('diary_snaps', JSON.stringify(snaps));
@@ -857,7 +993,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!entriesChecklist) return;
     entriesChecklist.innerHTML = '';
 
-    const snap = snaps.find(s => s.id === activeSnapId);
+    const snap = snaps.find(s => s.id == activeSnapId);
     if (!snap) return;
 
     if (entries.length === 0) {
@@ -891,18 +1027,24 @@ document.addEventListener('DOMContentLoaded', () => {
       item.appendChild(check);
 
       // Handle checklist link changes
-      item.addEventListener('click', () => {
-        if (snap.linkedEntry === entry.id) {
-          // unlink
-          snap.linkedEntry = null;
-          item.classList.remove('linked');
-        } else {
-          // link
-          snap.linkedEntry = entry.id;
-          // Unlink others
-          const otherItems = entriesChecklist.querySelectorAll('.checklist-item');
-          otherItems.forEach(i => i.classList.remove('linked'));
-          item.classList.add('linked');
+      item.addEventListener('click', async () => {
+        try {
+          if (snap.linkedEntry === entry.id) {
+            // unlink
+            snap.linkedEntry = null;
+            item.classList.remove('linked');
+          } else {
+            // link
+            snap.linkedEntry = entry.id;
+            // Unlink others
+            const otherItems = entriesChecklist.querySelectorAll('.checklist-item');
+            otherItems.forEach(i => i.classList.remove('linked'));
+            item.classList.add('linked');
+            // Server link
+            await API.linkSnapToEntry(snap.id, entry.id);
+          }
+        } catch (err) {
+          console.warn('API link snap failed, linking locally:', err);
         }
         
         localStorage.setItem('diary_snaps', JSON.stringify(snaps));
@@ -1002,4 +1144,22 @@ document.addEventListener('DOMContentLoaded', () => {
       if (floatEmoji) floatEmoji.style.animationPlayState = 'running';
     });
   }
+
+  // Entrance animations load
+  setTimeout(() => {
+    const fadeOverlay = document.getElementById('fade-overlay');
+    if (fadeOverlay) {
+      fadeOverlay.classList.add('fade-out');
+      setTimeout(() => fadeOverlay.remove(), 800);
+    }
+  }, 50);
+
+  setTimeout(() => {
+    const wrapper = document.querySelector('.snap-wrapper');
+    if (wrapper) wrapper.classList.add('animated');
+  }, 100);
+
+  setTimeout(() => {
+    if (floatingCompanion) floatingCompanion.classList.add('loaded');
+  }, 300);
 });

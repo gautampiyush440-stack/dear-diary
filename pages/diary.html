@@ -15,6 +15,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Courier+Prime&family=Dancing+Script:wght@600;700&family=Lato:ital,wght@0,300;0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
 
   <!-- Diary Style Sheet Link -->
+  <link rel="stylesheet" href="../css/theme.css">
   <link rel="stylesheet" href="../css/diary.css">
 </head>
 <body>
@@ -151,32 +152,32 @@
 
     <!-- Dynamic Main Diary Editor Workspace Canvas -->
     <main id="diary-page-canvas" class="diary-page-canvas classic-style">
-      
-      <!-- Page Bindings (Spiral rings left side) -->
-      <div class="spiral-binding-editor">
-        <div class="spiral-ring"></div>
-        <div class="spiral-ring"></div>
-        <div class="spiral-ring"></div>
-        <div class="spiral-ring"></div>
-        <div class="spiral-ring"></div>
-        <div class="spiral-ring"></div>
-        <div class="spiral-ring"></div>
-        <div class="spiral-ring"></div>
-        <div class="spiral-ring"></div>
-        <div class="spiral-ring"></div>
-        <div class="spiral-ring"></div>
-        <div class="spiral-ring"></div>
+      <div class="diary-canvas-content" style="position: relative; width: 100%; min-height: 100%; display: flex; flex-direction: column;">
+        <!-- Page Bindings (Spiral rings left side) -->
+        <div class="spiral-binding-editor">
+          <div class="spiral-ring"></div>
+          <div class="spiral-ring"></div>
+          <div class="spiral-ring"></div>
+          <div class="spiral-ring"></div>
+          <div class="spiral-ring"></div>
+          <div class="spiral-ring"></div>
+          <div class="spiral-ring"></div>
+          <div class="spiral-ring"></div>
+          <div class="spiral-ring"></div>
+          <div class="spiral-ring"></div>
+          <div class="spiral-ring"></div>
+          <div class="spiral-ring"></div>
+        </div>
+
+        <!-- Placed Polaroid attachments container -->
+        <div id="attachments-canvas" class="attachments-canvas"></div>
+
+        <!-- Placed decorations sticker container -->
+        <div id="decorations-canvas" class="decorations-canvas"></div>
+
+        <!-- Rich Text Area -->
+        <div id="text-editor" class="text-editor font-dancing" contenteditable="true" spellcheck="false"></div>
       </div>
-
-      <!-- Placed Polaroid attachments container -->
-      <div id="attachments-canvas" class="attachments-canvas"></div>
-
-      <!-- Placed decorations sticker container -->
-      <div id="decorations-canvas" class="decorations-canvas"></div>
-
-      <!-- Rich Text Area -->
-      <div id="text-editor" class="text-editor font-dancing" contenteditable="true" spellcheck="false"></div>
-
     </main>
 
     <!-- Font Selector Trigger Button -->
@@ -268,7 +269,7 @@
         <p id="transcription-text" class="transcription-text">Speak now. Your words will appear here...</p>
       </div>
 
-      <button id="btn-stop-voice" class="btn-stop-voice">Stop & Insert</button>
+      <button id="btn-stop-voice" class="btn-stop-voice">Done ✓</button>
     </div>
   </div>
 
@@ -297,27 +298,29 @@
 
     <!-- Detailed View canvas (Renders saved entries, photos, and stickers in exact positions) -->
     <main id="detail-page-canvas" class="diary-page-canvas classic-style">
-      <!-- Spiral bindings -->
-      <div class="spiral-binding-editor">
-        <div class="spiral-ring"></div>
-        <div class="spiral-ring"></div>
-        <div class="spiral-ring"></div>
-        <div class="spiral-ring"></div>
-        <div class="spiral-ring"></div>
-        <div class="spiral-ring"></div>
-        <div class="spiral-ring"></div>
-        <div class="spiral-ring"></div>
-        <div class="spiral-ring"></div>
-        <div class="spiral-ring"></div>
-        <div class="spiral-ring"></div>
-        <div class="spiral-ring"></div>
-      </div>
+      <div class="diary-canvas-content" style="position: relative; width: 100%; min-height: 100%; display: flex; flex-direction: column;">
+        <!-- Spiral bindings -->
+        <div class="spiral-binding-editor">
+          <div class="spiral-ring"></div>
+          <div class="spiral-ring"></div>
+          <div class="spiral-ring"></div>
+          <div class="spiral-ring"></div>
+          <div class="spiral-ring"></div>
+          <div class="spiral-ring"></div>
+          <div class="spiral-ring"></div>
+          <div class="spiral-ring"></div>
+          <div class="spiral-ring"></div>
+          <div class="spiral-ring"></div>
+          <div class="spiral-ring"></div>
+          <div class="spiral-ring"></div>
+        </div>
 
-      <div id="detail-attachments-canvas" class="attachments-canvas"></div>
-      <div id="detail-decorations-canvas" class="decorations-canvas"></div>
-      
-      <!-- Read-only text viewer -->
-      <div id="detail-text-viewer" class="text-editor font-dancing"></div>
+        <div id="detail-attachments-canvas" class="attachments-canvas"></div>
+        <div id="detail-decorations-canvas" class="decorations-canvas"></div>
+        
+        <!-- Read-only text viewer -->
+        <div id="detail-text-viewer" class="text-editor font-dancing"></div>
+      </div>
     </main>
 
     <!-- Bottom metadata stats -->
@@ -327,6 +330,8 @@
     </div>
   </div>
 
+  <!-- Central API Service Layer -->
+  <script src="../js/api.js"></script>
   <!-- Diary Controller Script Link -->
   <script src="../js/diary.js"></script>
 </body>

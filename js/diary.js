@@ -3,15 +3,15 @@
  */
 document.addEventListener('DOMContentLoaded', () => {
   // ---------------------------------------------------------
-  // LOCALSTORAGE PROFILE RETRIEVAL
+  // PROFILE STATE & FALLBACK RETRIEVAL
   // ---------------------------------------------------------
-  const userName = localStorage.getItem('user_name') || 'Friend';
-  const diaryName = localStorage.getItem('diary_name') || 'My Diary';
-  const companionEmoji = localStorage.getItem('companion_emoji') || '🦉';
-  const companionName = localStorage.getItem('companion_name') || 'Ollie';
+  let userName = localStorage.getItem('user_name') || 'Friend';
+  let diaryName = localStorage.getItem('diary_name') || 'My Diary';
+  let companionEmoji = localStorage.getItem('companion_emoji') || '🦉';
+  let companionName = localStorage.getItem('companion_name') || 'Ollie';
 
   // State elements
-  let entries = JSON.parse(localStorage.getItem('diary_entries')) || [];
+  let entries = [];
   let editingEntryId = null; // tracking whether editing or creating
   
   // Placed polaroids & decorations list for active editor
@@ -100,7 +100,33 @@ document.addEventListener('DOMContentLoaded', () => {
   }, 300);
 
   // Initialize view
-  renderDiaryHome();
+  async function initWorkspace() {
+    try {
+      const profile = await API.getProfile();
+      userName = profile.username || userName;
+      diaryName = profile.diaryName || diaryName;
+      companionEmoji = profile.companionEmoji || companionEmoji;
+      companionName = companionName = profile.companionName || companionName;
+
+      localStorage.setItem('user_name', userName);
+      localStorage.setItem('diary_name', diaryName);
+      localStorage.setItem('companion_name', companionName);
+      localStorage.setItem('companion_emoji', companionEmoji);
+    } catch (err) {
+      console.warn('API error loading workspace config:', err);
+    }
+
+    if (diaryTitle) {
+      diaryTitle.textContent = diaryName;
+    }
+    if (floatingEmoji) {
+      floatingEmoji.textContent = companionEmoji;
+    }
+
+    await renderDiaryHome();
+  }
+
+  initWorkspace();
 
   // ---------------------------------------------------------
   // CALENDAR STRIP GENERATOR
@@ -127,7 +153,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // Check if entry exists on this day
       const entryOnDay = entries.find(e => {
-        const entryDate = new Date(e.id);
+        const entryDate = e.createdAt ? new Date(e.createdAt) : new Date(e.id);
         return formatDateKey(entryDate) === dateKey;
       });
 
@@ -184,7 +210,38 @@ document.addEventListener('DOMContentLoaded', () => {
   // ---------------------------------------------------------
   // DIARY HOME FEED LOGIC
   // ---------------------------------------------------------
-  function renderDiaryHome() {
+  async function renderDiaryHome() {
+    try {
+      entries = await API.getEntries();
+      // Map database relational objects to frontend property formats
+      entries.forEach(e => {
+        if (!e.photos && e.Polaroids) {
+          e.photos = e.Polaroids.map(p => ({
+            src: p.src,
+            caption: p.caption,
+            left: p.left,
+            top: p.top,
+            tilt: p.tilt
+          }));
+        }
+        if (!e.decorations && e.Stickers) {
+          e.decorations = e.Stickers.map(s => ({
+            type: s.type,
+            left: s.left,
+            top: s.top
+          }));
+        }
+        if (e.createdAt && !e.date) {
+          const options = { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' };
+          e.date = new Date(e.createdAt).toLocaleDateString('en-US', options);
+        }
+      });
+      localStorage.setItem('diary_entries', JSON.stringify(entries));
+    } catch (err) {
+      console.warn('Backend API request failed, using localStorage fallback:', err);
+      entries = JSON.parse(localStorage.getItem('diary_entries')) || [];
+    }
+
     renderCalendarStrip();
     if (!entriesList || !emptyState) return;
     
@@ -281,8 +338,13 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  function deleteEntryAlert(id) {
+  async function deleteEntryAlert(id) {
     if (confirm('Delete this diary entry permanently? 🕯️')) {
+      try {
+        await API.deleteEntry(id);
+      } catch (err) {
+        console.warn('API delete failed, running local fallback delete:', err);
+      }
       entries = entries.filter(e => e.id !== id);
       localStorage.setItem('diary_entries', JSON.stringify(entries));
       renderDiaryHome();
@@ -375,6 +437,14 @@ document.addEventListener('DOMContentLoaded', () => {
       setPageStyle(style);
     });
   });
+
+  const toolStyleToggle = document.getElementById('tool-style-toggle');
+  const pageStyleSelector = document.querySelector('.page-style-selector');
+  if (toolStyleToggle && pageStyleSelector) {
+    toolStyleToggle.addEventListener('click', () => {
+      pageStyleSelector.classList.toggle('active');
+    });
+  }
 
   function setPageStyle(style) {
     // Clear old styles
@@ -579,12 +649,27 @@ document.addEventListener('DOMContentLoaded', () => {
     let localStartX = 0;
     let localStartY = 0;
 
+    // Prevent default browser dragging ghosts for images/text
+    element.addEventListener('dragstart', (e) => {
+      e.preventDefault();
+    });
+
     element.addEventListener('pointerdown', (e) => {
+      // Don't drag if interacting with caption input, delete buttons, or close crosses
+      const tag = e.target.tagName.toLowerCase();
+      if (tag === 'input' || 
+          e.target.classList.contains('polaroid-delete-btn') || 
+          e.target.classList.contains('sticker-delete-btn') || 
+          e.target.classList.contains('sticker-delete-trigger')) {
+        return;
+      }
+
       localDragging = true;
       element.setPointerCapture(e.pointerId);
       
-      // Stop keyboard edits click propagation
+      // Stop keyboard edits click propagation and default browser drag behaviors
       e.stopPropagation();
+      e.preventDefault();
 
       const rect = element.getBoundingClientRect();
       const parentRect = element.parentElement.getBoundingClientRect();
@@ -640,6 +725,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const toolVoice = document.getElementById('tool-voice');
   if (toolVoice) {
     toolVoice.addEventListener('click', () => {
+      // Check browser support first
+      if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+        alert("Voice writing works best in Chrome or Edge browser 🎙️");
+        return;
+      }
       openVoiceOverlay();
     });
   }
@@ -656,6 +746,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Web Speech API setups
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const voiceListeningTitle = document.querySelector('.voice-listening-title');
   let recognition = null;
   let isRecording = false;
 
@@ -666,25 +757,36 @@ document.addEventListener('DOMContentLoaded', () => {
     recognition.lang = 'en-US';
 
     recognition.onresult = (event) => {
-      let finalTranscript = '';
-      for (let i = event.resultIndex; i < event.results.length; ++i) {
-        if (event.results[i].isFinal) {
-          finalTranscript += event.results[i][0].transcript;
-        }
+      let fullTranscript = '';
+      for (let i = 0; i < event.results.length; ++i) {
+        fullTranscript += event.results[i][0].transcript;
       }
-      if (finalTranscript) {
-        transcriptionText.textContent = finalTranscript;
+      if (fullTranscript) {
+        transcriptionText.textContent = fullTranscript;
       }
     };
 
     recognition.onerror = (event) => {
       console.error('Speech error:', event.error);
-      transcriptionText.textContent = `Speech error occurred: ${event.error}. Please type manually.`;
+      if (event.error === 'not-allowed') {
+        transcriptionText.textContent = "Please allow microphone access in browser settings";
+      } else if (event.error === 'no-speech') {
+        transcriptionText.textContent = "No speech detected. Try again 🎙️";
+      } else {
+        transcriptionText.textContent = `Speech error occurred: ${event.error}. Please try again.`;
+      }
+      stopRecording();
+    };
+
+    recognition.onend = () => {
+      if (isRecording) {
+        stopRecording();
+      }
     };
   }
 
   function openVoiceOverlay() {
-    transcriptionText.textContent = 'Tap the microphone button to start recording. I am listening...';
+    transcriptionText.textContent = 'Speak now. Your words will appear here...';
     voiceOverlay.classList.add('active');
   }
 
@@ -693,11 +795,19 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Insert transcribed text into editor if text was recognized
     const textToInsert = transcriptionText.textContent;
-    if (textToInsert && textToInsert !== 'Speak now. Your words will appear here...' && !textToInsert.startsWith('Tap the microphone') && !textToInsert.startsWith('Speech error')) {
+    if (textToInsert && 
+        textToInsert !== 'Speak now. Your words will appear here...' && 
+        !textToInsert.startsWith('Please allow microphone') && 
+        !textToInsert.startsWith('No speech detected') &&
+        !textToInsert.startsWith('Speech error') &&
+        !textToInsert.startsWith('Listening closely')) {
       textEditor.focus();
-      // Simple insert text at end or cursor position
+      // Insert text at end of editor
       document.execCommand('insertText', false, '\n' + textToInsert + ' ');
       updateWordCount();
+      
+      // Show brief success message: Toast notification, Gold background
+      showToast("Added to your diary! ✍️");
     }
 
     voiceOverlay.classList.remove('active');
@@ -714,27 +824,84 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function startRecording() {
-    if (!SpeechRecognition) {
-      transcriptionText.textContent = 'Voice transcription is not supported by your browser. Please type directly in the editor.';
-      return;
-    }
+    if (!SpeechRecognition) return;
 
-    try {
-      recognition.start();
-      isRecording = true;
-      voiceOverlay.classList.add('recording');
-      transcriptionText.textContent = 'Listening closely...';
-    } catch (e) {
-      console.error(e);
-    }
+    // Request microphone permission first
+    navigator.mediaDevices.getUserMedia({ audio: true })
+      .then(() => {
+        try {
+          recognition.start();
+          isRecording = true;
+          voiceOverlay.classList.add('recording');
+          if (btnMicRecord) {
+            btnMicRecord.style.backgroundColor = '#FF4444'; // Background red
+          }
+          if (voiceListeningTitle) {
+            voiceListeningTitle.textContent = 'Listening...'; // Show "Listening..." text
+          }
+          transcriptionText.textContent = 'Listening closely...';
+        } catch (e) {
+          console.error(e);
+        }
+      })
+      .catch((err) => {
+        console.error('Microphone permission request failed:', err);
+        transcriptionText.textContent = "Please allow microphone access in browser settings";
+      });
   }
 
   function stopRecording() {
     if (recognition && isRecording) {
       recognition.stop();
-      isRecording = false;
-      voiceOverlay.classList.remove('recording');
     }
+    isRecording = false;
+    voiceOverlay.classList.remove('recording');
+    if (btnMicRecord) {
+      btnMicRecord.style.backgroundColor = ''; // Reset background to default gold
+    }
+    if (voiceListeningTitle) {
+      voiceListeningTitle.textContent = 'I am listening...';
+    }
+  }
+
+  function showToast(message) {
+    const toast = document.createElement('div');
+    toast.className = 'voice-toast';
+    toast.textContent = message;
+    
+    // Style toast dynamically
+    toast.style.position = 'fixed';
+    toast.style.bottom = '80px';
+    toast.style.left = '50%';
+    toast.style.transform = 'translateX(-50%) translateY(20px)';
+    toast.style.backgroundColor = '#FFD700'; // Gold bg
+    toast.style.color = '#1A0A00'; // Dark text
+    toast.style.padding = '12px 24px';
+    toast.style.borderRadius = '20px';
+    toast.style.fontFamily = "'Lato', sans-serif";
+    toast.style.fontWeight = '700';
+    toast.style.fontSize = '14px';
+    toast.style.boxShadow = '0 4px 15px rgba(0,0,0,0.5)';
+    toast.style.zIndex = '3000';
+    toast.style.opacity = '0';
+    toast.style.transition = 'all 0.3s ease';
+    
+    document.body.appendChild(toast);
+    
+    // Trigger slide up fade in
+    setTimeout(() => {
+      toast.style.opacity = '1';
+      toast.style.transform = 'translateX(-50%) translateY(0)';
+    }, 50);
+    
+    // Remove after 2 seconds
+    setTimeout(() => {
+      toast.style.opacity = '0';
+      toast.style.transform = 'translateX(-50%) translateY(-20px)';
+      setTimeout(() => {
+        toast.remove();
+      }, 300);
+    }, 2000);
   }
 
   // ---------------------------------------------------------
@@ -774,7 +941,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  function executeSaveEntry(moodEmoji) {
+  async function executeSaveEntry(moodEmoji) {
     const contentHtml = textEditor.innerHTML;
     const pageStyle = document.querySelector('.style-option-btn.active').getAttribute('data-style') || 'classic';
     const fontStyle = document.querySelector('.font-option-btn.active').getAttribute('data-font') || 'dancing';
@@ -786,41 +953,57 @@ document.addEventListener('DOMContentLoaded', () => {
     const options = { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' };
     const todayStr = new Date().toLocaleDateString('en-US', options);
 
-    if (editingEntryId) {
-      // Find and update existing
-      const entry = entries.find(e => e.id === editingEntryId);
-      if (entry) {
-        entry.content = contentHtml;
-        entry.mood = moodEmoji;
-        entry.pageStyle = pageStyle;
-        entry.font = fontStyle;
-        entry.photos = activePhotos;
-        entry.decorations = activeDecorations;
-        entry.wordCount = wordCount;
-      }
-    } else {
-      // Create new entry
-      const newEntry = {
-        id: Date.now(),
-        content: contentHtml,
-        mood: moodEmoji,
-        pageStyle: pageStyle,
-        font: fontStyle,
-        photos: activePhotos,
-        decorations: activeDecorations,
-        date: todayStr,
-        wordCount: wordCount
-      };
-      entries.push(newEntry);
-      
-      // ---------------------------------------------------------
-      // DYNAMIC STREAKS UPDATE
-      // ---------------------------------------------------------
-      updateStreaksOnSave();
-    }
+    const payload = {
+      content: contentHtml,
+      mood: moodEmoji,
+      pageStyle: pageStyle,
+      font: fontStyle,
+      wordCount: wordCount,
+      photos: activePhotos,
+      decorations: activeDecorations
+    };
 
-    // Save back to localStorage
-    localStorage.setItem('diary_entries', JSON.stringify(entries));
+    try {
+      if (editingEntryId) {
+        await API.updateEntry(editingEntryId, payload);
+      } else {
+        const res = await API.createEntry(payload);
+        if (res.streak) {
+          localStorage.setItem('writingStreak', String(res.streak));
+        }
+      }
+    } catch (err) {
+      console.warn('API save failed, executing local fallback saving:', err);
+      if (editingEntryId) {
+        // Find and update existing
+        const entry = entries.find(e => e.id === editingEntryId);
+        if (entry) {
+          entry.content = contentHtml;
+          entry.mood = moodEmoji;
+          entry.pageStyle = pageStyle;
+          entry.font = fontStyle;
+          entry.photos = activePhotos;
+          entry.decorations = activeDecorations;
+          entry.wordCount = wordCount;
+        }
+      } else {
+        // Create new entry
+        const newEntry = {
+          id: Date.now(),
+          content: contentHtml,
+          mood: moodEmoji,
+          pageStyle: pageStyle,
+          font: fontStyle,
+          photos: activePhotos,
+          decorations: activeDecorations,
+          date: todayStr,
+          wordCount: wordCount
+        };
+        entries.push(newEntry);
+        updateStreaksOnSave();
+      }
+      localStorage.setItem('diary_entries', JSON.stringify(entries));
+    }
 
     // Play Page-Flip Transition Close
     newEntryScreen.classList.add('page-flip-close');

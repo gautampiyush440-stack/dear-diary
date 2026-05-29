@@ -15,6 +15,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Lato:ital,wght@0,300;0,400;0,700;1,400&display=swap" rel="stylesheet">
 
   <!-- Snap Style Sheet Link -->
+  <link rel="stylesheet" href="../css/theme.css">
   <link rel="stylesheet" href="../css/snap.css">
 </head>
 <body>
@@ -193,7 +194,9 @@
     <!-- Toolbar Top -->
     <header class="camera-top-bar">
       <button id="btn-close-camera" class="btn-camera-top" aria-label="Close camera">✕</button>
+      <button id="btn-upload-file-trigger" class="btn-camera-top" aria-label="Upload photo" style="font-size: 20px; background: transparent; border: none; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; height: 36px; width: 36px; border-radius: 50%;">📁</button>
       <button id="btn-switch-camera" class="btn-camera-top" aria-label="Switch camera">🔄</button>
+      <input type="file" id="snap-file-input" accept="image/*" style="display: none;">
     </header>
 
     <!-- Filters horizontal scroll list -->
@@ -321,6 +324,8 @@
   <!-- Celebratory particles canvas overlay (fades out) -->
   <canvas id="confetti-canvas" class="confetti-canvas"></canvas>
 
+  <!-- Central API Service Layer -->
+  <script src="../js/api.js"></script>
   <!-- Snap Controller Script Link -->
   <script src="../js/snap.js"></script>
 </body>

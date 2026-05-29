@@ -4,52 +4,81 @@
 document.addEventListener('DOMContentLoaded', () => {
 
   // ==========================================================================
-  // PULL FROM localStorage & INITIALIZE STATES
+  // PROFILE STATE & FALLBACK RETRIEVAL
   // ==========================================================================
-  let coins = parseInt(localStorage.getItem('coins'), 10);
-  if (isNaN(coins)) {
-    coins = 0;
-    localStorage.setItem('coins', '0');
-  }
-
-  const userName = localStorage.getItem('user_name') || 'Friend';
-  const companionName = localStorage.getItem('companion_name') || 'Ollie';
-  const companionEmoji = localStorage.getItem('companion_emoji') || '🦉';
-
-  // Load entries & snaps
+  let userName = 'Friend';
+  let companionName = 'Ollie';
+  let companionEmoji = '🦉';
+  let coins = 0;
   let diaryEntries = [];
-  try {
-    diaryEntries = JSON.parse(localStorage.getItem('diary_entries')) || [];
-  } catch (e) {
-    diaryEntries = [];
-  }
-
   let snaps = [];
-  try {
-    snaps = JSON.parse(localStorage.getItem('diary_snaps')) || JSON.parse(localStorage.getItem('snaps')) || [];
-  } catch (e) {
-    snaps = [];
+
+  async function initPlayCabin() {
+    try {
+      const profile = await API.getProfile();
+      userName = profile.username || userName;
+      companionName = profile.companionName || companionName;
+      companionEmoji = profile.companionEmoji || companionEmoji;
+      coins = profile.coins || 0;
+
+      // Sync local storage backups
+      localStorage.setItem('user_name', userName);
+      localStorage.setItem('companion_name', companionName);
+      localStorage.setItem('companion_emoji', companionEmoji);
+      localStorage.setItem('coins', String(coins));
+
+      try {
+        diaryEntries = await API.getEntries();
+        localStorage.setItem('diary_entries', JSON.stringify(diaryEntries));
+      } catch (e) {}
+
+      try {
+        const snapsRes = await API.getSnaps();
+        snaps = snapsRes.snaps || [];
+        localStorage.setItem('diary_snaps', JSON.stringify(snaps));
+      } catch (e) {}
+    } catch (err) {
+      console.warn('API error loading play cabin configuration fallback:', err);
+      userName = localStorage.getItem('user_name') || 'Friend';
+      companionName = localStorage.getItem('companion_name') || 'Ollie';
+      companionEmoji = localStorage.getItem('companion_emoji') || '🦉';
+      coins = parseInt(localStorage.getItem('coins'), 10) || 0;
+      
+      try {
+        diaryEntries = JSON.parse(localStorage.getItem('diary_entries')) || [];
+      } catch (e) { diaryEntries = []; }
+      
+      try {
+        snaps = JSON.parse(localStorage.getItem('diary_snaps')) || [];
+      } catch (e) { snaps = []; }
+    }
+
+    // Update UI headers
+    const headerCoinCount = document.getElementById('header-coin-count');
+    if (headerCoinCount) headerCoinCount.textContent = coins;
+
+    const floatEmoji = document.getElementById('floating-companion-emoji');
+    if (floatEmoji) floatEmoji.textContent = companionEmoji;
+
+    // Initialize Game companion emojis
+    const gameCompanionIds = [
+      'match-companion-emoji',
+      'mood-companion-emoji',
+      'puzzle-companion-emoji',
+      'challenge-companion-emoji',
+      'story-companion-emoji'
+    ];
+    gameCompanionIds.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = companionEmoji;
+    });
+
+    const saysLabel = document.getElementById('companion-says-label');
+    if (saysLabel) saysLabel.textContent = `${companionName} says:`;
   }
 
-  // Update UI headers
-  const headerCoinCount = document.getElementById('header-coin-count');
-  if (headerCoinCount) headerCoinCount.textContent = coins;
-
-  const floatEmoji = document.getElementById('floating-companion-emoji');
-  if (floatEmoji) floatEmoji.textContent = companionEmoji;
-
-  // Initialize Game companion emojis
-  const gameCompanionIds = [
-    'match-companion-emoji',
-    'mood-companion-emoji',
-    'puzzle-companion-emoji',
-    'challenge-companion-emoji',
-    'story-companion-emoji'
-  ];
-  gameCompanionIds.forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.textContent = companionEmoji;
-  });
+  // Trigger loading configurations
+  initPlayCabin();
 
   // --------------------------------------------------------------------------
   // TIMER RESETS: MIDNIGHT COUNTDOWN
@@ -100,9 +129,16 @@ document.addEventListener('DOMContentLoaded', () => {
     requestAnimationFrame(updateCoins);
   }
 
-  function addCoins(amount) {
-    coins += amount;
-    localStorage.setItem('coins', coins);
+  async function addCoins(amount) {
+    try {
+      const res = await API.claimReward(amount, 'Mini Games');
+      coins = res.coins;
+      localStorage.setItem('coins', String(coins));
+    } catch (err) {
+      console.warn('API coins award failed, adding locally:', err);
+      coins += amount;
+      localStorage.setItem('coins', String(coins));
+    }
     animateCoinBalance(coins);
   }
 
@@ -1005,7 +1041,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let challengeTimerVal = 60;
   let challengeSubmitted = false;
 
-  function initDailyChallenge() {
+  async function initDailyChallenge() {
     challengeTimerVal = 60;
     challengeSubmitted = false;
 
@@ -1013,6 +1049,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const writingArea = document.getElementById('challenge-writing-area');
     const counter = document.getElementById('challenge-word-counter');
     const btnSubmit = document.getElementById('btn-submit-challenge');
+
+    // Fetch dynamic daily challenge prompt from backend
+    try {
+      const data = await API.getChallenge();
+      const promptTitle = document.querySelector('.challenge-prompt-title');
+      if (promptTitle && data.challenge) {
+        promptTitle.textContent = data.challenge;
+      }
+    } catch (err) {
+      console.warn('API error fetching daily challenge prompt:', err);
+    }
 
     if (timerBadge) {
       timerBadge.textContent = '⏱️ 00:60';
@@ -1070,7 +1117,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 1000);
   }
 
-  function submitDailyChallenge() {
+  async function submitDailyChallenge() {
     if (challengeSubmitted) return;
     challengeSubmitted = true;
     clearInterval(gameTimerInterval);
@@ -1083,7 +1130,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // Save entry check option
       const saveOption = confirm('Challenge complete! 🎉 Do you want to save this daily challenge entry to your diary logs?');
       if (saveOption) {
-        saveChallengeToDiary(text);
+        await saveChallengeToDiary(text);
       }
 
       showWinScreen(
@@ -1099,19 +1146,32 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  function saveChallengeToDiary(text) {
-    const newEntry = {
-      id: 'entry_' + Date.now(),
-      date: new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }),
-      time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
-      text: `<p>${text}</p>`,
-      mood: 'joyful',
-      style: 'ruled',
-      attachments: []
-    };
-
-    diaryEntries.unshift(newEntry);
-    localStorage.setItem('diary_entries', JSON.stringify(diaryEntries));
+  async function saveChallengeToDiary(text) {
+    const wordCount = text.split(/\s+/).filter(w => w.length > 0).length;
+    try {
+      await API.createEntry({
+        content: `<p>${text}</p>`,
+        mood: 'joyful',
+        pageStyle: 'ruled',
+        font: 'dancing',
+        wordCount: wordCount,
+        photos: [],
+        decorations: []
+      });
+    } catch (err) {
+      console.warn('API error saving challenge to diary, saving locally:', err);
+      const newEntry = {
+        id: 'entry_' + Date.now(),
+        date: new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }),
+        time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
+        text: `<p>${text}</p>`,
+        mood: 'joyful',
+        style: 'ruled',
+        attachments: []
+      };
+      diaryEntries.unshift(newEntry);
+      localStorage.setItem('diary_entries', JSON.stringify(diaryEntries));
+    }
   }
 
   // ==========================================================================

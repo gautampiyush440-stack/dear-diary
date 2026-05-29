@@ -45,6 +45,90 @@ document.addEventListener('DOMContentLoaded', () => {
   const floatEmoji = document.getElementById('floating-companion-emoji');
   if (floatEmoji) floatEmoji.textContent = companionEmoji;
 
+  // --- Async Backend Integration Loader ---
+  async function loadServerData() {
+    if (typeof API === 'undefined' || !API.isAuthenticated()) {
+      updateMainProfileUI();
+      initAchievementsBoard();
+      return;
+    }
+
+    try {
+      const profile = await API.getProfile();
+      userName = profile.username || userName;
+      diaryName = profile.diaryName || diaryName;
+      companionName = profile.companionName || companionName;
+      companionEmoji = profile.companionEmoji || companionEmoji;
+      coins = profile.coins !== undefined ? profile.coins : coins;
+      writingStreak = profile.streak !== undefined ? profile.streak : writingStreak;
+
+      const isPremium = !!profile.isPremium;
+      localStorage.setItem('premiumUpgrade', isPremium ? 'true' : 'false');
+
+      // Sync local storage for other views/tabs
+      localStorage.setItem('user_name', userName);
+      localStorage.setItem('diary_name', diaryName);
+      localStorage.setItem('companion_name', companionName);
+      localStorage.setItem('companion_emoji', companionEmoji);
+      localStorage.setItem('coins', coins);
+      localStorage.setItem('writingStreak', writingStreak);
+
+      if (profile.settingsPin) {
+        localStorage.setItem('pin', profile.settingsPin);
+        localStorage.setItem('diaryLocked', 'true');
+      } else {
+        localStorage.removeItem('pin');
+        localStorage.setItem('diaryLocked', 'false');
+      }
+
+      // Sync premium cards
+      const btnUpgrade = document.getElementById('btn-upgrade-premium');
+      if (btnUpgrade) {
+        if (isPremium) {
+          btnUpgrade.textContent = 'Active 👑';
+          btnUpgrade.disabled = true;
+        } else {
+          btnUpgrade.textContent = 'Upgrade →';
+          btnUpgrade.disabled = false;
+        }
+      }
+
+      // Fetch entries from DB
+      try {
+        const entries = await API.getEntries();
+        diaryEntries = entries || [];
+        localStorage.setItem('diary_entries', JSON.stringify(diaryEntries));
+      } catch (err) {
+        console.warn('Failed to load server entries, using local fallback:', err);
+      }
+
+      // Fetch snaps from DB
+      try {
+        const snapsData = await API.getSnaps();
+        snaps = snapsData || [];
+        localStorage.setItem('diary_snaps', JSON.stringify(snaps));
+      } catch (err) {
+        console.warn('Failed to load server snaps, using local fallback:', err);
+      }
+
+      // Refresh visuals
+      updateMainProfileUI();
+      animateCounter('stat-entries-count', diaryEntries.length);
+      animateCounter('stat-streak-count', writingStreak);
+      animateCounter('stat-coins-count', coins);
+      if (floatEmoji) floatEmoji.textContent = companionEmoji;
+
+      initAchievementsBoard();
+    } catch (err) {
+      console.warn('Backend load failed, operating in offline/local mode:', err);
+      updateMainProfileUI();
+      initAchievementsBoard();
+    }
+  }
+
+  // Trigger sync load
+  loadServerData();
+
   // ==========================================================================
   // FLOATING COMPANION DRAGGING (POINTER EVENTS)
   // ==========================================================================
@@ -236,6 +320,7 @@ document.addEventListener('DOMContentLoaded', () => {
       document.body.style.overflow = 'hidden';
 
       // Load screen specific metrics
+      if (overlayId === 'settings-profile') initProfileSettings();
       if (overlayId === 'character-studio') initCharacterStudio();
       if (overlayId === 'theme-gallery') initThemeGallery();
       if (overlayId === 'achievements') initAchievementsBoard();
@@ -294,6 +379,17 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     };
 
+    inputName.onchange = async () => {
+      const newName = inputName.value.trim();
+      if (newName && typeof API !== 'undefined' && API.isAuthenticated()) {
+        try {
+          await API.updateCompanion(newName, companionEmoji);
+        } catch (err) {
+          console.error('Failed to save companion name to database:', err);
+        }
+      }
+    };
+
     // Unlock logic based on writingStreak >= 7
     const cards = companionGrid.querySelectorAll('.companion-card');
     cards.forEach(card => {
@@ -317,7 +413,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       // Card click select companion
-      card.onclick = () => {
+      card.onclick = async () => {
         if (card.classList.contains('locked')) {
           alert('Maintain a 7-day writing streak to unlock this companion! 🔥');
           return;
@@ -337,6 +433,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Update floating character everywhere
         if (floatEmoji) floatEmoji.textContent = cEmoji;
+
+        if (typeof API !== 'undefined' && API.isAuthenticated()) {
+          try {
+            await API.updateCompanion(companionName, companionEmoji);
+          } catch (err) {
+            console.error('Failed to save companion selection to database:', err);
+          }
+        }
       };
     });
   }
@@ -544,6 +648,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Premium upgrade card handler
   const btnUpgrade = document.getElementById('btn-upgrade-premium');
+  const checkoutModal = document.getElementById('checkout-simulation-modal');
+  const btnCancelCheckout = document.getElementById('btn-cancel-checkout');
+  const btnConfirmCheckout = document.getElementById('btn-confirm-checkout');
+
   if (btnUpgrade) {
     // If already premium
     if (localStorage.getItem('premiumUpgrade') === 'true') {
@@ -551,13 +659,78 @@ document.addEventListener('DOMContentLoaded', () => {
       btnUpgrade.disabled = true;
     }
 
-    btnUpgrade.onclick = () => {
-      localStorage.setItem('premiumUpgrade', 'true');
-      btnUpgrade.textContent = 'Active 👑';
-      btnUpgrade.disabled = true;
-      showToast('Premium Golden active! 👑');
-      addBadge('badge_premium');
-      initAchievementsBoard();
+    btnUpgrade.onclick = async () => {
+      if (localStorage.getItem('premiumUpgrade') === 'true') {
+        btnUpgrade.textContent = 'Active 👑';
+        btnUpgrade.disabled = true;
+        return;
+      }
+
+      if (typeof API === 'undefined' || !API.isAuthenticated()) {
+        // Offline demo fallback: instant activation
+        localStorage.setItem('premiumUpgrade', 'true');
+        btnUpgrade.textContent = 'Active 👑';
+        btnUpgrade.disabled = true;
+        showToast('Premium Golden active! 👑');
+        addBadge('badge_premium');
+        initAchievementsBoard();
+        return;
+      }
+
+      try {
+        btnUpgrade.disabled = true;
+        btnUpgrade.textContent = 'Loading...';
+
+        // 1. Get payment session
+        const checkoutSession = await API.checkoutPremium();
+        const sessionId = checkoutSession.sessionId;
+
+        // 2. Open payment modal
+        if (checkoutModal) {
+          const desc = document.getElementById('checkout-modal-desc');
+          if (desc) {
+            desc.textContent = `Confirm simulated Golden Diary Premium upgrade for $${checkoutSession.price} ${checkoutSession.currency}.`;
+          }
+          checkoutModal.classList.add('active');
+        }
+
+        // 3. Confirm click
+        if (btnConfirmCheckout) {
+          btnConfirmCheckout.onclick = async () => {
+            try {
+              btnConfirmCheckout.disabled = true;
+              btnConfirmCheckout.textContent = 'Processing...';
+
+              await API.confirmPremium(sessionId);
+
+              localStorage.setItem('premiumUpgrade', 'true');
+              btnUpgrade.textContent = 'Active 👑';
+              btnUpgrade.disabled = true;
+
+              if (checkoutModal) checkoutModal.classList.remove('active');
+              showToast('Premium Golden active! 👑');
+              addBadge('badge_premium');
+              initAchievementsBoard();
+            } catch (err) {
+              alert(`Simulated payment failed: ${err.message || err}`);
+            } finally {
+              btnConfirmCheckout.disabled = false;
+              btnConfirmCheckout.textContent = 'Pay $4.99 💳';
+            }
+          };
+        }
+      } catch (err) {
+        alert(`Failed to start premium checkout: ${err.message || err}`);
+      } finally {
+        btnUpgrade.disabled = (localStorage.getItem('premiumUpgrade') === 'true');
+        btnUpgrade.textContent = (localStorage.getItem('premiumUpgrade') === 'true') ? 'Active 👑' : 'Upgrade →';
+      }
+    };
+  }
+
+  if (btnCancelCheckout && checkoutModal) {
+    btnCancelCheckout.onclick = () => {
+      checkoutModal.classList.remove('active');
     };
   }
 
@@ -1075,7 +1248,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // ==========================================================================
   
   // 1. Notifications Screen
-  function initNotificationsSettings() {
+  async function initNotificationsSettings() {
     const notifyWriting = document.getElementById('notify-writing');
     const notifySnaps = document.getElementById('notify-snaps');
     const notifyStreaks = document.getElementById('notify-streaks');
@@ -1093,8 +1266,21 @@ document.addEventListener('DOMContentLoaded', () => {
     if (notifyStreaks) notifyStreaks.checked = settingsObj.streaks;
     if (timeInput) timeInput.value = localStorage.getItem('reminderTime') || '21:00';
 
+    // Try fetching from server
+    if (typeof API !== 'undefined' && API.isAuthenticated()) {
+      try {
+        const serverSettings = await API.getNotificationSettings();
+        if (serverSettings) {
+          if (timeInput && serverSettings.time) timeInput.value = serverSettings.time;
+          if (notifyWriting) notifyWriting.checked = !!serverSettings.enabled;
+        }
+      } catch (err) {
+        console.warn('Failed to load server notifications preferences:', err);
+      }
+    }
+
     if (btnSaveReminders) {
-      btnSaveReminders.onclick = () => {
+      btnSaveReminders.onclick = async () => {
         const settings = {
           writing: notifyWriting ? notifyWriting.checked : true,
           snaps: notifySnaps ? notifySnaps.checked : true,
@@ -1102,6 +1288,24 @@ document.addEventListener('DOMContentLoaded', () => {
         };
         localStorage.setItem('notifications', JSON.stringify(settings));
         localStorage.setItem('reminderTime', timeInput ? timeInput.value : '21:00');
+
+        if (typeof API !== 'undefined' && API.isAuthenticated()) {
+          try {
+            btnSaveReminders.disabled = true;
+            btnSaveReminders.textContent = 'Saving...';
+
+            await API.saveNotificationSettings({
+              enabled: settings.writing || settings.snaps || settings.streaks,
+              time: timeInput ? timeInput.value : '21:00',
+              type: 'push'
+            });
+          } catch (err) {
+            console.error('Failed to save server notification settings:', err);
+          } finally {
+            btnSaveReminders.disabled = false;
+            btnSaveReminders.textContent = 'Save Settings';
+          }
+        }
         showToast('Settings saved!');
       };
     }
@@ -1163,6 +1367,19 @@ document.addEventListener('DOMContentLoaded', () => {
         showToast('Diary text backup exported! 🔒');
       };
     }
+
+    const btnTriggerWipe = document.getElementById('btn-trigger-wipe');
+    if (btnTriggerWipe) {
+      btnTriggerWipe.onclick = () => {
+        const doubleCheck1 = confirm('⚠️ WARNING: Are you absolutely sure you want to delete your account and wipe all your diary entries? This action cannot be undone.');
+        if (doubleCheck1) {
+          const doubleCheck2 = confirm('🔥 FINAL WARNING: This will permanently delete your account, streaks, companion settings, and entry history from both the server and your local device. Proceed?');
+          if (doubleCheck2) {
+            executeCompleteDataWipe();
+          }
+        }
+      };
+    }
   }
 
   // PIN Pad key clicks logic
@@ -1197,7 +1414,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  function submitPIN() {
+  async function submitPIN() {
     if (tempEnteredPin.length < 4) {
       alert('PIN must be 4 digits!');
       return;
@@ -1206,6 +1423,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const savedPin = localStorage.getItem('pin');
 
     if (pinActionState === 'set') {
+      if (typeof API !== 'undefined' && API.isAuthenticated()) {
+        try {
+          await API.updateSettingsPin(tempEnteredPin);
+        } catch (err) {
+          console.error('Failed to sync PIN to database:', err);
+        }
+      }
       localStorage.setItem('pin', tempEnteredPin);
       localStorage.setItem('diaryLocked', 'true');
       const toggleLock = document.getElementById('pin-lock-toggle');
@@ -1218,6 +1442,13 @@ document.addEventListener('DOMContentLoaded', () => {
       addBadge('badge_premium'); // trigger achievements check
     } else if (pinActionState === 'disable') {
       if (tempEnteredPin === savedPin) {
+        if (typeof API !== 'undefined' && API.isAuthenticated()) {
+          try {
+            await API.updateSettingsPin(null);
+          } catch (err) {
+            console.error('Failed to clear PIN from database:', err);
+          }
+        }
         localStorage.setItem('diaryLocked', 'false');
         localStorage.removeItem('pin');
         const toggleLock = document.getElementById('pin-lock-toggle');
@@ -1232,6 +1463,78 @@ document.addEventListener('DOMContentLoaded', () => {
         tempEnteredPin = '';
         updatePinDots();
       }
+    }
+  }
+
+  // --- New Profile Settings Screen controller ---
+  function initProfileSettings() {
+    const inputUser = document.getElementById('input-user-name');
+    const inputDiary = document.getElementById('input-diary-name');
+    const btnSave = document.getElementById('btn-save-profile');
+
+    if (inputUser) inputUser.value = userName;
+    if (inputDiary) inputDiary.value = diaryName;
+
+    if (btnSave) {
+      btnSave.onclick = async () => {
+        const newUsername = inputUser ? inputUser.value.trim() : '';
+        const newDiaryName = inputDiary ? inputDiary.value.trim() : '';
+
+        if (!newUsername || !newDiaryName) {
+          alert('Name fields cannot be empty! ✍️');
+          return;
+        }
+
+        try {
+          btnSave.disabled = true;
+          btnSave.textContent = 'Saving...';
+
+          if (typeof API !== 'undefined' && API.isAuthenticated()) {
+            await API.updateProfile(newUsername, newDiaryName);
+          }
+
+          userName = newUsername;
+          diaryName = newDiaryName;
+          localStorage.setItem('user_name', userName);
+          localStorage.setItem('diary_name', diaryName);
+
+          updateMainProfileUI();
+          showToast('Profile settings saved! ✨');
+          closeOverlay('settings-profile');
+        } catch (err) {
+          alert(`Failed to save settings: ${err.message || err}`);
+        } finally {
+          btnSave.disabled = false;
+          btnSave.textContent = 'Save Profile';
+        }
+      };
+    }
+  }
+
+  // --- Complete user account wipe ---
+  async function executeCompleteDataWipe() {
+    try {
+      if (typeof API !== 'undefined' && API.isAuthenticated()) {
+        await API.deleteAccount();
+      }
+    } catch (err) {
+      console.warn('Server account deletion failed or offline, wiping local storage only:', err);
+    } finally {
+      localStorage.clear();
+      showToast('All user data and settings deleted.');
+      
+      const fadeOverlay = document.createElement('div');
+      fadeOverlay.classList.add('fade-overlay');
+      fadeOverlay.style.opacity = '0';
+      document.body.appendChild(fadeOverlay);
+
+      void fadeOverlay.offsetWidth;
+      fadeOverlay.style.transition = 'opacity 0.8s ease-in-out';
+      fadeOverlay.style.opacity = '1';
+
+      setTimeout(() => {
+        window.location.href = '../index.html';
+      }, 800);
     }
   }
 
@@ -1283,6 +1586,9 @@ document.addEventListener('DOMContentLoaded', () => {
     btnConfirmSignOut.addEventListener('click', () => {
       // WIPE LocalStorage completely
       localStorage.clear();
+      if (typeof API !== 'undefined') {
+        API.clearToken();
+      }
 
       // Black transition viewport overlay fade out
       const fadeOverlay = document.createElement('div');

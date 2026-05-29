@@ -1,0 +1,580 @@
+/* ==========================================================================
+   Dear Diary - Global Themes Override Stylesheet (theme.css)
+   ========================================================================== */
+
+/* 1. DEFINE THEME VARIABLE SCHEMES */
+body {
+  --bg: #1A0A00;
+  --accent: #FFD700;
+  --accent-dark: #B8860B;
+  --text: #FFFAF0;
+  --text-muted: #8B7355;
+  --card-bg: #1C0A00;
+  --card-border: #B8860B;
+  --hero-bg: #2C1503;
+  --paper-bg: #FFF8E7;
+  --paper-text: #2C1503;
+}
+
+body.theme-vintage {
+  --bg: #F5ECD7;
+  --accent: #8B5A2B;
+  --accent-dark: #5C3D2E;
+  --text: #3D2B1F;
+  --text-muted: #8B7355;
+  --card-bg: #FFFDF9;
+  --card-border: #8B5A2B;
+  --hero-bg: #E3D2B4;
+  --paper-bg: #FFFDF9;
+  --paper-text: #3D2B1F;
+}
+
+body.theme-midnight {
+  --bg: #0D1117;
+  --accent: #7C5CBF;
+  --accent-dark: #503790;
+  --text: #C9D1D9;
+  --text-muted: #586069;
+  --card-bg: #161B22;
+  --card-border: #30363D;
+  --hero-bg: #21262D;
+  --paper-bg: #0D1117;
+  --paper-text: #C9D1D9;
+}
+
+/* 2. APPLY THEME GLOBAL OVERRIDES */
+body.theme-vintage,
+body.theme-midnight {
+  background-color: var(--bg) !important;
+  color: var(--text) !important;
+}
+
+/* Staggered load overlays */
+body.theme-vintage .fade-overlay,
+body.theme-midnight .fade-overlay {
+  background-color: var(--bg) !important;
+}
+
+/* General Layouts and Wrappers */
+body.theme-vintage .home-wrapper,
+body.theme-vintage .play-wrapper,
+body.theme-vintage .snap-wrapper,
+body.theme-vintage .diary-wrapper,
+body.theme-midnight .home-wrapper,
+body.theme-midnight .play-wrapper,
+body.theme-midnight .snap-wrapper,
+body.theme-midnight .diary-wrapper {
+  color: var(--text) !important;
+}
+
+/* Headers */
+body.theme-vintage .home-header,
+body.theme-vintage .snap-header,
+body.theme-vintage .play-header,
+body.theme-vintage .diary-header,
+body.theme-vintage .editor-header,
+body.theme-vintage .detail-header,
+body.theme-midnight .home-header,
+body.theme-midnight .snap-header,
+body.theme-midnight .play-header,
+body.theme-midnight .diary-header,
+body.theme-midnight .editor-header,
+body.theme-midnight .detail-header {
+  border-bottom: 1px solid rgba(184, 134, 11, 0.2) !important;
+  border-color: var(--card-border) !important;
+}
+
+body.theme-vintage .time-greeting,
+body.theme-vintage .brand-logo-small,
+body.theme-vintage .btn-bell,
+body.theme-vintage .snap-title,
+body.theme-vintage .play-title,
+body.theme-vintage .diary-title,
+body.theme-vintage .editor-date-label,
+body.theme-vintage .detail-date-label,
+body.theme-vintage .gold-text,
+body.theme-midnight .time-greeting,
+body.theme-midnight .brand-logo-small,
+body.theme-midnight .btn-bell,
+body.theme-midnight .snap-title,
+body.theme-midnight .play-title,
+body.theme-midnight .diary-title,
+body.theme-midnight .editor-date-label,
+body.theme-midnight .detail-date-label,
+body.theme-midnight .gold-text {
+  color: var(--accent) !important;
+}
+
+body.theme-vintage .brand-logo-small,
+body.theme-midnight .brand-logo-small {
+  border-color: var(--accent) !important;
+}
+
+/* Dashboard Cards and General Panels */
+body.theme-vintage .dashboard-card,
+body.theme-vintage .streak-card,
+body.theme-vintage .today-snap-card,
+body.theme-vintage .gallery-section,
+body.theme-vintage .notifications-panel,
+body.theme-vintage .game-card,
+body.theme-vintage .leaderboard-card,
+body.theme-vintage .stat-card,
+body.theme-vintage .achievement-card,
+body.theme-vintage .settings-section,
+body.theme-vintage .menu-item,
+body.theme-vintage .entry-card,
+body.theme-vintage .transcription-card,
+body.theme-vintage .bottom-sheet-card,
+body.theme-vintage .link-popup-card,
+body.theme-vintage .sticker-popup-card,
+body.theme-vintage .mood-popup-card,
+body.theme-vintage .time-capsule-card,
+body.theme-midnight .dashboard-card,
+body.theme-midnight .streak-card,
+body.theme-midnight .today-snap-card,
+body.theme-midnight .gallery-section,
+body.theme-midnight .notifications-panel,
+body.theme-midnight .game-card,
+body.theme-midnight .leaderboard-card,
+body.theme-midnight .stat-card,
+body.theme-midnight .achievement-card,
+body.theme-midnight .settings-section,
+body.theme-midnight .menu-item,
+body.theme-midnight .entry-card,
+body.theme-midnight .transcription-card,
+body.theme-midnight .bottom-sheet-card,
+body.theme-midnight .link-popup-card,
+body.theme-midnight .sticker-popup-card,
+body.theme-midnight .mood-popup-card,
+body.theme-midnight .time-capsule-card {
+  background-color: var(--card-bg) !important;
+  background: var(--card-bg) !important;
+  border: 1px solid var(--card-border) !important;
+  color: var(--text) !important;
+}
+
+/* Card titles and texts */
+body.theme-vintage .streak-title,
+body.theme-vintage .streak-sub,
+body.theme-vintage .snap-status-title,
+body.theme-vintage .snap-status-sub,
+body.theme-vintage .gallery-title,
+body.theme-vintage .month-year-label,
+body.theme-vintage .game-title,
+body.theme-vintage .game-desc,
+body.theme-vintage .entry-title,
+body.theme-vintage .entry-excerpt,
+body.theme-vintage .panel-header h3,
+body.theme-midnight .streak-title,
+body.theme-midnight .streak-sub,
+body.theme-midnight .snap-status-title,
+body.theme-midnight .snap-status-sub,
+body.theme-midnight .gallery-title,
+body.theme-midnight .month-year-label,
+body.theme-midnight .game-title,
+body.theme-midnight .game-desc,
+body.theme-midnight .entry-title,
+body.theme-midnight .entry-excerpt,
+body.theme-midnight .panel-header h3 {
+  color: var(--text) !important;
+}
+
+body.theme-vintage .streak-sub,
+body.theme-vintage .snap-status-sub,
+body.theme-vintage .game-desc,
+body.theme-vintage .entry-excerpt,
+body.theme-midnight .streak-sub,
+body.theme-midnight .snap-status-sub,
+body.theme-midnight .game-desc,
+body.theme-midnight .entry-excerpt {
+  color: var(--text-muted) !important;
+}
+
+/* Buttons */
+body.theme-vintage .btn-snap-now,
+body.theme-vintage .btn-add-entry,
+body.theme-vintage .btn-save-entry,
+body.theme-vintage .btn-close-editor,
+body.theme-vintage .btn-close-detail,
+body.theme-vintage .btn-edit-entry,
+body.theme-vintage .btn-mic-record,
+body.theme-vintage .btn-stop-voice,
+body.theme-vintage .btn-month-nav,
+body.theme-vintage .btn-game-play,
+body.theme-vintage .btn-review-filled,
+body.theme-vintage .btn-review-outline,
+body.theme-vintage .detail-tool-btn,
+body.theme-midnight .btn-snap-now,
+body.theme-midnight .btn-add-entry,
+body.theme-midnight .btn-save-entry,
+body.theme-midnight .btn-close-editor,
+body.theme-midnight .btn-close-detail,
+body.theme-midnight .btn-edit-entry,
+body.theme-midnight .btn-mic-record,
+body.theme-midnight .btn-stop-voice,
+body.theme-midnight .btn-month-nav,
+body.theme-midnight .btn-game-play,
+body.theme-midnight .btn-review-filled,
+body.theme-midnight .btn-review-outline,
+body.theme-midnight .detail-tool-btn {
+  background-color: var(--accent) !important;
+  color: var(--bg) !important;
+  border-color: var(--accent) !important;
+}
+
+body.theme-vintage .btn-review-outline,
+body.theme-midnight .btn-review-outline {
+  background-color: transparent !important;
+  color: var(--accent) !important;
+  border: 1px solid var(--accent) !important;
+}
+
+/* Floating companion */
+body.theme-vintage .floating-speech-bubble,
+body.theme-midnight .floating-speech-bubble {
+  background-color: var(--card-bg) !important;
+  border: 1px solid var(--card-border) !important;
+  color: var(--text) !important;
+}
+
+/* Calendar Day Grid */
+body.theme-vintage .grid-day-cell,
+body.theme-midnight .grid-day-cell {
+  background-color: rgba(44, 21, 3, 0.1) !important;
+  color: var(--text) !important;
+}
+body.theme-vintage .grid-day-cell.today,
+body.theme-midnight .grid-day-cell.today {
+  border: 2px solid var(--accent) !important;
+  color: var(--accent) !important;
+}
+body.theme-vintage .grid-day-cell.snapped-day,
+body.theme-midnight .grid-day-cell.snapped-day {
+  background-color: transparent !important;
+}
+
+/* Calendar Strip in Diary Workspace */
+body.theme-vintage .calendar-strip,
+body.theme-midnight .calendar-strip {
+  background-color: var(--card-bg) !important;
+}
+body.theme-vintage .calendar-day-btn,
+body.theme-midnight .calendar-day-btn {
+  color: var(--text-muted) !important;
+  background-color: transparent !important;
+}
+body.theme-vintage .calendar-day-btn.active,
+body.theme-midnight .calendar-day-btn.active {
+  color: var(--accent) !important;
+  border-bottom: 2px solid var(--accent) !important;
+}
+
+/* Full Screen Overlays */
+body.theme-vintage .camera-screen,
+body.theme-vintage .photo-review-screen,
+body.theme-vintage .snap-detail-screen,
+body.theme-vintage .new-entry-screen,
+body.theme-vintage .entry-detail-screen,
+body.theme-vintage .voice-overlay,
+body.theme-vintage .save-mood-overlay,
+body.theme-vintage .game-overlay-container,
+body.theme-midnight .camera-screen,
+body.theme-midnight .photo-review-screen,
+body.theme-midnight .snap-detail-screen,
+body.theme-midnight .new-entry-screen,
+body.theme-midnight .entry-detail-screen,
+body.theme-midnight .voice-overlay,
+body.theme-midnight .save-mood-overlay,
+body.theme-midnight .game-overlay-container {
+  background-color: var(--bg) !important;
+  color: var(--text) !important;
+}
+
+/* Ruled styling and textures in new-entry screen page background overrides */
+body.theme-vintage .classic-style,
+body.theme-vintage .vintage-style,
+body.theme-vintage .ruled-style,
+body.theme-vintage .blank-style,
+body.theme-vintage .dotted-style {
+  background-color: var(--paper-bg) !important;
+}
+body.theme-midnight .classic-style,
+body.theme-midnight .vintage-style,
+body.theme-midnight .ruled-style,
+body.theme-midnight .blank-style,
+body.theme-midnight .dotted-style {
+  background-color: var(--paper-bg) !important;
+}
+
+body.theme-vintage .text-editor,
+body.theme-midnight .text-editor {
+  color: var(--paper-text) !important;
+}
+
+/* Page style toggler and writing toolbar */
+body.theme-vintage .page-style-selector,
+body.theme-midnight .page-style-selector {
+  background-color: var(--card-bg) !important;
+  border-bottom: 1px solid var(--card-border) !important;
+}
+body.theme-vintage .writing-toolbar,
+body.theme-midnight .writing-toolbar {
+  background-color: var(--card-bg) !important;
+  border-top: 1px solid var(--card-border) !important;
+}
+body.theme-vintage .format-btn,
+body.theme-vintage .toolbar-tool-btn,
+body.theme-midnight .format-btn,
+body.theme-midnight .toolbar-tool-btn {
+  color: var(--text-muted) !important;
+}
+body.theme-vintage .btn-font-selector,
+body.theme-midnight .btn-font-selector {
+  background-color: var(--accent) !important;
+  color: var(--bg) !important;
+}
+
+/* Game overlays overrides */
+body.theme-vintage .game-header,
+body.theme-midnight .game-header {
+  border-bottom: 1px solid var(--card-border) !important;
+}
+body.theme-vintage .game-body-card,
+body.theme-midnight .game-body-card {
+  background-color: var(--card-bg) !important;
+  border: 1px solid var(--card-border) !important;
+}
+body.theme-vintage .memory-card,
+body.theme-midnight .memory-card {
+  background-color: var(--hero-bg) !important;
+  border: 1px solid var(--card-border) !important;
+}
+body.theme-vintage .letter-cell,
+body.theme-midnight .letter-cell {
+  background-color: var(--card-bg) !important;
+  border: 1px solid var(--card-border) !important;
+}
+body.theme-vintage .letter-cell.selected,
+body.theme-midnight .letter-cell.selected {
+  background-color: var(--accent) !important;
+  color: var(--bg) !important;
+}
+body.theme-vintage .word-clue,
+body.theme-midnight .word-clue {
+  background-color: var(--hero-bg) !important;
+}
+body.theme-vintage .word-clue.found,
+body.theme-midnight .word-clue.found {
+  background-color: var(--card-border) !important;
+}
+body.theme-vintage .mood-option-btn,
+body.theme-midnight .mood-option-btn {
+  background-color: var(--card-bg) !important;
+  border: 1px solid var(--card-border) !important;
+}
+
+/* Daily Challenge Card Overrides (Play Cabin) */
+body.theme-vintage .daily-challenge-card,
+body.theme-midnight .daily-challenge-card {
+  background-color: var(--card-bg) !important;
+  border-color: var(--card-border) !important;
+  color: var(--text) !important;
+}
+
+body.theme-vintage .daily-challenge-card {
+  box-shadow: none !important;
+}
+body.theme-midnight .daily-challenge-card {
+  box-shadow: 0 0 15px rgba(124, 92, 191, 0.25) !important;
+}
+
+body.theme-vintage .challenge-title,
+body.theme-vintage .challenge-reward,
+body.theme-vintage .challenge-text,
+body.theme-midnight .challenge-title,
+body.theme-midnight .challenge-reward,
+body.theme-midnight .challenge-text {
+  color: var(--text) !important;
+}
+
+body.theme-vintage .challenge-timer,
+body.theme-midnight .challenge-timer {
+  color: var(--text-muted) !important;
+}
+
+body.theme-vintage .btn-play-now,
+body.theme-midnight .btn-play-now {
+  background-color: transparent !important;
+  border: 1px solid var(--accent) !important;
+  color: var(--accent) !important;
+}
+
+body.theme-vintage .btn-play-now:hover,
+body.theme-midnight .btn-play-now:hover {
+  background-color: var(--accent) !important;
+  color: var(--bg) !important;
+}
+
+/* Anne Frank Card & Prompt Overrides (Home page legibility fix) */
+body.theme-vintage .anne-frank-card,
+body.theme-midnight .anne-frank-card {
+  background-color: var(--card-bg) !important;
+  border: 1px solid var(--card-border) !important;
+}
+body.theme-vintage .quote-text,
+body.theme-midnight .quote-text {
+  color: var(--text) !important;
+  border-left: 2px solid var(--accent) !important;
+}
+body.theme-vintage .author-label,
+body.theme-midnight .author-label {
+  color: var(--text-muted) !important;
+}
+body.theme-vintage .read-more-trigger,
+body.theme-midnight .read-more-trigger {
+  color: var(--accent) !important;
+}
+body.theme-vintage .companion-says-label,
+body.theme-midnight .companion-says-label {
+  color: var(--accent) !important;
+}
+body.theme-vintage .companion-speech,
+body.theme-midnight .companion-speech {
+  color: var(--text) !important;
+}
+body.theme-vintage .prompt-card,
+body.theme-midnight .prompt-card {
+  border: 1px dashed var(--accent) !important;
+}
+body.theme-vintage .prompt-says-label,
+body.theme-midnight .prompt-says-label {
+  color: var(--accent) !important;
+}
+body.theme-vintage .prompt-question,
+body.theme-midnight .prompt-question {
+  color: var(--text) !important;
+}
+body.theme-vintage .prompt-action,
+body.theme-midnight .prompt-action {
+  color: var(--accent) !important;
+}
+
+/* ==========================================================================
+   3. BOTTOM NAVIGATION BAR SYSTEM (Common across all pages)
+   ========================================================================== */
+.bottom-nav {
+  position: fixed !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 65px !important;
+  background-color: var(--card-bg) !important;
+  border-top: 1px solid var(--card-border) !important;
+  z-index: 900 !important;
+  display: grid !important;
+  grid-template-columns: repeat(5, 1fr) !important;
+  align-items: center !important;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.4) !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.nav-tab {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-decoration: none !important;
+  color: var(--text-muted) !important;
+  font-family: 'Lato', sans-serif !important;
+  height: 100% !important;
+  position: relative !important;
+  transition: color 0.3s ease !important;
+}
+
+.tab-icon {
+  font-size: 18px !important;
+  margin-bottom: 2px !important;
+  transition: transform 0.2s ease !important;
+  display: inline-block !important;
+}
+
+.tab-label {
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+}
+
+.nav-tab.active {
+  color: var(--accent) !important;
+}
+
+.center-diary-tab {
+  overflow: visible !important;
+  height: 100% !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  position: relative !important;
+  z-index: 1010 !important;
+}
+
+.diary-circle {
+  position: absolute !important;
+  bottom: 12px !important;
+  width: 58px !important;
+  height: 58px !important;
+  background-color: var(--accent) !important;
+  border-radius: 50% !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.4) !important;
+  animation: diary-center-pulse-theme 2s infinite ease-in-out !important;
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+}
+
+/* Custom glow matching active theme colors */
+body.theme-vintage .diary-circle {
+  box-shadow: 0 0 15px rgba(139, 90, 43, 0.4) !important;
+}
+body.theme-midnight .diary-circle {
+  box-shadow: 0 0 15px rgba(124, 92, 191, 0.4) !important;
+}
+
+.diary-icon {
+  font-size: 24px !important;
+  color: var(--bg) !important;
+}
+
+.diary-circle:hover {
+  transform: scale(1.1) !important;
+}
+
+.diary-circle:active {
+  transform: scale(0.95) !important;
+}
+
+@keyframes diary-center-pulse-theme {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.03); }
+  100% { transform: scale(1); }
+}
+
+.tab-dot {
+  position: absolute !important;
+  top: 8px !important;
+  width: 4px !important;
+  height: 4px !important;
+  background-color: var(--accent) !important;
+  border-radius: 50% !important;
+  opacity: 0 !important;
+  transform: scale(0.5) !important;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+}
+
+.nav-tab.active .tab-dot {
+  opacity: 1 !important;
+  transform: scale(1) !important;
+}

@@ -829,3 +829,89 @@ body {
   flex-direction: column;
   gap: 12px;
 }
+
+/* Mobile Viewport Responsiveness */
+@media (max-width: 480px) {
+  .home-wrapper {
+    padding: 0 12px 80px 12px;
+  }
+  .home-header {
+    padding: 14px 0 8px 0;
+  }
+  .time-greeting {
+    font-size: 19px;
+  }
+  .home-main {
+    gap: 12px;
+  }
+  .dashboard-card {
+    padding: 12px;
+  }
+  .streak-card-top, .streak-card-bottom {
+    gap: 8px;
+  }
+  .streak-emoji {
+    font-size: 24px;
+  }
+  .streak-title {
+    font-size: 16px;
+  }
+  .streak-progress-right {
+    width: 46px;
+    height: 46px;
+  }
+  .progress-ring {
+    width: 46px;
+    height: 46px;
+  }
+  /* Target elements inside the SVG */
+  .progress-ring circle {
+    r: 17;
+    cx: 23;
+    cy: 23;
+  }
+  .mood-emoji-btn {
+    font-size: 28px;
+    width: 42px;
+    height: 42px;
+  }
+}
+
+@media (max-width: 360px) {
+  .home-wrapper {
+    padding: 0 8px 75px 8px;
+  }
+  .time-greeting {
+    font-size: 17px;
+  }
+  .dashboard-card {
+    padding: 10px;
+    border-radius: 12px;
+  }
+  .streak-title {
+    font-size: 15px;
+  }
+  .snap-streak-title {
+    font-size: 13px;
+  }
+  .quote-text {
+    font-size: 14px;
+  }
+  .companion-emoji {
+    font-size: 32px;
+  }
+  .companion-speech {
+    font-size: 12px;
+  }
+  .prompt-question {
+    font-size: 14px;
+  }
+  .mood-emojis-row {
+    gap: 4px;
+  }
+  .mood-emoji-btn {
+    font-size: 24px;
+    width: 36px;
+    height: 36px;
+  }
+}

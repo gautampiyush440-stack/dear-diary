@@ -69,7 +69,7 @@
           <div class="page-hole"></div><div class="page-hole"></div><div class="page-hole"></div>
         </div>
 
-        <span class="page-step-label">Day 1</span>
+        <span class="page-step-label">1/4</span>
         <h2 class="page-question handwriting" id="typewriter-q1"></h2>
 
         <div class="page-content-wrapper">
@@ -96,6 +96,7 @@
           <div class="page-hole"></div><div class="page-hole"></div><div class="page-hole"></div>
         </div>
 
+        <span class="page-step-label">2/4</span>
         <div class="page-greeting-wrapper-s2">
           <span id="greeting-name-s2" class="page-greeting-s2">Nice to meet you! 🌟</span>
         </div>
@@ -140,6 +141,7 @@
           <div class="page-hole"></div><div class="page-hole"></div><div class="page-hole"></div>
         </div>
 
+        <span class="page-step-label">3/4</span>
         <div class="page-greeting-wrapper-s3">
           <span id="diary-ready-title-s3" class="page-greeting-s3">Your diary is ready! 🌟</span>
         </div>
@@ -221,6 +223,7 @@
           <div class="page-hole"></div><div class="page-hole"></div><div class="page-hole"></div>
         </div>
 
+        <span class="page-step-label">4/4</span>
         <!-- Bouncing Selected Companion Emojis -->
         <div class="bouncing-companion-container">
           <div class="emoji-wrapper" style="position: relative; display: inline-block;">
@@ -247,9 +250,11 @@
           <!-- Reactive word tracker -->
           <div id="word-counter" class="word-counter">0 / 50 words</div>
 
-          <!-- Fading Anne Frank Quote -->
-          <div class="quote-container">
-            <p class="anne-quote">"Every story starts with one word 🕯️"</p>
+          <div class="password-signup-wrapper" style="margin-top: 8px; margin-bottom: 15px; display: flex; flex-direction: column; align-items: center; width: 100%; gap: 6px;">
+            <label for="user-password-input" style="font-family: 'Lato', sans-serif; font-size: 10px; text-transform: uppercase; font-weight: 700; color: rgba(30, 18, 8, 0.6); letter-spacing: 0.5px;">Choose password to lock your diary</label>
+            <div class="underline-input-wrapper-s1" style="width: 80%; max-width: 240px; margin-bottom: 0;">
+              <input type="password" id="user-password-input" class="underline-input-s1" placeholder="Enter password..." autocomplete="new-password" style="font-size: 14px; text-align: center; padding: 4px; background: transparent; border: none; border-bottom: 1px solid rgba(184, 134, 11, 0.3); color: #1E1208; outline: none; width: 100%;">
+            </div>
           </div>
         </div>
 
@@ -271,6 +276,8 @@
     <div id="diary-born-message" class="diary-born-message"></div>
   </div>
 
+  <!-- Central API Service Layer -->
+  <script src="../js/api.js"></script>
   <!-- Onboarding Script Link -->
   <script src="../js/onboarding.js"></script>
 </body>

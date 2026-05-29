@@ -240,11 +240,13 @@ body.page-fade-out {
 .char-d {
   transform: translateX(-50vw);
   animation: slide-in-d 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation-delay: 0.2s;
 }
 
 .char-b {
   transform: translateX(50vw);
   animation: slide-in-b 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation-delay: 0.2s;
 }
 
 /* Visual spacing tweak so the letters merge beautifully */
@@ -296,7 +298,7 @@ body.page-fade-out {
   pointer-events: none;
   z-index: 10;
   animation: flash-pulse-anim 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  animation-delay: 1s;
+  animation-delay: 0.8s;
 }
 
 @keyframes flash-pulse-anim {
@@ -316,7 +318,7 @@ body.page-fade-out {
 /* Logo glow enhancement on collision */
 .logo-container {
   animation: logo-glow-anim 1.2s ease-out forwards;
-  animation-delay: 1s;
+  animation-delay: 0.8s;
 }
 
 @keyframes logo-glow-anim {
@@ -344,7 +346,7 @@ body.page-fade-out {
   opacity: 0;
   transform: translateY(12px);
   animation: fade-in-up 0.8s cubic-bezier(0.25, 1, 0.5, 1) forwards;
-  animation-delay: 1.1s;
+  animation-delay: 0.8s;
   text-shadow: 0 2px 10px rgba(255, 215, 0, 0.25);
 }
 
@@ -360,7 +362,7 @@ body.page-fade-out {
   opacity: 0;
   transform: translateY(12px);
   animation: fade-in-up 0.8s cubic-bezier(0.25, 1, 0.5, 1) forwards;
-  animation-delay: 1.25s;
+  animation-delay: 1s;
 }
 
 @keyframes fade-in-up {
@@ -377,7 +379,7 @@ body.page-fade-out {
   position: relative;
   opacity: 0;
   animation: fade-in-loader 0.5s ease-out forwards;
-  animation-delay: 1.4s;
+  animation-delay: 1.2s;
 }
 
 @keyframes fade-in-loader {
@@ -400,8 +402,6 @@ body.page-fade-out {
   background: linear-gradient(90deg, #B8860B, #FFD700);
   border-radius: 1px;
   position: relative;
-  animation: fill-bar-anim 2.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-  animation-delay: 1.4s;
 }
 
 @keyframes fill-bar-anim {

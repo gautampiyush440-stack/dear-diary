@@ -436,40 +436,86 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   if (btnFinish) {
-    btnFinish.addEventListener('click', () => {
+    btnFinish.addEventListener('click', async () => {
+      const passwordInput = document.getElementById('user-password-input');
+      const password = passwordInput ? passwordInput.value.trim() : '';
+      if (!password) {
+        alert('Please choose a password to secure your diary! 🔑');
+        if (passwordInput) passwordInput.focus();
+        return;
+      }
+
+      const username = userNameInput ? userNameInput.value.trim() : 'Friend';
+      const diaryName = diaryNameInput ? diaryNameInput.value.trim() : 'My Diary';
+      const compName = selectedCompanion.name || 'Ollie';
+      const compEmoji = selectedCompanion.emoji || '🦉';
       const entryText = firstEntryInput ? firstEntryInput.value.trim() : '';
-      localStorage.setItem('first_entry', entryText);
 
-      // 1. Trigger Full-screen Gold Flash (0.3s)
-      const flashOverlay = document.getElementById('gold-flash-overlay');
-      if (flashOverlay) {
-        flashOverlay.classList.remove('flash');
-        void flashOverlay.offsetWidth; // trigger reflow
-        flashOverlay.classList.add('flash');
-      }
+      try {
+        btnFinish.disabled = true;
+        btnFinish.textContent = 'Registering...';
 
-      // 2. Show Dark Overlay Message
-      const bornOverlay = document.getElementById('diary-born-overlay');
-      const bornMessage = document.getElementById('diary-born-message');
-      if (bornOverlay && bornMessage) {
-        const userName = localStorage.getItem('user_name') || 'Friend';
-        const diaryName = localStorage.getItem('diary_name') || 'My Diary';
-        bornMessage.textContent = `${userName}, your diary ${diaryName} is born 🥺`;
-        
-        bornOverlay.classList.add('active');
-      }
+        // 1. Signup with Backend
+        await API.signup(username, password, diaryName, compName, compEmoji);
 
-      // 3. Wait 1.5s, then fade to black (transition overlay)
-      setTimeout(() => {
-        if (overlay) {
-          overlay.classList.add('active');
+        // 2. Post first entry if any exists
+        if (entryText) {
+          const words = entryText.split(/\s+/).filter(w => w.length > 0).length;
+          await API.createEntry({
+            content: entryText,
+            mood: '😄',
+            pageStyle: 'classic',
+            font: 'dancing',
+            wordCount: words,
+            photos: [],
+            decorations: []
+          });
         }
 
-        // 4. Redirect after fade completes
+        // Sync local storage keys
+        localStorage.setItem('user_name', username);
+        localStorage.setItem('diary_name', diaryName);
+        localStorage.setItem('companion_name', compName);
+        localStorage.setItem('companion_emoji', compEmoji);
+        localStorage.setItem('first_entry', entryText);
+
+        // Disable status
+        btnFinish.disabled = false;
+        btnFinish.textContent = 'Begin My Journey ✨';
+
+        // 3. Trigger Full-screen Gold Flash (0.3s)
+        const flashOverlay = document.getElementById('gold-flash-overlay');
+        if (flashOverlay) {
+          flashOverlay.classList.remove('flash');
+          void flashOverlay.offsetWidth; // trigger reflow
+          flashOverlay.classList.add('flash');
+        }
+
+        // 4. Show Dark Overlay Message
+        const bornOverlay = document.getElementById('diary-born-overlay');
+        const bornMessage = document.getElementById('diary-born-message');
+        if (bornOverlay && bornMessage) {
+          bornMessage.textContent = `${username}, your diary ${diaryName} is born 🥺`;
+          bornOverlay.classList.add('active');
+        }
+
+        // 5. Wait 1.5s, then fade to black (transition overlay)
         setTimeout(() => {
-          window.location.href = 'home.html';
-        }, 800);
-      }, 1500);
+          if (overlay) {
+            overlay.classList.add('active');
+          }
+
+          // 6. Redirect after fade completes
+          setTimeout(() => {
+            window.location.href = 'home.html';
+          }, 800);
+        }, 1500);
+
+      } catch (err) {
+        alert(`Registration failed: ${err.message || err}`);
+        btnFinish.disabled = false;
+        btnFinish.textContent = 'Begin My Journey ✨';
+      }
     });
   }
 

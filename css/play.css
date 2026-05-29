@@ -1652,11 +1652,125 @@ body {
 }
 
 /* Responsiveness adjustments */
-@media (max-width: 400px) {
+@media (max-width: 480px) {
+  .play-wrapper {
+    padding: 0 12px 80px 12px;
+  }
+  .play-header {
+    padding: 15px 0 8px 0;
+  }
+  .play-title {
+    font-size: 21px;
+  }
+  .daily-challenge-card {
+    padding: 12px;
+    margin-bottom: 16px;
+    gap: 8px;
+  }
+  .challenge-text {
+    font-size: 15px;
+  }
+  .btn-play-now {
+    padding: 6px 18px;
+    font-size: 11px;
+  }
+  .games-grid {
+    gap: 8px;
+  }
+  .game-card {
+    padding: 12px;
+    min-height: 170px;
+  }
+  .game-card-emoji {
+    font-size: 38px;
+  }
+  .game-card-name {
+    font-size: 13px;
+  }
+  .game-card-desc {
+    font-size: 10px;
+  }
+  .btn-game-play {
+    padding: 5px 16px;
+    font-size: 11px;
+  }
+  .overlay-header {
+    padding: 12px 16px;
+  }
+  .overlay-title {
+    font-size: 19px;
+  }
+  .overlay-content {
+    padding: 16px;
+    gap: 12px;
+  }
+  .memory-grid {
+    gap: 6px;
+  }
+  .card-emoji {
+    font-size: 22px;
+  }
+  .puzzle-grid {
+    gap: 6px;
+    max-width: 250px;
+  }
+  .puzzle-cell {
+    font-size: 15px;
+  }
+  .win-card {
+    padding: 24px 16px;
+    gap: 12px;
+  }
+}
+
+@media (max-width: 360px) {
+  .play-wrapper {
+    padding: 0 8px 75px 8px;
+  }
+  .play-title {
+    font-size: 19px;
+  }
+  .coin-badge {
+    padding: 2px 8px;
+  }
+  .coin-count {
+    font-size: 12px;
+  }
+  .daily-challenge-card {
+    padding: 10px;
+    border-radius: 12px;
+  }
+  .challenge-text {
+    font-size: 14px;
+  }
   .games-grid {
     grid-template-columns: 1fr;
+    gap: 10px;
   }
   .game-card.full-width {
     grid-column: span 1;
+  }
+  .game-card {
+    min-height: auto;
+    padding: 12px;
+    gap: 4px;
+  }
+  .btn-game-play {
+    max-width: none;
+    width: auto;
+    padding: 6px 24px;
+  }
+  .memory-grid {
+    gap: 4px;
+  }
+  .card-emoji {
+    font-size: 18px;
+  }
+  .puzzle-grid {
+    gap: 4px;
+    max-width: 220px;
+  }
+  .puzzle-cell {
+    font-size: 13px;
   }
 }

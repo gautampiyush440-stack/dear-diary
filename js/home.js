@@ -2,117 +2,148 @@
  * Dear Diary - Home Dashboard Controller
  */
 document.addEventListener('DOMContentLoaded', () => {
-  // ---------------------------------------------------------
-  // PULL FROM localStorage
-  // ---------------------------------------------------------
-  const userName = localStorage.getItem('user_name') || 'Friend';
-  const diaryName = localStorage.getItem('diary_name') || 'My Diary';
-  const companionName = localStorage.getItem('companion_name') || 'Ollie';
-  const companionEmoji = localStorage.getItem('companion_emoji') || '🦉';
-  
-  // Streaks (default to 1 if not set)
-  let writingStreak = parseInt(localStorage.getItem('writingStreak'), 10);
-  if (isNaN(writingStreak)) {
-    writingStreak = 1;
-    localStorage.setItem('writingStreak', '1');
-  }
-  
-  let snapStreak = parseInt(localStorage.getItem('snapStreak'), 10);
-  if (isNaN(snapStreak)) {
-    snapStreak = 1;
-    localStorage.setItem('snapStreak', '1');
-  }
+  // Initialize dashboard stats
+  async function initDashboard() {
+    let userName = 'Friend';
+    let diaryName = 'My Diary';
+    let companionName = 'Ollie';
+    let companionEmoji = '🦉';
+    let writingStreak = 1;
+    let snapStreak = 1;
 
-  // ---------------------------------------------------------
-  // INITIALIZE DYNAMIC LABELS
-  // ---------------------------------------------------------
-  // Inject companion emojis & labels
-  const emojiDisplay = document.getElementById('companion-emoji');
-  if (emojiDisplay) emojiDisplay.textContent = companionEmoji;
+    try {
+      // 1. Fetch live profile
+      const profile = await API.getProfile();
+      userName = profile.username || 'Friend';
+      diaryName = profile.diaryName || 'My Diary';
+      companionName = profile.companionName || 'Ollie';
+      companionEmoji = profile.companionEmoji || '🦉';
+      writingStreak = profile.streak || 0;
 
-  const floatEmojiDisplay = document.getElementById('floating-companion-emoji');
-  if (floatEmojiDisplay) floatEmojiDisplay.textContent = companionEmoji;
+      // Sync local storage backups
+      localStorage.setItem('user_name', userName);
+      localStorage.setItem('diary_name', diaryName);
+      localStorage.setItem('companion_name', companionName);
+      localStorage.setItem('companion_emoji', companionEmoji);
 
-  const saysLabel = document.getElementById('companion-says-label');
-  if (saysLabel) saysLabel.textContent = `${companionName} says:`;
+      // Load snap list
+      try {
+        const snaps = await API.getSnaps();
+        snapStreak = snaps.length > 0 ? 1 : 0;
+      } catch (err) {
+        snapStreak = parseInt(localStorage.getItem('snapStreak'), 10) || 0;
+      }
+    } catch (err) {
+      console.warn('Backend API request failed, using localStorage fallback:', err);
+      userName = localStorage.getItem('user_name') || 'Friend';
+      diaryName = localStorage.getItem('diary_name') || 'My Diary';
+      companionName = localStorage.getItem('companion_name') || 'Ollie';
+      companionEmoji = localStorage.getItem('companion_emoji') || '🦉';
+      
+      writingStreak = parseInt(localStorage.getItem('writingStreak'), 10);
+      if (isNaN(writingStreak)) writingStreak = 1;
 
-  // Auto set current date on Anne Frank card
-  const dateEl = document.getElementById('anne-frank-date');
-  if (dateEl) {
-    const options = { month: 'long', day: 'numeric', year: 'numeric' };
-    dateEl.textContent = new Date().toLocaleDateString('en-US', options);
-  }
-
-  // ---------------------------------------------------------
-  // DYNAMIC HEADER GREETINGS & MESSAGES
-  // ---------------------------------------------------------
-  const timeGreeting = document.getElementById('time-greeting');
-  const companionSpeech = document.getElementById('companion-speech');
-  const hour = new Date().getHours();
-  
-  let greetingText = "";
-  let companionText = "";
-
-  // Greetings logic based on hours:
-  // 5am-12pm: "Good Morning ☀️"
-  // 12pm-5pm: "Good Afternoon 🌤️"
-  // 5pm-9pm: "Good Evening 🌙"
-  // 9pm-5am: "Good Night ⭐"
-  if (hour >= 5 && hour < 12) {
-    greetingText = `Good Morning, ${userName} ☀️`;
-    companionText = `Good morning ${userName}! Ready to make a memory? 🌟`;
-  } else if (hour >= 12 && hour < 17) {
-    greetingText = `Good Afternoon, ${userName} 🌤️`;
-    companionText = `How is your day going ${userName}? 🌤️`;
-  } else if (hour >= 17 && hour < 21) {
-    greetingText = `Good Evening, ${userName} 🌙`;
-    companionText = `Tell me about your day ${userName} 🌙`;
-  } else {
-    greetingText = `Good Night, ${userName} ⭐`;
-    companionText = `I am here to listen ${userName}. How are you? ⭐`;
-  }
-
-  if (timeGreeting) timeGreeting.textContent = greetingText;
-  if (companionSpeech) companionSpeech.textContent = companionText;
-
-  // ---------------------------------------------------------
-  // STREAK COUNTERS & PROGRESS RINGS
-  // ---------------------------------------------------------
-  // Milestones: 7, 14, 30, 100 days
-  const milestones = [7, 14, 30, 100];
-  let nextMilestone = 7;
-  for (let m of milestones) {
-    if (writingStreak < m) {
-      nextMilestone = m;
-      break;
+      snapStreak = parseInt(localStorage.getItem('snapStreak'), 10);
+      if (isNaN(snapStreak)) snapStreak = 1;
     }
-    nextMilestone = 100;
-  }
 
-  let percent = 0;
-  if (writingStreak >= 100) {
-    percent = 100;
-  } else {
-    percent = Math.round((writingStreak / nextMilestone) * 100);
-  }
+    // ---------------------------------------------------------
+    // INITIALIZE DYNAMIC LABELS
+    // ---------------------------------------------------------
+    const emojiDisplay = document.getElementById('companion-emoji');
+    if (emojiDisplay) emojiDisplay.textContent = companionEmoji;
 
-  // Animate progress circle stroke
-  const circle = document.getElementById('progress-ring-circle');
-  const label = document.getElementById('progress-percent-label');
-  if (circle) {
-    const circumference = 2 * Math.PI * 21; // ~131.95
-    circle.style.strokeDasharray = `${circumference} ${circumference}`;
-    circle.style.strokeDashoffset = circumference; // start empty
+    const floatEmojiDisplay = document.getElementById('floating-companion-emoji');
+    if (floatEmojiDisplay) floatEmojiDisplay.textContent = companionEmoji;
+
+    const saysLabel = document.getElementById('companion-says-label');
+    if (saysLabel) saysLabel.textContent = `${companionName} says:`;
+
+    // Auto set current date on Anne Frank card
+    const dateEl = document.getElementById('anne-frank-date');
+    if (dateEl) {
+      const options = { month: 'long', day: 'numeric', year: 'numeric' };
+      dateEl.textContent = new Date().toLocaleDateString('en-US', options);
+    }
+
+    // ---------------------------------------------------------
+    // DYNAMIC HEADER GREETINGS & MESSAGES
+    // ---------------------------------------------------------
+    const timeGreeting = document.getElementById('time-greeting');
+    const companionSpeech = document.getElementById('companion-speech');
+    const hour = new Date().getHours();
     
-    // Smooth animate fill
+    let greetingText = "";
+    let companionText = "";
+
+    if (hour >= 5 && hour < 12) {
+      greetingText = `Good Morning, ${userName} ☀️`;
+      companionText = `Good morning ${userName}! Ready to make a memory? 🌟`;
+    } else if (hour >= 12 && hour < 17) {
+      greetingText = `Good Afternoon, ${userName} 🌤️`;
+      companionText = `How is your day going ${userName}? 🌤️`;
+    } else if (hour >= 17 && hour < 21) {
+      greetingText = `Good Evening, ${userName} 🌙`;
+      companionText = `Tell me about your day ${userName} 🌙`;
+    } else {
+      greetingText = `Good Night, ${userName} ⭐`;
+      companionText = `I am here to listen ${userName}. How are you? ⭐`;
+    }
+
+    if (timeGreeting) timeGreeting.textContent = greetingText;
+    if (companionSpeech) companionSpeech.textContent = companionText;
+
+    // Trigger count-up animation
     setTimeout(() => {
-      const offset = circumference - (percent / 100) * circumference;
-      circle.style.strokeDashoffset = offset;
-    }, 400);
+      animateCountUp('streak-title', writingStreak, writingStreak === 1 ? 'Day Streak' : 'Day Streaks');
+      animateCountUp('snap-streak-title', snapStreak, snapStreak === 1 ? 'Snap Streak' : 'Snap Streaks');
+    }, 250);
+
+    // Render streak milestone rings
+    renderStreakRing(writingStreak);
   }
-  
-  if (label) {
-    label.textContent = `${percent}%`;
+
+  // Trigger loading dashboard
+  initDashboard();
+
+  // Define helper functions outside initDashboard
+  function renderStreakRing(writingStreak) {
+    // Milestones: 7, 14, 30, 100 days
+    const milestones = [7, 14, 30, 100];
+    let nextMilestone = 7;
+    for (let m of milestones) {
+      if (writingStreak < m) {
+        nextMilestone = m;
+        break;
+      }
+      nextMilestone = 100;
+    }
+
+    let percent = 0;
+    if (writingStreak >= 100) {
+      percent = 100;
+    } else {
+      percent = Math.round((writingStreak / nextMilestone) * 100);
+    }
+
+    // Animate progress circle stroke
+    const circle = document.getElementById('progress-ring-circle');
+    const label = document.getElementById('progress-percent-label');
+    if (circle) {
+      const circumference = 2 * Math.PI * 21; // ~131.95
+      circle.style.strokeDasharray = `${circumference} ${circumference}`;
+      circle.style.strokeDashoffset = circumference; // start empty
+      
+      // Smooth animate fill
+      setTimeout(() => {
+        const offset = circumference - (percent / 100) * circumference;
+        circle.style.strokeDashoffset = offset;
+      }, 400);
+    }
+    
+    if (label) {
+      label.textContent = `${percent}%`;
+    }
   }
 
   // ---------------------------------------------------------
@@ -341,6 +372,36 @@ document.addEventListener('DOMContentLoaded', () => {
       
       const floatEmoji = document.getElementById('floating-companion-emoji');
       if (floatEmoji) floatEmoji.style.animationPlayState = 'running';
+    });
+  }
+
+  // ---------------------------------------------------------
+  // COMPANION CARD INTERACTIVE CHAT
+  // ---------------------------------------------------------
+  const companionCard = document.querySelector('.companion-card');
+  if (companionCard) {
+    companionCard.style.cursor = 'pointer';
+    companionCard.addEventListener('click', async () => {
+      const liveCompanionName = localStorage.getItem('companion_name') || 'Ollie';
+      const message = prompt(`Chat with ${liveCompanionName}: What is on your mind today? 🥺`);
+      if (!message || !message.trim()) return;
+
+      const speechBubble = document.getElementById('companion-speech');
+      if (speechBubble) {
+        speechBubble.textContent = "Thinking... 💭";
+      }
+
+      try {
+        const response = await API.chatWithCompanion(message);
+        if (speechBubble && response.reply) {
+          speechBubble.textContent = response.reply;
+        }
+      } catch (err) {
+        console.warn('API companion chat failed, using offline response:', err);
+        if (speechBubble) {
+          speechBubble.textContent = `I'm always here to support you! 🦉 Keep writing in your diary.`;
+        }
+      }
     });
   }
 });

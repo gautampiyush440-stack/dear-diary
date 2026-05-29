@@ -425,11 +425,16 @@ body {
    PAGE STYLE SELECTOR
    -------------------------------------------------------------------------- */
 .page-style-selector {
+  display: none; /* Hidden by default */
   background-color: rgba(44, 21, 3, 0.3);
   padding: 8px 16px;
   border-bottom: 1px solid rgba(184, 134, 11, 0.1);
   overflow-x: auto;
   flex-shrink: 0;
+}
+
+.page-style-selector.active {
+  display: block; /* Show when active */
 }
 
 .style-row {
@@ -1519,4 +1524,103 @@ body {
   0% { transform: rotateY(0deg) scale(1); opacity: 1; }
   50% { transform: rotateY(-90deg) scale(0.95); opacity: 0.5; }
   100% { transform: rotateY(-180deg) scale(0.9); opacity: 0; }
+}
+
+/* Mobile Viewport Responsiveness */
+@media (max-width: 480px) {
+  .diary-wrapper {
+    padding: 0 12px 80px 12px;
+  }
+  .diary-header {
+    padding: 15px 0 8px 0;
+  }
+  .date-item {
+    width: 38px;
+  }
+  .date-number {
+    font-size: 14px;
+  }
+  .new-entry-screen {
+    padding: 20px 14px 20px 14px;
+  }
+  .diary-page-canvas {
+    padding: 24px 20px 24px 40px;
+  }
+  .text-editor {
+    padding-left: 36px;
+    font-size: 16px;
+    line-height: 28px;
+    min-height: 320px;
+  }
+  .write-tools-bar {
+    gap: 10px;
+    padding: 6px 12px;
+  }
+  .tool-btn {
+    font-size: 15px;
+  }
+  .polaroid-card {
+    width: 140px;
+    padding: 8px 8px 12px 8px;
+  }
+  .polaroid-image {
+    height: 100px;
+  }
+  .polaroid-caption-input {
+    font-size: 11px;
+    margin-top: 6px;
+  }
+  .bottom-sheet-card {
+    padding: 16px 12px 24px 12px;
+  }
+  .stickers-grid {
+    gap: 8px;
+  }
+  .sticker-btn {
+    padding: 10px 4px;
+    font-size: 9px;
+  }
+}
+
+@media (max-width: 360px) {
+  .diary-wrapper {
+    padding: 0 8px 75px 8px;
+  }
+  .date-item {
+    width: 32px;
+  }
+  .date-number {
+    font-size: 12px;
+  }
+  .diary-page-canvas {
+    padding: 20px 12px 20px 32px;
+  }
+  .text-editor {
+    padding-left: 28px;
+    font-size: 14px;
+    line-height: 24px;
+    min-height: 260px;
+  }
+  .polaroid-card {
+    width: 110px;
+  }
+  .polaroid-image {
+    height: 80px;
+  }
+  .sticker-item {
+    font-size: 22px;
+  }
+  .transcription-card {
+    max-height: 140px;
+  }
+  .voice-listening-title {
+    font-size: 20px;
+  }
+  .btn-mic-record {
+    width: 70px;
+    height: 70px;
+  }
+  .mic-icon {
+    font-size: 28px;
+  }
 }

@@ -15,6 +15,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Lato:ital,wght@0,300;0,400;0,700;1,400&display=swap" rel="stylesheet">
 
   <!-- Me Style Sheet Link -->
+  <link rel="stylesheet" href="../css/theme.css">
   <link rel="stylesheet" href="../css/me.css">
 </head>
 <body>
@@ -130,6 +131,11 @@
       <section class="menu-section">
         <h3 class="menu-section-title">SETTINGS</h3>
         <div class="menu-list">
+          <button class="menu-item" data-overlay="settings-profile">
+            <span class="menu-icon">👤</span>
+            <span class="menu-label">Profile Settings</span>
+            <span class="menu-arrow">→</span>
+          </button>
           <button class="menu-item" data-overlay="settings-notifications">
             <span class="menu-icon">🔔</span>
             <span class="menu-label">Notifications</span>
@@ -743,6 +749,41 @@
   </div>
 
   <!-- ====================================================================
+       SETTINGS - PROFILE SCREEN OVERLAY (Slides up full screen)
+       ==================================================================== -->
+  <div id="overlay-settings-profile" class="me-overlay">
+    <header class="overlay-header">
+      <button class="btn-overlay-back" data-target="settings-profile">← Back</button>
+      <h2 class="overlay-title">Profile Settings 👤</h2>
+    </header>
+
+    <div class="overlay-content">
+      <div class="privacy-actions-card">
+        <h3>Edit Profile</h3>
+        <p>Customize your username and diary title</p>
+        
+        <div class="profile-input-group" style="display: flex; flex-direction: column; gap: 4px;">
+          <span class="time-label" style="font-size: 10px; color: var(--text-muted);">Your Name</span>
+          <div class="studio-input-wrapper" style="width: 100%;">
+            <input type="text" id="input-user-name" class="companion-underline-input" placeholder="Your name..." autocomplete="off" style="text-align: left; font-family: 'Lato', sans-serif; font-size: 15px; font-weight: normal; border-bottom: 1.5px solid var(--card-border);">
+            <div class="underline-focus-bar"></div>
+          </div>
+        </div>
+
+        <div class="profile-input-group" style="display: flex; flex-direction: column; gap: 4px; margin-top: 12px;">
+          <span class="time-label" style="font-size: 10px; color: var(--text-muted);">Diary Name</span>
+          <div class="studio-input-wrapper" style="width: 100%;">
+            <input type="text" id="input-diary-name" class="companion-underline-input" placeholder="Diary name..." autocomplete="off" style="text-align: left; font-family: 'Lato', sans-serif; font-size: 15px; font-weight: normal; border-bottom: 1.5px solid var(--card-border);">
+            <div class="underline-focus-bar"></div>
+          </div>
+        </div>
+
+        <button id="btn-save-profile" class="btn-save-gold" style="margin-top: 15px;">Save Profile</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================================================================
        SETTINGS - NOTIFICATIONS SCREEN OVERLAY (Slides up full screen)
        ==================================================================== -->
   <div id="overlay-settings-notifications" class="me-overlay">
@@ -920,7 +961,7 @@
       </div>
 
       <div class="about-footer">
-        <p>Made with 💛 for you.</p>
+        <p>Made with ❤️ by Piyush</p>
       </div>
     </div>
   </div>
@@ -963,6 +1004,22 @@
   </div>
 
   <!-- ====================================================================
+       PREMIUM CHECKOUT GATEWAY SIMULATION MODAL
+       ==================================================================== -->
+  <div id="checkout-simulation-modal" class="confirm-overlay">
+    <div class="confirm-card" style="border: 2px solid var(--accent); background: linear-gradient(135deg, var(--card-bg) 0%, rgba(218, 165, 32, 0.1) 100%);">
+      <div class="confirm-icon" style="color: var(--accent);">👑</div>
+      <h2 class="confirm-title" style="color: var(--accent);">Golden Upgrade</h2>
+      <p class="confirm-desc" id="checkout-modal-desc">Upgrade to Golden Diary Premium for only $4.99 USD.</p>
+      
+      <div class="confirm-actions-row" style="margin-top: 15px;">
+        <button id="btn-cancel-checkout" class="btn-confirm-action outline">Cancel</button>
+        <button id="btn-confirm-checkout" class="btn-confirm-action" style="background-color: var(--accent); color: #000; border: none; font-weight: bold;">Pay $4.99 💳</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================================================================
        SIGN OUT DATA WIPE DIALOG MODAL
        ==================================================================== -->
   <div id="sign-out-confirm-modal" class="confirm-overlay">
@@ -990,6 +1047,7 @@
   </div>
 
   <!-- Me Script Link -->
+  <script src="../js/api.js"></script>
   <script src="../js/me.js"></script>
 </body>
 </html>
