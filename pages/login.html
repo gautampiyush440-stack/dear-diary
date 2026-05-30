@@ -408,19 +408,6 @@
       // Forgot Password Link
       const btnForgot = document.getElementById('btn-forgot-password');
 
-      // Check auth on load: If already logged in, redirect to home.html
-      const checkFirebaseInterval = setInterval(() => {
-        if (typeof window.firebase !== 'undefined') {
-          clearInterval(checkFirebaseInterval);
-          
-          window.firebase.auth().onAuthStateChanged((user) => {
-            if (user) {
-              window.location.href = 'home.html';
-            }
-          });
-        }
-      }, 50);
-
       // Tab switches
       if (tabLogin && tabSignup) {
         tabLogin.addEventListener('click', () => {

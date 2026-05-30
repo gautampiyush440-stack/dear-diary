@@ -1,22 +1,41 @@
 /**
  * Dear Diary - My Space Profile Controller
  */
-// Protect page via Firebase Auth state
+// Protect page via Firebase Auth state & setup navigation behavior
 (function() {
+  const activePage = 'me.html';
+
+  // 1. Auth Guard
   const checkFirebase = setInterval(() => {
     if (typeof window.firebase !== 'undefined') {
       clearInterval(checkFirebase);
       window.firebase.auth().onAuthStateChanged((user) => {
-        if (!user) {
-          if (window.location.protocol === 'file:') {
-            window.location.href = 'login.html';
-          } else {
-            window.location.href = '/pages/login.html';
-          }
+        if (window.firebase.auth().currentUser === null) {
+          window.location.href = 'login.html';
         }
       });
     }
   }, 50);
+
+  // 2. Navigation
+  document.addEventListener('DOMContentLoaded', () => {
+    const navTabs = document.querySelectorAll('.bottom-nav a');
+    navTabs.forEach(tab => {
+      const href = tab.getAttribute('href') || '';
+      const pageName = href.substring(href.lastIndexOf('/') + 1);
+      
+      if (pageName === activePage) {
+        tab.classList.add('active');
+      } else {
+        tab.classList.remove('active');
+      }
+
+      tab.addEventListener('click', (e) => {
+        e.preventDefault();
+        window.location.href = pageName;
+      });
+    });
+  });
 })();
 
 document.addEventListener('DOMContentLoaded', () => {

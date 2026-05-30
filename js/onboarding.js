@@ -7,12 +7,8 @@
     if (typeof window.firebase !== 'undefined') {
       clearInterval(checkFirebase);
       window.firebase.auth().onAuthStateChanged((user) => {
-        if (!user) {
-          if (window.location.protocol === 'file:') {
-            window.location.href = 'login.html';
-          } else {
-            window.location.href = '/pages/login.html';
-          }
+        if (window.firebase.auth().currentUser === null) {
+          window.location.href = 'login.html';
         }
       });
     }
