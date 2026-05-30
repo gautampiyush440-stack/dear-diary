@@ -435,11 +435,19 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // Hide password field if already authenticated (Firebase login flow)
+  const passwordWrapper = document.querySelector('.password-signup-wrapper');
+  if (passwordWrapper && typeof API !== 'undefined' && API.isAuthenticated()) {
+    passwordWrapper.style.display = 'none';
+  }
+
   if (btnFinish) {
     btnFinish.addEventListener('click', async () => {
+      const isAuth = typeof API !== 'undefined' && API.isAuthenticated();
       const passwordInput = document.getElementById('user-password-input');
       const password = passwordInput ? passwordInput.value.trim() : '';
-      if (!password) {
+      
+      if (!isAuth && !password) {
         alert('Please choose a password to secure your diary! 🔑');
         if (passwordInput) passwordInput.focus();
         return;
@@ -455,8 +463,23 @@ document.addEventListener('DOMContentLoaded', () => {
         btnFinish.disabled = true;
         btnFinish.textContent = 'Registering...';
 
-        // 1. Signup with Backend
-        await API.signup(username, password, diaryName, compName, compEmoji);
+        // 1. Authenticate / Signup with Backend
+        if (isAuth) {
+          // Update profile in Firebase
+          const fbUser = window.firebase ? window.firebase.auth().currentUser : null;
+          if (fbUser) {
+            try {
+              await fbUser.updateProfile({ displayName: username });
+            } catch (fbErr) {
+              console.error("Failed to update Firebase display name:", fbErr);
+            }
+          }
+          // Update SQLite backend
+          await API.updateProfile(username, diaryName);
+          await API.updateCompanion(compName, compEmoji);
+        } else {
+          await API.signup(username, password, diaryName, compName, compEmoji);
+        }
 
         // 2. Post first entry if any exists
         if (entryText) {

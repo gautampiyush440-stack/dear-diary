@@ -4,26 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <!-- SEO Optimization Meta Tags -->
-  <title>Dear Diary — Your Private Digital Journal & Companion</title>
-  <meta name="description" content="Capture your thoughts, dreams, and memories with Dear Diary. A beautiful, minimal, and secure digital journal. Your story, your companion.">
-  <meta name="keywords" content="diary, journal, private journal, secure diary, daily reflection, thoughts tracker">
-  <meta name="author" content="Dear Diary App">
-
-  <!-- Open Graph / Social Sharing Meta Tags -->
-  <meta property="og:type" content="website">
-  <meta property="og:title" content="Dear Diary — Your Private Digital Journal & Companion">
-  <meta property="og:description" content="Capture your thoughts, dreams, and memories with Dear Diary. A beautiful, minimal, and secure digital journal.">
-  <meta property="og:site_name" content="Dear Diary">
+  <title>Dear Diary — Login & Sign Up</title>
+  <meta name="description" content="Access your private digital journal. A beautiful, minimal, and secure space for daily reflections.">
 
   <!-- Google Fonts Connection -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Lato:ital,wght@0,300;0,400;0,700;1,400&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Lato:ital,wght@0,300;0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
 
-  <!-- ====================================================================
-       INLINE STYLES (Consolidated reset, splash overlay, and onboarding steps)
-       ==================================================================== -->
   <style>
     /* Reset & Base Variables */
     * {
@@ -33,2220 +21,730 @@
     }
 
     body {
-      background-color: #120500;
-      color: #FFE066;
+      background-color: #1A0A00;
+      color: #FFFAF0;
       font-family: 'Lato', sans-serif;
-      overflow: hidden;
-      height: 100vh;
-      width: 100vw;
+      min-height: 100vh;
       display: flex;
+      align-items: center;
       justify-content: center;
-      align-items: center;
-      user-select: none;
-      opacity: 1;
-      transition: opacity 0.6s cubic-bezier(0.25, 1, 0.5, 1);
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
+      padding: 20px;
+      overflow-x: hidden;
     }
 
-    /* Page fade-out state during final redirection transition */
-    body.page-fade-out {
-      opacity: 0;
-    }
-
-    /* Full Screen Transition Overlay (fade to black on completion) */
-    .transition-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
+    /* Card Wrapper with Fade-In Animation */
+    .login-container {
+      background-color: #1C0A00;
+      border: 1px solid #B8860B;
+      border-radius: 20px;
+      padding: 40px 30px;
       width: 100%;
-      height: 100%;
-      background-color: #000000;
-      z-index: 99999;
-      opacity: 0;
-      visibility: hidden;
-      transition: opacity 0.8s ease, visibility 0.8s;
-      pointer-events: none;
+      max-width: 400px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+      animation: fadeIn 0.6s ease-out;
+      position: relative;
     }
 
-    .transition-overlay.active {
-      opacity: 1;
-      visibility: visible;
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(15px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
-    /* ====================================================================
-       Static Blurred Background Diary Component (Z-Index: 1)
-       ==================================================================== */
-    .diary-page-background {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background-color: #120500;
-      display: flex;
-      flex-direction: column;
-      z-index: 1;
-      padding: 30px;
-      box-sizing: border-box;
-      filter: blur(10px) brightness(0.4);
-      transform: scale(1.03);
-      pointer-events: none;
+    /* Shake Animation for Errors */
+    .shake {
+      animation: shake 0.4s ease-in-out;
     }
 
-    .diary-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid rgba(184, 134, 11, 0.2);
-      padding-bottom: 15px;
-      margin-bottom: 30px;
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-8px); }
+      40%, 80% { transform: translateX(8px); }
     }
 
-    .diary-brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
+    /* Header Styles */
+    .brand-header {
+      text-align: center;
+      margin-bottom: 25px;
     }
 
-    .brand-monogram {
-      font-family: 'Playfair Display', serif;
+    .brand-logo {
+      font-family: 'Dancing Script', cursive;
+      font-size: 40px;
+      color: #FFD700;
       font-weight: 700;
-      font-size: 26px;
-      background: linear-gradient(135deg, #FFE875 0%, #F7C600 50%, #B8860B 100%);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
+      line-height: 1;
+      margin-bottom: 5px;
+      user-select: none;
     }
 
     .brand-name {
       font-family: 'Dancing Script', cursive;
-      font-weight: 700;
-      font-size: 22px;
+      font-size: 28px;
       color: #FFD700;
-    }
-
-    .diary-date {
-      font-family: 'Lato', sans-serif;
-      font-size: 12px;
-      font-weight: 700;
-      color: #B8860B;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-    }
-
-    .diary-main {
-      flex-grow: 1;
-      display: flex;
-      justify-content: center;
-      align-items: stretch;
-    }
-
-    .diary-paper {
-      width: 100%;
-      max-width: 900px;
-      background-color: #1A0A00;
-      border: 1px solid rgba(184, 134, 11, 0.15);
-      border-radius: 16px;
-      box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.9), 0 10px 40px rgba(0, 0, 0, 0.7);
-      padding: 50px 60px;
-      position: relative;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .diary-paper::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 90px;
-      width: 1px;
-      height: 100%;
-      background-color: rgba(212, 175, 55, 0.25);
-    }
-
-    .ruled-bg {
-      position: absolute;
-      top: 50px;
-      left: 60px;
-      right: 60px;
-      bottom: 50px;
-      background-image: linear-gradient(rgba(184, 134, 11, 0.08) 1px, transparent 1px);
-      background-size: 100% 2.2rem;
-      pointer-events: none;
-    }
-
-    .diary-entry-title {
-      font-family: 'Dancing Script', cursive;
-      font-size: 32px;
-      color: #FFD700;
-      margin-bottom: 2.2rem;
-      line-height: 2.2rem;
-      height: 2.2rem;
-      padding-left: 60px;
-    }
-
-    .paper-content {
-      position: relative;
-      flex-grow: 1;
-    }
-
-    .mock-lines {
-      padding-left: 60px;
-      display: flex;
-      flex-direction: column;
-      gap: 2.2rem;
-    }
-
-    .mock-line {
-      height: 14px;
-      width: 90%;
-      background-color: rgba(255, 224, 102, 0.15);
-      border-radius: 4px;
-    }
-
-    .mock-line:nth-child(2) { width: 75%; }
-    .mock-line:nth-child(3) { width: 85%; }
-    .mock-line:nth-child(4) { width: 50%; }
-    .mock-line:nth-child(5) { width: 60%; }
-
-    /* ====================================================================
-       Splash Overlay Screen Component (Z-Index: 9999)
-       ==================================================================== */
-    #splash-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: radial-gradient(circle at center, rgba(26, 10, 0, 0.45) 0%, rgba(12, 4, 0, 0.78) 100%);
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      z-index: 9999;
-      opacity: 1;
-      visibility: visible;
-      transition: opacity 0.3s cubic-bezier(0.25, 1, 0.5, 1), 
-                  visibility 0.3s cubic-bezier(0.25, 1, 0.5, 1);
-    }
-
-    #splash-overlay.fade-out {
-      opacity: 0;
-      visibility: hidden;
-    }
-
-    .splash-content {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      position: relative;
-    }
-
-    .logo-wrapper {
-      position: relative;
-      margin-bottom: 24px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 120px;
-      width: 240px;
-    }
-
-    .logo-container {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-family: 'Playfair Display', serif;
-      font-weight: 700;
-      font-size: 96px; 
-      line-height: 1;
-      position: relative;
-      letter-spacing: -2px;
-      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.6));
-    }
-
-    .logo-char {
-      display: inline-block;
-      background: linear-gradient(135deg, #FFE875 0%, #F7C600 50%, #B8860B 100%);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-    }
-
-    .char-d {
-      transform: translateX(-50vw);
-      animation: slide-in-d 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-      animation-delay: 0.2s;
-    }
-
-    .char-b {
-      transform: translateX(50vw);
-      animation: slide-in-b 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-      animation-delay: 0.2s;
-    }
-
-    .char-d { margin-right: -2px; }
-    .char-b { margin-left: -2px; }
-
-    @keyframes slide-in-d {
-      0% { transform: translateX(-50vw); opacity: 0; }
-      40% { opacity: 1; }
-      100% { transform: translateX(0); opacity: 1; }
-    }
-
-    @keyframes slide-in-b {
-      0% { transform: translateX(50vw); opacity: 0; }
-      40% { opacity: 1; }
-      100% { transform: translateX(0); opacity: 1; }
-    }
-
-    .flash-pulse {
-      position: absolute;
-      width: 160px;
-      height: 160px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(255, 215, 0, 0.95) 0%, rgba(255, 179, 0, 0.3) 40%, rgba(255, 215, 0, 0) 70%);
-      transform: scale(0);
-      opacity: 0;
-      pointer-events: none;
-      z-index: 10;
-      animation: flash-pulse-anim 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-      animation-delay: 0.8s;
-    }
-
-    @keyframes flash-pulse-anim {
-      0% { transform: scale(0); opacity: 0; }
-      15% { opacity: 1; }
-      100% { transform: scale(2.2); opacity: 0; }
-    }
-
-    .logo-container {
-      animation: logo-glow-anim 1.2s ease-out forwards;
-      animation-delay: 0.8s;
-    }
-
-    @keyframes logo-glow-anim {
-      0% { filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.6)); }
-      15% { filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.95)) drop-shadow(0 0 35px rgba(212, 175, 55, 0.6)); }
-      100% { filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.2)) drop-shadow(0 2px 6px rgba(0, 0, 0, 0.6)); }
-    }
-
-    .app-name {
-      font-family: 'Dancing Script', cursive;
-      font-weight: 700;
-      font-size: 36px;
-      color: #FFD700;
-      margin-top: 10px;
+      font-weight: 600;
       margin-bottom: 6px;
-      opacity: 0;
-      transform: translateY(12px);
-      animation: fade-in-up 0.8s cubic-bezier(0.25, 1, 0.5, 1) forwards;
-      animation-delay: 0.8s;
-      text-shadow: 0 2px 10px rgba(255, 215, 0, 0.25);
     }
 
-    .app-tagline {
+    .brand-subtitle {
       font-family: 'Lato', sans-serif;
       font-style: italic;
-      font-weight: 400;
       font-size: 13px;
       color: #B8860B;
-      margin-bottom: 36px;
-      letter-spacing: 0.8px;
-      opacity: 0;
-      transform: translateY(12px);
-      animation: fade-in-up 0.8s cubic-bezier(0.25, 1, 0.5, 1) forwards;
-      animation-delay: 1s;
+      letter-spacing: 0.5px;
     }
 
-    @keyframes fade-in-up {
+    /* Tab Switcher */
+    .tab-switcher {
+      display: flex;
+      border-bottom: 1px solid #8B7355;
+      margin-bottom: 25px;
+    }
+
+    .tab-btn {
+      flex: 1;
+      background: none;
+      border: none;
+      padding: 12px;
+      font-family: 'Lato', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      color: #8B7355;
+      cursor: pointer;
+      transition: color 0.3s, border-bottom 0.3s;
+      text-align: center;
+      border-bottom: 2px solid transparent;
+      outline: none;
+    }
+
+    .tab-btn.active {
+      color: #FFD700;
+      border-bottom: 2px solid #FFD700;
+    }
+
+    /* Forms container & smooth slide animations */
+    .form-wrapper {
+      position: relative;
+    }
+
+    .auth-form {
+      display: none;
+      animation: slideUp 0.4s ease-out;
+    }
+
+    .auth-form.active {
+      display: block;
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
     }
 
-    .loader-container {
-      width: 160px;
-      height: 2px;
-      position: relative;
-      opacity: 0;
-      animation: fade-in-loader 0.5s ease-out forwards;
-      animation-delay: 1.2s;
-    }
-
-    @keyframes fade-in-loader {
-      to { opacity: 1; }
-    }
-
-    .loader-track {
-      width: 100%;
-      height: 100%;
-      background: rgba(184, 134, 11, 0.15);
-      border-radius: 1px;
+    /* Input Fields */
+    .input-group {
+      margin-bottom: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
       position: relative;
     }
 
-    .loader-fill {
-      height: 100%;
-      width: 0%;
-      background: linear-gradient(90deg, #B8860B, #FFD700);
-      border-radius: 1px;
-      position: relative;
-    }
-
-    @keyframes fill-bar-anim {
-      to { width: 100%; }
-    }
-
-    .loader-fill::after {
-      content: '';
-      position: absolute;
-      right: -4px;
-      top: -3px;
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background-color: #FFFFFF;
-      box-shadow: 0 0 10px #FFD700, 0 0 20px #FFD700;
-      opacity: 0.95;
-      transform: scale(0.9);
-      animation: glow-pulse 1s ease-in-out infinite alternate;
-    }
-
-    @keyframes glow-pulse {
-      0% { transform: scale(0.8); box-shadow: 0 0 8px #FFD700, 0 0 12px #FFD700; }
-      100% { transform: scale(1.1); box-shadow: 0 0 15px #FFD700, 0 0 25px #FFD700; }
-    }
-
-
-
-    /* ====================================================================
-       Onboarding Layout Component (Z-Index: 10)
-       ==================================================================== */
-    #onboarding-container {
-      width: 100%;
-      max-width: 520px;
-      display: none; /* Initially hidden */
-      flex-direction: column;
-      align-items: center;
-      padding: 20px;
-      position: relative;
-      z-index: 10;
-    }
-
-    .onboarding-header {
-      margin-bottom: 16px;
-      text-align: center;
-    }
-
-    .brand-logo {
-      font-family: 'Playfair Display', serif;
-      font-weight: 700;
-      font-size: 40px; /* Size: 40px */
-      color: #FFD700; /* Color: #FFD700 */
-      text-align: center;
-      letter-spacing: -1px;
-      filter: drop-shadow(0 2px 5px rgba(255, 215, 0, 0.15));
-    }
-
-    .progress-dots-container {
-      display: flex;
-      gap: 10px; /* Spacing: 10px */
-      margin-bottom: 24px;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .progress-dot {
-      width: 8px; /* Size: 8px each dot */
-      height: 8px;
-      border-radius: 50%;
-      border: 1px solid #FFD700; /* outline gold */
-      background-color: transparent;
-      transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
-    }
-
-    .progress-dot.active {
-      background-color: #FFD700; /* filled gold #FFD700 */
-      border-color: #FFD700;
-      box-shadow: 0 0 8px #FFD700;
-      transform: scale(1.2);
-    }
-
-    .progress-dot.completed {
-      background-color: transparent;
-      border-color: #FFD700;
-    }
-
-    /* 3D Book Containers */
-    .book-container {
-      position: relative;
-      width: 100%;
-      height: 580px;
-      perspective: 1200px;
-    }
-
-    /* Stationary Spiral Ring Binding */
-    .spiral-binding {
-      position: absolute;
-      top: 25px;
-      bottom: 25px;
-      left: 5px;
-      width: 24px;
-      z-index: 100;
-      pointer-events: none;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-around;
-      align-items: center;
-    }
-
-    .spiral-ring {
-      width: 28px;
-      height: 8px;
-      background: linear-gradient(180deg, #FFE066 0%, #D4AF37 40%, #B8860B 80%, #704F00 100%);
-      border-radius: 4px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
-      margin-bottom: 2px;
-    }
-
-    /* Diary Page Sheet Card */
-    .onboarding-diary-paper {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      top: 0;
-      left: 0;
-      background-color: #F2E0BC; /* aged paper #F2E0BC */
-      border-radius: 4px 16px 16px 4px;
-      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.65), 
-                  inset -2px 0 10px rgba(0, 0, 0, 0.05),
-                  inset 20px 0 30px rgba(0, 0, 0, 0.08);
-      padding: 40px 36px 40px 52px;
-      color: #1E1208;
-      transform-origin: left center;
-      transform-style: preserve-3d;
-      transition: transform 0.8s cubic-bezier(0.645, 0.045, 0.355, 1);
-      display: flex;
-      flex-direction: column;
-    }
-
-    /* Localized page flip turn animation on the diary page div only */
-    .onboarding-diary-paper.flipping-forward {
-      animation: page-flip-forward-anim 0.8s cubic-bezier(0.645, 0.045, 0.355, 1);
-    }
-
-    .onboarding-diary-paper.flipping-backward {
-      animation: page-flip-backward-anim 0.8s cubic-bezier(0.645, 0.045, 0.355, 1);
-    }
-
-    @keyframes page-flip-forward-anim {
-      0% { transform: rotateY(0deg); }
-      50% { transform: rotateY(90deg) scale(0.98); filter: brightness(0.85); }
-      100% { transform: rotateY(0deg); }
-    }
-
-    @keyframes page-flip-backward-anim {
-      0% { transform: rotateY(0deg); }
-      50% { transform: rotateY(-90deg) scale(0.98); filter: brightness(0.85); }
-      100% { transform: rotateY(0deg); }
-    }
-
-    .page-holes {
-      position: absolute;
-      top: 25px;
-      bottom: 25px;
-      left: 14px;
-      width: 10px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-around;
-      align-items: center;
-      pointer-events: none;
-    }
-
-    .page-hole {
-      width: 6px;
-      height: 6px;
-      background-color: #1A0A00;
-      border-radius: 50%;
-      box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.8);
-    }
-
-    .page-question {
-      font-family: 'Dancing Script', cursive;
-      font-size: 28px;
-      font-weight: 700;
-      color: #8B5A2B;
-      margin-top: 15px;
-      margin-bottom: 24px;
-      line-height: 1.25;
-      text-shadow: 0 0 1px rgba(139, 90, 43, 0.1);
-    }
-
-    .page-content-wrapper {
-      flex-grow: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      width: 100%;
-    }
-
-    /* ====================================================================
-       Screen 1 Styles & Animations
-       ==================================================================== */
-    .onboarding-wrapper.start-animation {
-      opacity: 0;
-      animation: wrapper-fade-in 1s ease-out forwards;
-    }
-
-    @keyframes wrapper-fade-in {
-      to { opacity: 1; }
-    }
-
-    #onboarding-container.start-animation .book-container {
-      transform: translateY(40px);
-      opacity: 0;
-      animation: book-slide-up 0.8s cubic-bezier(0.25, 1, 0.5, 1) forwards;
-      animation-delay: 0.2s;
-    }
-
-    @keyframes book-slide-up {
-      to { transform: translateY(0); opacity: 1; }
-    }
-
-    .page-step-label {
-      display: block;
+    .input-group label {
       font-family: 'Lato', sans-serif;
-      font-size: 11px;
       font-weight: 700;
+      color: #B8860B;
+      font-size: 12px;
       text-transform: uppercase;
-      letter-spacing: 2px;
-      color: #D4AF37;
-      margin-top: 15px;
-      margin-bottom: 8px;
+      letter-spacing: 0.5px;
     }
 
-    .page-question.handwriting {
-      font-family: 'Dancing Script', cursive;
-      color: #2C1503; /* #2C1503 ink brown */
-      font-size: 28px;
-      min-height: 40px;
-      margin-bottom: 24px;
-      text-align: center;
-    }
-
-    #screen-1 .page-question.handwriting { font-size: 28px; }
-    #screen-2 .page-question.handwriting { font-size: 26px; }
-    #screen-3 .page-question.handwriting { font-size: 26px; }
-
-    .underline-input-wrapper-s1 {
-      position: relative;
-      margin: 30px auto;
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    .underline-input-s1 {
-      width: 70%; /* 70% of diary page */
-      border: none;
-      background: transparent;
-      color: #2C1503;
-      font-family: 'Dancing Script', cursive;
-      font-size: 24px;
-      font-weight: 600;
-      padding: 10px 0;
-      text-align: center;
-      outline: none;
-    }
-
-    .underline-input-s1::placeholder {
-      color: rgba(44, 21, 3, 0.35);
-      font-style: italic;
-    }
-
-    .underline-line {
-      height: 1px;
-      background-color: #B8860B;
-      width: 0%;
-      transition: width 1s cubic-bezier(0.25, 1, 0.5, 1);
-      transition-delay: 1s;
-    }
-
-    .active-underline .underline-line {
-      width: 70%;
-    }
-
-    /* Outlined Gold Button next style */
-    .btn-next-outline {
-      background-color: transparent;
-      border: 1px solid #FFD700; /* border 1px solid #FFD700 */
-      color: #FFD700; /* color #FFD700 */
-      font-family: 'Lato', sans-serif;
-      font-size: 11px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 1.8px;
-      padding: 12px 40px; /* padding 12px 40px */
-      border-radius: 4px; /* border-radius 4px */
-      cursor: pointer;
-      outline: none;
-      transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
-    }
-
-    .btn-next-outline:hover {
-      background-color: #FFD700; /* fills gold */
-      color: #1A0A00; /* text turns #1A0A00 */
-      box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
-    }
-
-    .btn-next-outline.disabled {
-      opacity: 0.35;
-      pointer-events: none;
-      border-color: rgba(255, 215, 0, 0.35);
-      color: rgba(255, 215, 0, 0.35);
-    }
-
-    .page-footer-s1 {
-      margin-top: auto;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      width: 100%;
-      position: relative;
-      padding-top: 10px;
-    }
-
-    .btn-skip {
-      background: transparent;
-      border: none;
-      color: #8B7355; /* color #8B7355 */
-      font-family: 'Lato', sans-serif;
-      font-size: 10px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      cursor: pointer;
-      outline: none;
-      text-decoration: none;
-      border-bottom: 1px dashed rgba(139, 115, 85, 0.4);
-      padding-bottom: 2px;
-      transition: all 0.3s ease;
-    }
-
-    .btn-skip:hover {
-      color: #FFD700;
-      border-bottom-color: #FFD700;
-    }
-
-    /* Sparkles */
-    .sparkle {
-      position: absolute;
-      pointer-events: none;
-      width: 6px;
-      height: 6px;
-      background-color: #FFD700;
-      border-radius: 50%;
-      box-shadow: 0 0 8px #FFD700;
-      z-index: 1000;
-      animation: sparkle-shoot 0.8s ease-out forwards;
-    }
-
-    @keyframes sparkle-shoot {
-      0% { transform: translate(0, 0) scale(1) rotate(0deg); opacity: 1; }
-      100% { transform: translate(var(--dx), var(--dy)) scale(0) rotate(360deg); opacity: 0; }
-    }
-
-    /* ====================================================================
-       Screen 2 Styles
-       ==================================================================== */
-    .page-greeting-wrapper-s2 {
-      text-align: center;
-      margin-top: 15px;
-      margin-bottom: 8px;
-      opacity: 0;
-    }
-
-    .active-chips .page-greeting-wrapper-s2 {
-      animation: s2-glow-fade 1.2s ease-out forwards;
-      animation-delay: 0.6s;
-    }
-
-    @keyframes s2-glow-fade {
-      0% { opacity: 0; text-shadow: 0 0 15px rgba(184, 134, 11, 0); }
-      50% { opacity: 1; text-shadow: 0 0 15px rgba(184, 134, 11, 0.8); }
-      100% { opacity: 1; text-shadow: 0 0 4px rgba(184, 134, 11, 0.2); }
-    }
-
-    .page-greeting-s2 {
-      font-family: 'Lato', sans-serif;
-      font-style: italic;
-      font-weight: 700;
-      font-size: 13px; /* Size: 13px */
-      color: #B8860B; /* Color: #B8860B */
-    }
-
-    .page-hint-s2 {
-      font-family: 'Lato', sans-serif;
-      font-style: italic;
-      color: #8B7355; /* Color: #8B7355 */
-      font-size: 12px; /* Size: 12px */
-      text-align: center;
-      margin-bottom: 24px;
-    }
-
-    .underline-input-wrapper-s2 {
-      position: relative;
-      margin: 20px auto 35px auto;
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    .underline-input-s2 {
-      width: 70%; /* 70% width of page */
-      border: none;
-      background: transparent;
-      color: #2C1503;
-      font-family: 'Dancing Script', cursive;
-      font-size: 24px;
-      font-weight: 600;
-      padding: 10px 0;
-      text-align: center;
-      outline: none;
-    }
-
-    .underline-input-s2::placeholder {
-      color: rgba(44, 21, 3, 0.35);
-      font-style: italic;
-    }
-
-    .chips-container {
-      display: flex;
-      gap: 10px;
-      justify-content: center;
-      margin-bottom: 30px;
-    }
-
-    .suggestion-chip {
-      background-color: transparent; /* Background: transparent */
-      border: 1px solid #B8860B; /* Border: 1px solid #B8860B */
-      color: #B8860B; /* Color: #B8860B */
-      font-family: 'Lato', sans-serif; /* Font: Lato */
-      font-size: 12px; /* 12px */
-      font-weight: 700;
-      padding: 5px 16px; /* Padding: 5px 16px */
-      border-radius: 20px; /* Border radius: 20px */
-      cursor: pointer;
-      opacity: 0;
-      transform: scale(0.3);
-      transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
-    }
-
-    .active-chips .suggestion-chip {
-      animation: s2-chip-bounce-in 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-    }
-
-    .active-chips .suggestion-chip:nth-child(1) { animation-delay: 1.8s; }
-    .active-chips .suggestion-chip:nth-child(2) { animation-delay: 2.0s; }
-    .active-chips .suggestion-chip:nth-child(3) { animation-delay: 2.2s; }
-
-    @keyframes s2-chip-bounce-in {
-      to { opacity: 1; transform: scale(1); }
-    }
-
-    .suggestion-chip:hover {
-      background-color: #B8860B; /* background #B8860B */
-      color: #1A0A00; /* color #1A0A00 */
-    }
-
-
-
-    .page-footer-s2 {
-      margin-top: auto;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      width: 100%;
-      position: relative;
-      padding-top: 10px;
-    }
-
-    .center-actions {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .btn-next-outline:not(.disabled) {
-      box-shadow: 0 0 15px rgba(255, 215, 0, 0.25);
-      animation: gold-glow-pulse 1.5s infinite alternate;
-    }
-
-    @keyframes gold-glow-pulse {
-      0% { box-shadow: 0 0 8px rgba(255, 215, 0, 0.2); }
-      100% { box-shadow: 0 0 15px rgba(255, 215, 0, 0.45); }
-    }
-
-    /* Back Buttons */
-    .btn-back {
-      position: absolute;
-      left: 0;
-      top: 12px;
-      background: transparent;
-      border: none;
-      color: rgba(139, 90, 43, 0.6);
-      font-family: 'Lato', sans-serif;
-      font-size: 11px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 1.2px;
-      cursor: pointer;
-      outline: none;
-      transition: all 0.3s ease;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-
-    .btn-back:hover {
-      color: #8B5A2B;
-    }
-
-    /* ====================================================================
-       Screen 3 Styles
-       ==================================================================== */
-    .page-greeting-wrapper-s3 {
-      text-align: center;
-      margin-top: 15px;
-      margin-bottom: 8px;
-      opacity: 0;
-    }
-
-    .active-cards .page-greeting-wrapper-s3 {
-      animation: s3-glow-fade 1.2s ease-out forwards;
-      animation-delay: 0.6s;
-    }
-
-    @keyframes s3-glow-fade {
-      0% { opacity: 0; }
-      100% { opacity: 1; }
-    }
-
-    .page-greeting-s3 {
-      font-family: 'Lato', sans-serif;
-      font-style: italic;
-      font-weight: 700;
-      font-size: 13px; /* Size: 13px */
-      color: #B8860B; /* Color: #B8860B */
-    }
-
-    .page-hint-s3 {
-      font-family: 'Lato', sans-serif;
-      font-style: italic;
-      color: #8B7355; /* Color: #8B7355 */
-      font-size: 12px; /* Size: 12px */
-      text-align: center;
-      margin-bottom: 16px;
-    }
-
-    .character-grid-s3 {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-      margin-bottom: 12px;
-      width: 100%;
-    }
-
-    .char-card-s3 {
-      background-color: rgba(255, 255, 255, 0.5); /* Background: rgba(255,255,255,0.5) */
-      border: 1.5px solid #D4C09A; /* Border: 1.5px solid #D4C09A */
-      border-radius: 12px; /* Border radius: 12px */
-      padding: 10px 8px; /* Padding: 10px 8px */
-      text-align: center;
-      cursor: pointer;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
-      opacity: 0;
-      transform: scale(0.3);
-      width: 100%;
-    }
-
-    /* Staggered Pop-In bounce cards on Screen 3 active */
-    .active-cards .char-card-s3 {
-      opacity: 1;
-      transform: scale(1);
-      animation: s3-card-bounce-in 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-
-    .active-cards .char-card-s3:nth-child(1) { animation-delay: 1.6s; }
-    .active-cards .char-card-s3:nth-child(2) { animation-delay: 1.7s; }
-    .active-cards .char-card-s3:nth-child(3) { animation-delay: 1.8s; }
-    .active-cards .char-card-s3:nth-child(4) { animation-delay: 1.9s; }
-    .active-cards .char-card-s3:nth-child(5) { animation-delay: 2.0s; }
-    .active-cards .char-card-s3:nth-child(6) { animation-delay: 2.1s; }
-
-    @keyframes s3-card-bounce-in {
-      0% { opacity: 0; transform: scale(0.3); }
-      100% { opacity: 1; transform: scale(1); }
-    }
-
-    .char-emoji-s3 {
-      font-size: 40px; /* large, centered, 40px */
-      margin-bottom: 4px;
-      transition: transform 0.3s ease;
-      display: inline-block;
-    }
-
-    .char-name-s3 {
-      font-family: 'Lato', sans-serif;
-      font-weight: 700; /* Font: Lato Bold */
-      font-size: 11px; /* Size: 11px */
-      color: #2C1503; /* Color: #2C1503 */
-      margin-bottom: 1px;
-    }
-
-    .char-desc-s3 {
-      font-family: 'Lato', sans-serif;
-      font-size: 9px;
-      color: rgba(44, 21, 3, 0.6);
-      font-style: italic;
-    }
-
-    /* Hover States Card */
-    .char-card-s3:hover:not(.selected) {
-      transform: scale(1.03); /* Slight scale up 1.03 */
-      border-color: #B8860B; /* Border color #B8860B */
-    }
-
-    /* Selected Card Style */
-    .char-card-s3.selected {
-      background-color: rgba(255, 215, 0, 0.2); /* Background: rgba(255,215,0,0.2) */
-      border: 2px solid #FFD700; /* Border: 2px solid #FFD700 */
-      box-shadow: 0 0 12px rgba(255, 215, 0, 0.5); /* box-shadow: 0 0 12px rgba(255,215,0,0.5) */
-      transform: scale(1.05); /* Scale: 1.05 */
-      z-index: 5; /* Lift above neighbors */
-    }
-
-    /* Selected card reaction click bounce */
-    .char-card-s3.selected.bounce-react {
-      animation: card-select-bounce 0.5s ease-out;
-    }
-
-    @keyframes card-select-bounce {
-      0% { transform: scale(1.0); }
-      30% { transform: scale(1.15) translateY(-5px); }
-      50% { transform: scale(0.98) translateY(2px); }
-      70% { transform: scale(1.07) translateY(-1px); }
-      100% { transform: scale(1.05) translateY(0); }
-    }
-
-    .companion-feedback-wrapper {
-      text-align: center;
-      min-height: 18px;
-      margin-bottom: 5px;
-    }
-
-    .companion-feedback-text {
-      font-family: 'Lato', sans-serif;
-      font-style: italic; /* Font: Lato Italic */
-      color: #B8860B; /* Color: #B8860B */
-      font-size: 12px; /* Size: 12px */
-      opacity: 0;
-      transition: opacity 0.5s ease;
-    }
-
-    .companion-feedback-text.visible {
-      opacity: 1; /* Fades in on selection */
-    }
-
-    .page-footer-s3 {
-      margin-top: auto;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      width: 100%;
-      position: relative;
-      padding-top: 5px;
-    }
-
-    /* ====================================================================
-       Screen 4 Styles
-       ==================================================================== */
-    .bouncing-companion-container {
-      display: flex;
-      justify-content: center;
-      margin-top: 5px;
-      margin-bottom: 10px;
-      height: 48px;
-    }
-
-    .bouncing-emoji {
-      font-size: 42px;
-      line-height: 1;
-      animation: companion-bounce 1s infinite alternate cubic-bezier(0.25, 0.8, 0.25, 1);
-      transform-origin: bottom center;
-      filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.15));
-    }
-
-    @keyframes companion-bounce {
-      0% { transform: translateY(0) scale(1, 0.95); }
-      100% { transform: translateY(-15px) scale(0.95, 1); }
-    }
-
-    .textarea-wrapper {
+    .input-wrapper {
       position: relative;
       width: 100%;
-      margin-bottom: 4px;
     }
 
-    .lined-textarea {
+    .input-field {
       width: 100%;
-      height: 120px;
-      border: none;
-      background-color: transparent;
-      background-image: linear-gradient(rgba(184, 134, 11, 0.09) 1px, transparent 1px);
-      background-size: 100% 2rem;
-      line-height: 2rem;
-      padding: 0 0 0 10px;
+      background-color: #2C1503;
+      border: 1px solid #B8860B;
+      border-radius: 8px;
+      padding: 12px 16px;
+      padding-right: 45px; /* Leave room for eye toggle icon */
+      color: #FFFAF0;
       font-family: 'Lato', sans-serif;
       font-size: 14px;
-      color: #1E1208;
-      resize: none;
       outline: none;
+      transition: border-color 0.3s, box-shadow 0.3s;
     }
 
-    .lined-textarea::placeholder {
-      color: rgba(30, 18, 8, 0.35);
-      font-style: italic;
+    .input-field::placeholder {
+      color: #8B7355;
     }
 
-    .word-counter {
-      font-family: 'Lato', sans-serif;
-      font-size: 10px;
-      color: rgba(30, 18, 8, 0.5);
-      text-align: right;
-      width: 100%;
-      margin-bottom: 10px;
+    .input-field:focus {
+      border-color: #FFD700;
+      box-shadow: 0 0 8px rgba(255, 215, 0, 0.25);
     }
 
-    .quote-container {
-      text-align: center;
-      margin-top: 5px;
-      margin-bottom: 20px;
-      opacity: 0;
-      transform: translateY(8px);
-      animation: quote-fade-in 1.5s ease-out forwards;
-      animation-delay: 0.6s;
+    /* Eye Toggle Icon for Passwords */
+    .toggle-password {
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      color: #8B7355;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.3s;
     }
 
-    .anne-quote {
-      font-family: 'Dancing Script', cursive;
-      font-size: 18px;
-      font-weight: 600;
-      color: #8B5A2B;
+    .toggle-password:hover {
+      color: #FFD700;
     }
 
-    @keyframes quote-fade-in {
-      to { opacity: 0.8; transform: translateY(0); }
+    .eye-icon {
+      width: 20px;
+      height: 20px;
     }
 
-    .btn-finish {
-      background: linear-gradient(135deg, #FFE875 0%, #D4AF37 50%, #B8860B 100%);
-      border: none;
+    /* Submit Button with Golden Glow */
+    .btn-submit {
+      background-color: #FFD700;
       color: #1A0A00;
       font-family: 'Lato', sans-serif;
-      font-size: 12px;
       font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 1.5px;
-      padding: 14px 28px;
-      border-radius: 24px;
+      font-size: 14px;
+      border: none;
+      border-radius: 8px;
+      padding: 14px;
+      width: 100%;
       cursor: pointer;
+      margin-top: 15px;
+      box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+      transition: background-color 0.3s, box-shadow 0.3s, transform 0.1s;
       outline: none;
-      width: 100%;
-      box-shadow: 0 4px 15px rgba(212, 175, 55, 0.35);
-      transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
-    }
-
-    .btn-finish:hover {
-      box-shadow: 0 6px 20px rgba(212, 175, 55, 0.55);
-      transform: translateY(-2px);
-      filter: brightness(1.06);
-    }
-
-    .page-footer-s4 {
-      margin-top: auto;
       display: flex;
-      flex-direction: column;
-      gap: 12px;
-      align-items: stretch;
-      width: 100%;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
     }
 
-    /* Responsiveness adjustments for smaller devices */
-    @media (max-width: 480px) {
-      .book-container {
-        height: 520px;
-      }
-      .onboarding-diary-paper {
-        padding: 24px 20px 24px 38px;
-      }
-      .page-question {
-        font-size: 21px;
-        margin-bottom: 14px;
-      }
-      .character-grid-s3 {
-        gap: 6px;
-        margin-bottom: 12px;
-      }
-      .char-card-s3 {
-        padding: 8px 4px;
-      }
-      .char-emoji-s3 {
-        font-size: 26px;
-      }
-      .char-name-s3 {
-        font-size: 9px;
-      }
-      .char-desc-s3 {
-        font-size: 8px;
-      }
-      .lined-textarea {
-        height: 90px;
-        line-height: 1.8rem;
-        background-size: 100% 1.8rem;
-      }
-      .btn-next-outline {
-        padding: 8px 20px;
-        font-size: 10px;
-      }
-      .suggestion-chip {
-        padding: 4px 12px;
-        font-size: 11px;
-      }
+    .btn-submit:hover {
+      background-color: #FFE65A;
+      box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
     }
 
-    @media (max-width: 360px) {
-      .book-container {
-        height: 470px;
-      }
-      .onboarding-diary-paper {
-        padding: 20px 14px 20px 32px;
-      }
-      .page-question {
-        font-size: 18px;
-        margin-bottom: 8px;
-        min-height: 32px;
-      }
-      .page-step-label {
-        margin-top: 5px;
-        margin-bottom: 4px;
-      }
-      .underline-input-s1, .underline-input-s2 {
-        font-size: 20px;
-      }
-      .character-grid-s3 {
-        gap: 4px;
-        margin-bottom: 8px;
-      }
-      .char-card-s3 {
-        padding: 6px 2px;
-        border-radius: 8px;
-      }
-      .char-emoji-s3 {
-        font-size: 20px;
-      }
-      .char-name-s3 {
-        font-size: 8px;
-      }
-      .char-desc-s3 {
-        display: none; /* hide traits on very small devices */
-      }
-      .lined-textarea {
-        height: 80px;
-        line-height: 1.6rem;
-        background-size: 100% 1.6rem;
-        font-size: 13px;
-      }
-      .btn-finish {
-        padding: 10px 20px;
-        font-size: 11px;
-      }
+    .btn-submit:active {
+      transform: scale(0.98);
     }
 
-    /* Login Overlay Style */
-    .login-overlay {
+    .btn-submit:disabled {
+      background-color: #8B7355;
+      color: #2C1503;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    /* Spinner */
+    .spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(26, 10, 0, 0.25);
+      border-radius: 50%;
+      border-top-color: #1A0A00;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Forget Password & Links */
+    .forgot-link {
+      font-family: 'Lato', sans-serif;
+      font-size: 12px;
+      color: #8B7355;
+      text-decoration: none;
+      display: block;
+      text-align: center;
+      margin-top: 18px;
+      transition: color 0.3s;
+      outline: none;
+    }
+
+    .forgot-link:hover {
+      color: #FFD700;
+    }
+
+    /* Error Message Panel */
+    .error-panel {
+      color: #FF6B6B;
+      font-family: 'Lato', sans-serif;
+      font-size: 12px;
+      margin-top: 12px;
+      text-align: center;
+      display: none;
+      line-height: 1.4;
+    }
+
+    /* Footer terms */
+    .card-footer {
+      font-family: 'Lato', sans-serif;
+      font-size: 10px;
+      color: #8B7355;
+      text-align: center;
+      margin-top: 25px;
+      line-height: 1.4;
+    }
+
+    /* Screen Preloader */
+    .screen-preloader {
       position: fixed;
       top: 0;
       left: 0;
       width: 100vw;
       height: 100vh;
-      background-color: rgba(10, 5, 0, 0.95);
-      z-index: 10000;
+      background-color: #1A0A00;
       display: flex;
-      justify-content: center;
       align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      transition: opacity 0.5s ease-out, visibility 0.5s;
+    }
+
+    .screen-preloader.fade-out {
       opacity: 0;
       visibility: hidden;
-      transition: opacity 0.4s ease, visibility 0.4s;
     }
-    .login-overlay.visible {
-      opacity: 1;
-      visibility: visible;
+
+    .preloader-candle {
+      font-size: 40px;
+      animation: pulse 1.5s infinite alternate;
     }
-    .login-card {
-      width: 90%;
-      max-width: 380px;
-      background-color: #1C0A00;
-      border: 1px solid #FFD700;
-      border-radius: 16px;
-      padding: 30px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(255, 215, 0, 0.05);
-    }
-    .login-card h2 {
-      font-family: 'Dancing Script', cursive;
-      font-size: 28px;
-      color: #FFD700;
-      margin-bottom: 20px;
-    }
-    .login-input-group {
-      width: 100%;
-      margin-bottom: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-    }
-    .login-input-group label {
-      font-family: 'Lato', sans-serif;
-      font-size: 11px;
-      text-transform: uppercase;
-      font-weight: 700;
-      color: #8B7355;
-      letter-spacing: 0.5px;
-    }
-    .login-input {
-      background-color: #2C1503;
-      border: 1px solid rgba(184, 134, 11, 0.3);
-      border-radius: 8px;
-      padding: 10px 14px;
-      color: #FFE066;
-      font-family: 'Lato', sans-serif;
-      font-size: 14px;
-      outline: none;
-      transition: border-color 0.3s;
-    }
-    .login-input:focus {
-      border-color: #FFD700;
-    }
-    .login-error-msg {
-      color: #FF4444;
-      font-size: 12px;
-      margin-top: -10px;
-      margin-bottom: 15px;
-      text-align: center;
-      display: none;
-      font-family: 'Lato', sans-serif;
-    }
-    .login-actions {
-      display: flex;
-      gap: 12px;
-      width: 100%;
-      margin-top: 10px;
-    }
-    .btn-login-submit {
-      flex: 1;
-      background: linear-gradient(135deg, #FFE875 0%, #D4AF37 50%, #B8860B 100%);
-      border: none;
-      color: #1A0A00;
-      font-family: 'Lato', sans-serif;
-      font-size: 12px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      padding: 12px;
-      border-radius: 20px;
-      cursor: pointer;
-      box-shadow: 0 4px 10px rgba(212, 175, 55, 0.2);
-    }
-    .btn-login-cancel {
-      flex: 1;
-      background-color: transparent;
-      border: 1px solid rgba(184, 134, 11, 0.5);
-      color: #8B7355;
-      font-family: 'Lato', sans-serif;
-      font-size: 12px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      padding: 12px;
-      border-radius: 20px;
-      cursor: pointer;
-      transition: all 0.3s;
-    }
-    .btn-login-cancel:hover {
-      border-color: #FFD700;
-      color: #FFD700;
+
+    @keyframes pulse {
+      from { transform: scale(1); opacity: 0.7; }
+      to { transform: scale(1.15); opacity: 1; }
     }
   </style>
 </head>
 <body>
 
-  <!-- Full-Screen Transition Overlay (Fades to black on final submit) -->
-  <div id="transition-overlay" class="transition-overlay"></div>
-
-  <!-- Static Blurred Background (Visible behind the splash overlay on load) -->
-  <div class="diary-page-background" aria-hidden="true">
-    <header class="diary-header">
-      <div class="diary-brand">
-        <span class="brand-monogram">db</span>
-        <span class="brand-name">Dear Diary</span>
-      </div>
-      <div class="diary-date" id="splash-current-date">Friday, May 29, 2026</div>
-    </header>
-    
-    <main class="diary-main">
-      <div class="diary-paper">
-        <div class="ruled-bg"></div>
-        <div class="paper-content">
-          <h2 class="diary-entry-title">Dear Diary,</h2>
-          <div class="mock-lines">
-            <div class="mock-line"></div>
-            <div class="mock-line"></div>
-            <div class="mock-line"></div>
-            <div class="mock-line"></div>
-            <div class="mock-line"></div>
-          </div>
-        </div>
-      </div>
-    </main>
+  <!-- Preloader while Firebase Auth state completes verification -->
+  <div id="preloader" class="screen-preloader">
+    <div class="preloader-candle">🕯️</div>
   </div>
 
-  <!-- Fullscreen Splash Overlay (Z-Index: 9999) -->
-  <div id="splash-overlay">
-    <div class="splash-content">
-      
-      <!-- Logo Unit -->
-      <div class="logo-wrapper">
-        <div class="logo-container" aria-label="db logo">
-          <span class="logo-char char-d">d</span>
-          <span class="logo-char char-b">b</span>
-        </div>
-        <div class="flash-pulse"></div>
-      </div>
-
-      <h1 class="app-name">Dear Diary</h1>
-      <p class="app-tagline">Your story. Your companion.</p>
-
-      <div class="loader-container">
-        <div class="loader-track">
-          <div class="loader-fill"></div>
-        </div>
-      </div>
-
-    </div>
-
-  </div>
-
-  <!-- ====================================================================
-       ONBOARDING CONTAINER (Initially hidden, revealed on splash complete)
-       ==================================================================== -->
-  <div id="onboarding-container">
+  <div class="login-container" id="login-card">
     
-    <header class="onboarding-header">
-      <div class="brand-logo" aria-label="db logo">db</div>
+    <!-- Top Branding Logo & Name -->
+    <header class="brand-header">
+      <div class="brand-logo">db</div>
+      <h1 class="brand-name">Dear Diary</h1>
+      <div class="brand-subtitle" id="form-subtitle">Welcome Back 🥺</div>
     </header>
 
-    <!-- 4 Step Progress Dots -->
-    <div class="progress-dots-container" aria-label="Step Progress">
-      <div class="progress-dot active" data-step="1"></div>
-      <div class="progress-dot" data-step="2"></div>
-      <div class="progress-dot" data-step="3"></div>
-      <div class="progress-dot" data-step="4"></div>
-    </div>
+    <!-- Tab Switcher -->
+    <nav class="tab-switcher">
+      <button class="tab-btn active" id="tab-login">Login</button>
+      <button class="tab-btn" id="tab-signup">Sign Up</button>
+    </nav>
 
-    <!-- 3D Book Container -->
-    <div class="book-container">
+    <!-- Forms Container -->
+    <div class="form-wrapper">
       
-      <!-- Stationary Spiral Binding loops -->
-      <div class="spiral-binding" aria-hidden="true">
-        <div class="spiral-ring"></div>
-        <div class="spiral-ring"></div>
-        <div class="spiral-ring"></div>
-        <div class="spiral-ring"></div>
-        <div class="spiral-ring"></div>
-        <div class="spiral-ring"></div>
-        <div class="spiral-ring"></div>
-        <div class="spiral-ring"></div>
-        <div class="spiral-ring"></div>
-        <div class="spiral-ring"></div>
-        <div class="spiral-ring"></div>
-        <div class="spiral-ring"></div>
-      </div>
-
-      <!-- Unified Flipping Diary Paper Card -->
-      <div class="onboarding-diary-paper" id="active-paper-sheet">
-        <!-- Punch Holes -->
-        <div class="page-holes" aria-hidden="true">
-          <div class="page-hole"></div><div class="page-hole"></div><div class="page-hole"></div>
-          <div class="page-hole"></div><div class="page-hole"></div><div class="page-hole"></div>
-          <div class="page-hole"></div><div class="page-hole"></div><div class="page-hole"></div>
-          <div class="page-hole"></div><div class="page-hole"></div><div class="page-hole"></div>
+      <!-- 1. LOGIN FORM -->
+      <form class="auth-form active" id="form-login" onsubmit="return false;">
+        <div class="input-group">
+          <label for="login-email">Email</label>
+          <div class="input-wrapper">
+            <input type="email" id="login-email" class="input-field" placeholder="your@email.com" required autocomplete="email">
+          </div>
         </div>
 
-        <!-- ====================================================================
-             SCREEN 1: User Identity View
-             ==================================================================== -->
-        <div id="screen-1" class="onboarding-screen-block">
-          <span class="page-step-label">1/4</span>
-          <h2 class="page-question handwriting" id="typewriter-q1"></h2>
-
-          <div class="page-content-wrapper">
-            <div class="underline-input-wrapper-s1">
-              <input type="text" id="user-name-input" class="underline-input-s1" placeholder="Your name..." autocomplete="off" maxlength="25">
-              <div class="underline-line"></div>
-            </div>
-            
-            <div style="margin-top: 25px; text-align: center;">
-              <a href="#" id="link-show-login" style="font-family: 'Lato', sans-serif; font-size: 11px; color: #B8860B; text-transform: uppercase; font-weight: 700; letter-spacing: 1px; text-decoration: none; border-bottom: 1px dashed rgba(184, 134, 11, 0.4); padding-bottom: 2px; transition: color 0.3s;">Already have a diary? Log in 🔑</a>
-            </div>
+        <div class="input-group">
+          <label for="login-password">Password</label>
+          <div class="input-wrapper">
+            <input type="password" id="login-password" class="input-field" placeholder="••••••••" required autocomplete="current-password">
+            <span class="toggle-password" onclick="togglePasswordVisibility('login-password')">
+              <!-- SVG Eye Icon -->
+              <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+            </span>
           </div>
-
-          <footer class="page-footer-s1">
-            <div class="center-actions">
-              <button class="btn-next-outline disabled" id="btn-next-1">Next &rarr;</button>
-              <button class="btn-skip" id="btn-skip-1">Skip for now</button>
-            </div>
-          </footer>
         </div>
 
-        <!-- ====================================================================
-             SCREEN 2: Diary Branding View
-             ==================================================================== -->
-        <div id="screen-2" class="onboarding-screen-block" style="display: none;">
-          <span class="page-step-label">2/4</span>
-          <div class="page-greeting-wrapper-s2">
-            <span id="greeting-name-s2" class="page-greeting-s2">Nice to meet you! 🌟</span>
+        <button class="btn-submit" id="btn-login-submit">
+          Log In
+        </button>
+
+        <a href="#" class="forgot-link" id="btn-forgot-password">Forgot Password?</a>
+        <div class="error-panel" id="login-error"></div>
+      </form>
+
+      <!-- 2. SIGN UP FORM -->
+      <form class="auth-form" id="form-signup" onsubmit="return false;">
+        <div class="input-group">
+          <label for="signup-name">Your Name</label>
+          <div class="input-wrapper">
+            <input type="text" id="signup-name" class="input-field" placeholder="What shall I call you?" required autocomplete="name">
           </div>
-
-          <h2 class="page-question handwriting" id="typewriter-q2"></h2>
-          <p class="page-hint-s2">Give it a name that feels like yours</p>
-
-          <div class="page-content-wrapper">
-            <div class="underline-input-wrapper-s2">
-              <input type="text" id="diary-name-input" class="underline-input-s2" placeholder="My diary's name..." autocomplete="off" maxlength="25">
-              <div class="underline-line"></div>
-            </div>
-
-            <!-- Suggestion Chips -->
-            <div class="chips-container" id="chips-parent-s2" aria-label="Diary suggestions">
-              <button class="suggestion-chip">Luna</button>
-              <button class="suggestion-chip">Echo</button>
-              <button class="suggestion-chip">Sol</button>
-            </div>
-          </div>
-
-          <footer class="page-footer-s2">
-            <button class="btn-back" id="btn-back-2">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-              Back
-            </button>
-            <div class="center-actions">
-              <button class="btn-next-outline disabled" id="btn-next-2">Next &rarr;</button>
-              <button class="btn-skip" id="btn-skip-2">Skip for now</button>
-            </div>
-          </footer>
         </div>
 
-        <!-- ====================================================================
-             SCREEN 3: Companion Watchman View
-             ==================================================================== -->
-        <div id="screen-3" class="onboarding-screen-block" style="display: none;">
-          <span class="page-step-label">3/4</span>
-          <div class="page-greeting-wrapper-s3">
-            <span id="diary-ready-title-s3" class="page-greeting-s3">Your diary is ready! 🌟</span>
+        <div class="input-group">
+          <label for="signup-email">Email</label>
+          <div class="input-wrapper">
+            <input type="email" id="signup-email" class="input-field" placeholder="your@email.com" required autocomplete="email">
           </div>
-
-          <h2 class="page-question handwriting" id="typewriter-q3"></h2>
-          <p class="page-hint-s3">Pick your companion. They will always be with you.</p>
-
-          <div class="page-content-wrapper">
-            <!-- 3x2 Grid -->
-            <div class="character-grid-s3" id="cards-parent-s3" aria-label="Companion Selection">
-              <div class="char-card-s3" data-name="Ollie" data-emoji="🦉">
-                <span class="char-emoji-s3">🦉</span>
-                <span class="char-name-s3">Ollie</span>
-                <span class="char-desc-s3">Wise</span>
-              </div>
-              <div class="char-card-s3" data-name="Luna" data-emoji="🐱">
-                <span class="char-emoji-s3">🐱</span>
-                <span class="char-name-s3">Luna</span>
-                <span class="char-desc-s3">Cozy</span>
-              </div>
-              <div class="char-card-s3" data-name="Stella" data-emoji="🌟">
-                <span class="char-emoji-s3">🌟</span>
-                <span class="char-name-s3">Stella</span>
-                <span class="char-desc-s3">Magical</span>
-              </div>
-              <div class="char-card-s3" data-name="Bruno" data-emoji="🐻">
-                <span class="char-emoji-s3">🐻</span>
-                <span class="char-name-s3">Bruno</span>
-                <span class="char-desc-s3">Warm</span>
-              </div>
-              <div class="char-card-s3" data-name="Finn" data-emoji="🦊">
-                <span class="char-emoji-s3">🦊</span>
-                <span class="char-name-s3">Finn</span>
-                <span class="char-desc-s3">Playful</span>
-              </div>
-              <div class="char-card-s3" data-name="Pip" data-emoji="🐧">
-                <span class="char-emoji-s3">🐧</span>
-                <span class="char-name-s3">Pip</span>
-                <span class="char-desc-s3">Loyal</span>
-              </div>
-            </div>
-
-            <div class="companion-feedback-wrapper">
-              <span id="companion-feedback-text" class="companion-feedback-text"></span>
-            </div>
-          </div>
-
-          <footer class="page-footer-s3">
-            <button class="btn-back" id="btn-back-3">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-              Back
-            </button>
-            <div class="center-actions">
-              <button class="btn-next-outline disabled" id="btn-next-3">Next &rarr;</button>
-              <button class="btn-skip" id="btn-skip-3">Skip for now</button>
-            </div>
-          </footer>
         </div>
 
-        <!-- ====================================================================
-             SCREEN 4: Reflection Write View
-             ==================================================================== -->
-        <div id="screen-4" class="onboarding-screen-block" style="display: none;">
-          <span class="page-step-label">4/4</span>
-          <div class="bouncing-companion-container">
-            <div id="companion-bouncing-emoji" class="bouncing-emoji">🦉</div>
+        <div class="input-group">
+          <label for="signup-password">Password</label>
+          <div class="input-wrapper">
+            <input type="password" id="signup-password" class="input-field" placeholder="Min 6 characters" required autocomplete="new-password">
+            <span class="toggle-password" onclick="togglePasswordVisibility('signup-password')">
+              <!-- SVG Eye Icon -->
+              <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+            </span>
           </div>
-
-          <h2 class="page-question" style="font-size: 24px; text-align: center; margin-top: 0; margin-bottom: 8px;">
-            <span id="companion-listening-text">Ollie is listening 🥺</span>
-          </h2>
-          <p style="font-family: 'Lato', sans-serif; font-size: 11px; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; text-align: center; color: rgba(30, 18, 8, 0.6); margin-bottom: 16px;">Write your first line to your diary...</p>
-
-          <div class="page-content-wrapper">
-            <div class="textarea-wrapper">
-              <textarea id="first-entry-input" class="lined-textarea" placeholder="Dear Diary..." autocomplete="off"></textarea>
-            </div>
-            <div id="word-counter" class="word-counter">0 words</div>
-
-            <div class="password-signup-wrapper" style="margin-top: 8px; margin-bottom: 15px; display: flex; flex-direction: column; align-items: center; width: 100%; gap: 6px;">
-              <label for="user-password-input" style="font-family: 'Lato', sans-serif; font-size: 10px; text-transform: uppercase; font-weight: 700; color: rgba(30, 18, 8, 0.6); letter-spacing: 0.5px;">Choose password to lock your diary</label>
-              <div class="underline-input-wrapper-s1" style="width: 80%; max-width: 240px; margin-bottom: 0;">
-                <input type="password" id="user-password-input" class="underline-input-s1" placeholder="Enter password..." autocomplete="new-password" style="font-size: 14px; text-align: center; padding: 4px;">
-                <div class="underline-line" style="bottom: 0;"></div>
-              </div>
-            </div>
-          </div>
-
-          <footer class="page-footer-s4">
-            <button class="btn-finish" id="btn-finish">Begin My Journey ✨</button>
-            <button class="btn-back" id="btn-back-4" style="align-self: center;">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-              Back
-            </button>
-          </footer>
         </div>
 
-      </div>
+        <button class="btn-submit" id="btn-signup-submit">
+          Create My Diary ✨
+        </button>
+        <div class="error-panel" id="signup-error"></div>
+      </form>
 
     </div>
+
+    <!-- Bottom Agreements Footer -->
+    <footer class="card-footer">
+      By continuing you agree to our<br>Terms & Privacy Policy
+    </footer>
+
   </div>
 
   <!-- Central API Service Layer -->
   <script src="js/api.js"></script>
 
-  <!-- ====================================================================
-       INLINE JAVASCRIPT (Controls Splash sequence, Page Flip turn triggers, data caching)
-       ==================================================================== -->
-  <script>
+  <!-- Firebase Configuration & Initialization Module -->
+  <script type="module" src="js/firebase-config.js"></script>
+
+  <!-- Redesigned Login Controller Logic -->
+  <script type="module">
+    // Make sure DOM and Firebase initialization wrapper are ready
     document.addEventListener('DOMContentLoaded', () => {
-      // Redirect authenticated users immediately
-      if (typeof API !== 'undefined' && API.isAuthenticated()) {
-        window.location.href = 'pages/home.html';
-        return;
-      }
+      
+      const preloader = document.getElementById('preloader');
+      const loginCard = document.getElementById('login-card');
+      const formSubtitle = document.getElementById('form-subtitle');
 
-      // ---------------------------------------------------------
-      // SPLASH OVERLAY CONTROLLER
-      // ---------------------------------------------------------
-      const splashOverlay = document.getElementById('splash-overlay');
-      const splashDateEl = document.getElementById('splash-current-date');
-      const onboardingContainer = document.getElementById('onboarding-container');
-      const transitionOverlay = document.getElementById('transition-overlay');
-      const loaderFill = document.querySelector('.loader-fill');
+      // Tabs
+      const tabLogin = document.getElementById('tab-login');
+      const tabSignup = document.getElementById('tab-signup');
 
-      let isSplashDismissed = false;
+      // Forms
+      const formLogin = document.getElementById('form-login');
+      const formSignup = document.getElementById('form-signup');
 
-      // Dyn date on static backdrop
-      if (splashDateEl) {
-        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-        splashDateEl.textContent = new Date().toLocaleDateString('en-US', options);
-      }
-
-      function dismissSplash() {
-        if (isSplashDismissed) return;
-        isSplashDismissed = true;
-
-        splashOverlay.classList.add('fade-out');
-
-        setTimeout(() => {
-          splashOverlay.style.display = 'none';
-          
-          // Reveal onboarding book wrapper
-          onboardingContainer.style.display = 'flex';
-          onboardingContainer.classList.add('start-animation');
-          document.getElementById('active-paper-sheet').classList.add('active-underline');
-
-          // Trigger Screen 1 Typewriter questions
-          triggerTypewriter(1);
-        }, 300); // Wait only 0.3s (Fade out duration)
-      }
-
-      // JS Loading Bar fill animation starting at 1.2s delay
-      setTimeout(() => {
-        if (loaderFill) {
-          let currentWidth = 0;
-          const fillInterval = setInterval(() => {
-            currentWidth += 2;
-            loaderFill.style.width = currentWidth + '%';
-            if (currentWidth >= 100) {
-              clearInterval(fillInterval);
-              // Wait only 200ms after loading completes, then fade out
-              setTimeout(() => {
-                dismissSplash();
-              }, 200);
-            }
-          }, 30); // Increment 2% every 30ms (Total fill time: 1.5s)
-        } else {
-          // Fallback if loaderFill element is missing
-          setTimeout(() => {
-            dismissSplash();
-          }, 1700); // 1.5s fill + 200ms wait
-        }
-      }, 1200); // Loading bar start delay: 1.2s
-
-
-      // ---------------------------------------------------------
-      // ONBOARDING SCREEN CONTROLLER
-      // ---------------------------------------------------------
-      let currentStep = 1;
-      const maxSteps = 4;
-
-      let selectedCompanion = {
-        name: '',
-        emoji: ''
-      };
-
-      // Inputs
-      const userNameInput = document.getElementById('user-name-input');
-      const diaryNameInput = document.getElementById('diary-name-input');
-      const firstEntryInput = document.getElementById('first-entry-input');
-      const wordCounter = document.getElementById('word-counter');
-
-      // Dynamic Headers
-      const greetingNameText = document.getElementById('greeting-name-s2');
-      const diaryReadyTitleText = document.getElementById('diary-ready-title-s3');
-      const companionBouncingEmoji = document.getElementById('companion-bouncing-emoji');
-      const companionListeningText = document.getElementById('companion-listening-text');
-      const companionFeedbackText = document.getElementById('companion-feedback-text');
-
-      // Indicators
-
-      const activeSheet = document.getElementById('active-paper-sheet');
-
-      // Buttons
-      const btnNext1 = document.getElementById('btn-next-1');
-      const btnNext2 = document.getElementById('btn-next-2');
-      const btnNext3 = document.getElementById('btn-next-3');
-      const btnFinish = document.getElementById('btn-finish');
-
-      const btnBack2 = document.getElementById('btn-back-2');
-      const btnBack3 = document.getElementById('btn-back-3');
-      const btnBack4 = document.getElementById('btn-back-4');
-
-      const btnSkip1 = document.getElementById('btn-skip-1');
-      const btnSkip2 = document.getElementById('btn-skip-2');
-      const btnSkip3 = document.getElementById('btn-skip-3');
-
-      // Sugestion chips & Cards grids parents
-      const chipsParent = document.getElementById('chips-parent-s2');
-      const cardsParent = document.getElementById('cards-parent-s3');
-
-      /**
-       * Handwriting Typewriter engine
-       */
-      function typeText(element, text, speed = 60) {
-        element.textContent = '';
-        let index = 0;
-        function type() {
-          if (index < text.length) {
-            element.textContent += text.charAt(index);
-            index++;
-            setTimeout(type, speed);
-          }
-        }
-        type();
-      }
-
-      function triggerTypewriter(step) {
-        const el = document.getElementById(`typewriter-q${step}`);
-        if (!el) return;
-        el.textContent = ''; // clear text
-
-        if (step === 1) {
-          typeText(el, "What shall I call you?", 70);
-        } else if (step === 2) {
-          typeText(el, "What shall we call your diary?", 70);
-        } else if (step === 3) {
-          typeText(el, "Who will watch over your diary?", 70);
-        }
-      }
-
-      /**
-       * Perform page turn animation and swap active div content halfway
-       */
-      function flipPageTo(targetStep) {
-        if (targetStep === currentStep) return;
-
-        // 1. Save data checks based on step direction
-        if (targetStep > currentStep) {
-          if (currentStep === 1) {
-            saveNameData();
-          } else if (currentStep === 2) {
-            saveDiaryNameData();
-          } else if (currentStep === 3) {
-            saveCompanionData();
-          }
-        }
-
-        // Determine transition direction class
-        const directionClass = targetStep > currentStep ? 'flipping-forward' : 'flipping-backward';
-
-        // 2. Trigger flip turn animation on the diary page div itself
-        activeSheet.classList.add(directionClass);
-        activeSheet.classList.remove('active-underline', 'active-chips', 'active-cards');
-
-        // 3. Swap visible content halfway through (400ms) when page is edge-on
-        setTimeout(() => {
-          // Hide all screens
-          for (let s = 1; s <= maxSteps; s++) {
-            document.getElementById(`screen-${s}`).style.display = 'none';
-            const dot = document.querySelector(`.progress-dot[data-step="${s}"]`);
-            if (dot) {
-              dot.classList.remove('active', 'completed');
-              if (s < targetStep) dot.classList.add('completed');
-              if (s === targetStep) dot.classList.add('active');
-            }
-          }
-
-          // Show target screen
-          document.getElementById(`screen-${targetStep}`).style.display = 'block';
-          currentStep = targetStep;
-
-          // Trigger screen-specific loaders
-          if (currentStep === 1) {
-            activeSheet.classList.add('active-underline');
-          } else if (currentStep === 2) {
-            activeSheet.classList.add('active-underline', 'active-chips');
-          } else if (currentStep === 3) {
-            activeSheet.classList.add('active-cards');
-          }
-
-          // Dynamic typewriter triggers
-          triggerTypewriter(currentStep);
-        }, 400);
-
-        // 4. Remove flipping animation class on completion (800ms)
-        setTimeout(() => {
-          activeSheet.classList.remove('flipping-forward', 'flipping-backward');
-        }, 800);
-      }
-
-      // Save handlers
-      function saveNameData() {
-        let name = userNameInput.value.trim();
-        if (!name) name = 'Friend';
-        localStorage.setItem('user_name', name);
-        if (greetingNameText) {
-          greetingNameText.textContent = `Nice to meet you, ${name}! 🌟`;
-        }
-      }
-
-      function saveDiaryNameData() {
-        let dName = diaryNameInput.value.trim();
-        if (!dName) dName = 'My Diary';
-        localStorage.setItem('diary_name', dName);
-        if (diaryReadyTitleText) {
-          diaryReadyTitleText.textContent = `${dName} is ready! 🌟`;
-        }
-      }
-
-      function saveCompanionData() {
-        localStorage.setItem('companion_name', selectedCompanion.name || 'Ollie');
-        localStorage.setItem('companion_emoji', selectedCompanion.emoji || '🦉');
-        if (companionBouncingEmoji) {
-          companionBouncingEmoji.textContent = selectedCompanion.emoji || '🦉';
-        }
-        if (companionListeningText) {
-          companionListeningText.textContent = `${selectedCompanion.name || 'Ollie'} is listening 🥺`;
-        }
-      }
-
-      // =========================================================
-      // SCREEN 1 TRIGGERS
-      // =========================================================
-      // Keyboard gold typing sparkles trigger
-      function triggerSparkles(element) {
-        const wrapper = element.parentElement;
-        if (!wrapper) return;
-        if (wrapper.querySelectorAll('.sparkle').length > 15) return;
-
-        for (let i = 0; i < 4; i++) {
-          const s = document.createElement('div');
-          s.classList.add('sparkle');
-          const width = element.offsetWidth || 180;
-          const x = (Math.random() - 0.5) * (width * 0.7);
-          s.style.left = `calc(50% + ${x}px)`;
-          s.style.top = `38px`;
-          const dx = (Math.random() - 0.5) * 60;
-          const dy = (Math.random() - 0.5) * 60 - 20;
-          s.style.setProperty('--dx', `${dx}px`);
-          s.style.setProperty('--dy', `${dy}px`);
-          wrapper.appendChild(s);
-          setTimeout(() => s.remove(), 800);
-        }
-      }
-
-      if (userNameInput) {
-        userNameInput.addEventListener('input', () => {
-          const val = userNameInput.value.trim();
-          if (val.length > 0) {
-            btnNext1.classList.remove('disabled');
-            triggerSparkles(userNameInput);
-          } else {
-            btnNext1.classList.add('disabled');
-          }
-        });
-      }
-
-      if (btnNext1) {
-        btnNext1.addEventListener('click', () => {
-          if (btnNext1.classList.contains('disabled')) return;
-          flipPageTo(2);
-        });
-      }
-
-      if (btnSkip1) {
-        btnSkip1.addEventListener('click', (e) => {
-          e.preventDefault();
-          userNameInput.value = 'Friend';
-          btnNext1.classList.remove('disabled');
-          flipPageTo(2);
-        });
-      }
-
-      // =========================================================
-      // SCREEN 2 TRIGGERS
-      // =========================================================
-      function checkDiaryNameInput() {
-        if (!diaryNameInput) return;
-        const val = diaryNameInput.value.trim();
-        if (val.length > 0) {
-          btnNext2.classList.remove('disabled');
-        } else {
-          btnNext2.classList.add('disabled');
-        }
-      }
-
-      if (diaryNameInput) {
-        diaryNameInput.addEventListener('input', () => {
-          checkDiaryNameInput();
-          if (diaryNameInput.value.trim().length > 0) {
-            triggerSparkles(diaryNameInput);
-          }
-        });
-      }
-
-      // Chips auto fill
-      if (chipsParent) {
-        const chips = chipsParent.querySelectorAll('.suggestion-chip');
-        chips.forEach(chip => {
-          chip.addEventListener('click', () => {
-            if (diaryNameInput) {
-              diaryNameInput.value = chip.textContent;
-              diaryNameInput.focus();
-              checkDiaryNameInput();
-              triggerSparkles(diaryNameInput);
-            }
-          });
-        });
-      }
-
-      if (btnNext2) {
-        btnNext2.addEventListener('click', () => {
-          if (btnNext2.classList.contains('disabled')) return;
-          flipPageTo(3);
-        });
-      }
-
-      if (btnBack2) btnBack2.addEventListener('click', () => flipPageTo(1));
-
-      if (btnSkip2) {
-        btnSkip2.addEventListener('click', (e) => {
-          e.preventDefault();
-          diaryNameInput.value = 'Echo';
-          btnNext2.classList.remove('disabled');
-          flipPageTo(3);
-        });
-      }
-
-      // =========================================================
-      // SCREEN 3 TRIGGERS
-      // =========================================================
-      if (cardsParent) {
-        const cards = cardsParent.querySelectorAll('.char-card-s3');
-        cards.forEach(card => {
-          card.addEventListener('click', () => {
-            // Unselect all cards
-            cards.forEach(c => c.classList.remove('selected', 'bounce-react'));
-            
-            // Force DOM style reflow to ensure animation restarts on every click
-            void card.offsetWidth;
-            
-            // Select active card
-            card.classList.add('selected', 'bounce-react');
-            
-            selectedCompanion.name = card.getAttribute('data-name');
-            selectedCompanion.emoji = card.getAttribute('data-emoji');
-
-            // Save character name and emoji to localStorage immediately
-            localStorage.setItem('companion_name', selectedCompanion.name);
-            localStorage.setItem('companion_emoji', selectedCompanion.emoji);
-
-            // Feedback fade in text
-            if (companionFeedbackText) {
-              companionFeedbackText.textContent = `${selectedCompanion.name} will be your companion! 🥺`;
-              companionFeedbackText.classList.add('visible');
-            }
-
-            // Enable Next
-            if (btnNext3) btnNext3.classList.remove('disabled');
-          });
-        });
-      }
-
-      if (btnNext3) {
-        btnNext3.addEventListener('click', () => {
-          if (btnNext3.classList.contains('disabled')) return;
-          flipPageTo(4);
-        });
-      }
-
-      if (btnBack3) btnBack3.addEventListener('click', () => flipPageTo(2));
-
-      if (btnSkip3) {
-        btnSkip3.addEventListener('click', (e) => {
-          e.preventDefault();
-          selectedCompanion.name = 'Ollie';
-          selectedCompanion.emoji = '🦉';
-          btnNext3.classList.remove('disabled');
-          flipPageTo(4);
-        });
-      }
-
-      // =========================================================
-      // SCREEN 4 TRIGGERS
-      // =========================================================
-      if (firstEntryInput && wordCounter) {
-        firstEntryInput.addEventListener('input', () => {
-          const text = firstEntryInput.value.trim();
-          const words = text ? text.split(/\s+/).length : 0;
-          wordCounter.textContent = `${words} word${words !== 1 ? 's' : ''}`;
-        });
-      }
-
-      if (btnFinish) {
-        btnFinish.addEventListener('click', async () => {
-          const passwordInput = document.getElementById('user-password-input');
-          const password = passwordInput ? passwordInput.value.trim() : '';
-          if (!password) {
-            alert('Please choose a password to secure your diary! 🔑');
-            if (passwordInput) passwordInput.focus();
-            return;
-          }
-
-          const username = userNameInput ? userNameInput.value.trim() : 'Friend';
-          const diaryName = diaryNameInput ? diaryNameInput.value.trim() : 'My Diary';
-          const compName = selectedCompanion.name || 'Ollie';
-          const compEmoji = selectedCompanion.emoji || '🦉';
-          const text = firstEntryInput ? firstEntryInput.value.trim() : '';
-
-          try {
-            // Disable button during network call
-            btnFinish.disabled = true;
-            btnFinish.textContent = 'Registering...';
-
-            // 1. Call API Signup
-            await API.signup(username, password, diaryName, compName, compEmoji);
-
-            // 2. Save first entry if any
-            if (text) {
-              const words = text.split(/\s+/).filter(w => w.length > 0).length;
-              await API.createEntry({
-                content: text,
-                mood: '😄',
-                pageStyle: 'classic',
-                font: 'dancing',
-                wordCount: words,
-                photos: [],
-                decorations: []
-              });
-            }
-
-            // Save basic client info to local storage for backward compatibility / fallback
-            localStorage.setItem('user_name', username);
-            localStorage.setItem('diary_name', diaryName);
-            localStorage.setItem('companion_name', compName);
-            localStorage.setItem('companion_emoji', compEmoji);
-
-            // Fade whole viewport to black
-            if (transitionOverlay) {
-              transitionOverlay.classList.add('active');
-            }
-
-            setTimeout(() => {
-              window.location.href = 'pages/home.html';
-            }, 800);
-          } catch (err) {
-            alert(`Registration failed: ${err.message || err}`);
-            btnFinish.disabled = false;
-            btnFinish.textContent = 'Begin My Journey ✨';
-          }
-        });
-      }
-
-      if (btnBack4) btnBack4.addEventListener('click', () => flipPageTo(3));
-
-      // Login Overlay Triggers
-      const linkShowLogin = document.getElementById('link-show-login');
-      const loginOverlay = document.getElementById('login-overlay');
-      const btnLoginCancel = document.getElementById('btn-login-cancel');
+      // Submit Buttons
       const btnLoginSubmit = document.getElementById('btn-login-submit');
-      const loginUsernameInput = document.getElementById('login-username');
-      const loginPasswordInput = document.getElementById('login-password');
+      const btnSignupSubmit = document.getElementById('btn-signup-submit');
+
+      // Errors
       const loginError = document.getElementById('login-error');
+      const signupError = document.getElementById('signup-error');
 
-      if (linkShowLogin && loginOverlay) {
-        linkShowLogin.addEventListener('click', (e) => {
-          e.preventDefault();
-          loginOverlay.classList.add('visible');
-          if (loginUsernameInput) loginUsernameInput.focus();
-        });
-      }
+      // Forgot Password Link
+      const btnForgot = document.getElementById('btn-forgot-password');
 
-      if (btnLoginCancel && loginOverlay) {
-        btnLoginCancel.addEventListener('click', () => {
-          loginOverlay.classList.remove('visible');
+      // -------------------------------------------------------------
+      // 1. CHECK FIREBASE AUTH STATE ON PAGE LOAD
+      // -------------------------------------------------------------
+      // We run this inside a setTimeout check loop to wait for window.firebase initialization
+      const checkInterval = setInterval(() => {
+        if (typeof window.firebase !== 'undefined') {
+          clearInterval(checkInterval);
+          
+          window.firebase.auth().onAuthStateChanged((user) => {
+            if (user) {
+              // Redirect home.html directly if logged in
+              window.location.href = 'pages/home.html';
+            } else {
+              // Remove preloader smoothly
+              if (preloader) preloader.classList.add('fade-out');
+            }
+          });
+        }
+      }, 50);
+
+      // Fallback loader dismiss after 3 seconds in case Firebase fails to block load
+      setTimeout(() => {
+        if (preloader && !preloader.classList.contains('fade-out')) {
+          preloader.classList.add('fade-out');
+        }
+      }, 3000);
+
+      // -------------------------------------------------------------
+      // 2. TAB TOGGLE NAVIGATION
+      // -------------------------------------------------------------
+      if (tabLogin && tabSignup) {
+        tabLogin.addEventListener('click', () => {
+          tabLogin.classList.add('active');
+          tabSignup.classList.remove('active');
+          
+          formLogin.classList.add('active');
+          formSignup.classList.remove('active');
+          
+          formSubtitle.textContent = "Welcome Back 🥺";
+          
           if (loginError) loginError.style.display = 'none';
-          if (loginUsernameInput) loginUsernameInput.value = '';
-          if (loginPasswordInput) loginPasswordInput.value = '';
+        });
+
+        tabSignup.addEventListener('click', () => {
+          tabSignup.classList.add('active');
+          tabLogin.classList.remove('active');
+          
+          formSignup.classList.add('active');
+          formLogin.classList.remove('active');
+          
+          formSubtitle.textContent = "Join Us ✨";
+          
+          if (signupError) signupError.style.display = 'none';
         });
       }
 
+      // -------------------------------------------------------------
+      // 3. HELPERS FOR ANIMATIONS & LOADING STATES
+      // -------------------------------------------------------------
+      function triggerShake() {
+        if (loginCard) {
+          loginCard.classList.remove('shake');
+          void loginCard.offsetWidth; // trigger reflow
+          loginCard.classList.add('shake');
+          setTimeout(() => loginCard.classList.remove('shake'), 400);
+        }
+      }
+
+      function showButtonLoading(btn, text) {
+        btn.disabled = true;
+        btn.innerHTML = `<span class="spinner"></span> ${text}`;
+      }
+
+      function hideButtonLoading(btn, text) {
+        btn.disabled = false;
+        btn.innerHTML = text;
+      }
+
+      function formatFirebaseError(err) {
+        console.error("Firebase auth error:", err);
+        const code = err.code || '';
+        
+        if (code.includes('auth/invalid-credential') || code.includes('auth/wrong-password') || code.includes('auth/user-not-found')) {
+          return "Wrong email or password";
+        } else if (code.includes('auth/email-already-in-use')) {
+          return "Email already in use";
+        } else if (code.includes('auth/invalid-email')) {
+          return "Please enter valid email";
+        } else if (code.includes('auth/weak-password')) {
+          return "Password too short (min 6)";
+        }
+        
+        return err.message || "An authentication error occurred. Please try again.";
+      }
+
+      // -------------------------------------------------------------
+      // 4. FIREBASE AUTH LOGIN PROCESS
+      // -------------------------------------------------------------
       if (btnLoginSubmit) {
         btnLoginSubmit.addEventListener('click', async () => {
-          const username = loginUsernameInput ? loginUsernameInput.value.trim() : '';
-          const password = loginPasswordInput ? loginPasswordInput.value.trim() : '';
+          const emailInput = document.getElementById('login-email');
+          const passwordInput = document.getElementById('login-password');
 
-          if (!username || !password) {
+          const email = emailInput ? emailInput.value.trim() : '';
+          const password = passwordInput ? passwordInput.value : '';
+
+          if (loginError) loginError.style.display = 'none';
+
+          if (!email || !password) {
             if (loginError) {
-              loginError.textContent = 'Please enter both name and password! 🔑';
+              loginError.textContent = "Please fill in all fields! 🔑";
               loginError.style.display = 'block';
             }
+            triggerShake();
             return;
           }
 
           try {
-            if (loginError) loginError.style.display = 'none';
-            btnLoginSubmit.disabled = true;
-            btnLoginSubmit.textContent = 'Logging In...';
+            showButtonLoading(btnLoginSubmit, "Logging in...");
 
-            const data = await API.login(username, password);
+            // A. Log in via Firebase Auth
+            const userCredential = await window.firebase.auth().signInWithEmailAndPassword(email, password);
+            const user = userCredential.user;
 
-            // Fetch profile settings to sync local storage for front-end compatibility
-            const profile = await API.getProfile();
-            localStorage.setItem('user_name', profile.username);
-            localStorage.setItem('diary_name', profile.diaryName || 'My Diary');
-            localStorage.setItem('companion_name', profile.companionName || 'Ollie');
-            localStorage.setItem('companion_emoji', profile.companionEmoji || '🦉');
+            // B. Sync browser local storage
+            API.setToken('firebase-local-token');
+            localStorage.setItem('user_name', user.displayName || 'Friend');
+            localStorage.setItem('userName', user.displayName || 'Friend');
+            localStorage.setItem('userEmail', user.email);
+            localStorage.setItem('userId', user.uid);
 
-            // Fade whole viewport to black
-            if (transitionOverlay) {
-              transitionOverlay.classList.add('active');
-            }
-
-            setTimeout(() => {
-              window.location.href = 'pages/home.html';
-            }, 800);
+            // C. Redirect to dashboard
+            window.location.href = 'pages/home.html';
 
           } catch (err) {
+            hideButtonLoading(btnLoginSubmit, "Log In");
             if (loginError) {
-              loginError.textContent = err.message || 'Login failed. Please check credentials.';
+              loginError.textContent = formatFirebaseError(err);
               loginError.style.display = 'block';
             }
-            btnLoginSubmit.disabled = false;
-            btnLoginSubmit.textContent = 'Log In ✓';
+            triggerShake();
           }
         });
       }
+
+      // -------------------------------------------------------------
+      // 5. FIREBASE AUTH SIGN UP PROCESS
+      // -------------------------------------------------------------
+      if (btnSignupSubmit) {
+        btnSignupSubmit.addEventListener('click', async () => {
+          const nameInput = document.getElementById('signup-name');
+          const emailInput = document.getElementById('signup-email');
+          const passwordInput = document.getElementById('signup-password');
+
+          const name = nameInput ? nameInput.value.trim() : '';
+          const email = emailInput ? emailInput.value.trim() : '';
+          const password = passwordInput ? passwordInput.value : '';
+
+          if (signupError) signupError.style.display = 'none';
+
+          if (!name || !email || !password) {
+            if (signupError) {
+              signupError.textContent = "Please fill in all fields! 🔑";
+              signupError.style.display = 'block';
+            }
+            triggerShake();
+            return;
+          }
+
+          if (password.length < 6) {
+            if (signupError) {
+              signupError.textContent = "Password too short (min 6)";
+              signupError.style.display = 'block';
+            }
+            triggerShake();
+            return;
+          }
+
+          try {
+            showButtonLoading(btnSignupSubmit, "Creating diary...");
+
+            // A. Register User in Firebase Auth
+            const userCredential = await window.firebase.auth().createUserWithEmailAndPassword(email, password);
+            const user = userCredential.user;
+
+            // B. Set user displayName profile attribute in Firebase
+            await user.updateProfile({ displayName: name });
+
+            // C. Sync browser local storage
+            API.setToken('firebase-local-token');
+            localStorage.setItem('user_name', name);
+            localStorage.setItem('userName', name);
+            localStorage.setItem('userEmail', user.email);
+            localStorage.setItem('userId', user.uid);
+
+            // D. Redirect to onboarding options page
+            window.location.href = 'pages/onboarding.html';
+
+          } catch (err) {
+            hideButtonLoading(btnSignupSubmit, "Create My Diary ✨");
+            if (signupError) {
+              signupError.textContent = formatFirebaseError(err);
+              signupError.style.display = 'block';
+            }
+            triggerShake();
+          }
+        });
+      }
+
+      // -------------------------------------------------------------
+      // 6. FORGOT PASSWORD ACTION
+      // -------------------------------------------------------------
+      if (btnForgot) {
+        btnForgot.addEventListener('click', async (e) => {
+          e.preventDefault();
+          const emailInput = document.getElementById('login-email');
+          const email = emailInput ? emailInput.value.trim() : '';
+
+          if (loginError) loginError.style.display = 'none';
+
+          if (!email) {
+            if (loginError) {
+              loginError.textContent = "Please enter your Email above first! 📧";
+              loginError.style.color = "#FFD700"; // yellow warning accent
+              loginError.style.display = 'block';
+            }
+            triggerShake();
+            return;
+          }
+
+          try {
+            await window.firebase.auth().sendPasswordResetEmail(email);
+            alert(`Password reset link sent successfully to ${email} 📨`);
+          } catch (err) {
+            if (loginError) {
+              loginError.style.color = "#FF6B6B"; // restore red alert
+              loginError.textContent = formatFirebaseError(err);
+              loginError.style.display = 'block';
+            }
+            triggerShake();
+          }
+        });
+      }
+
     });
+
+    // -------------------------------------------------------------
+    // 7. TOGGLE PASSWORD VISIBILITY HELPER (Global Scope)
+    // -------------------------------------------------------------
+    window.togglePasswordVisibility = function(fieldId) {
+      const input = document.getElementById(fieldId);
+      const btn = input ? input.nextElementSibling : null;
+      
+      if (input && btn) {
+        const eyeSvg = btn.querySelector('.eye-icon');
+        
+        if (input.type === 'password') {
+          input.type = 'text';
+          // Add cross-out line inside eye SVG for visible state
+          if (eyeSvg) {
+            eyeSvg.innerHTML = `
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+              <line x1="1" y1="1" x2="23" y2="23" stroke="currentColor" stroke-width="2"></line>
+            `;
+          }
+        } else {
+          input.type = 'password';
+          // Restore normal eye SVG
+          if (eyeSvg) {
+            eyeSvg.innerHTML = `
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            `;
+          }
+        }
+      }
+    };
   </script>
 
-  <!-- Login Overlay Modal -->
-  <div id="login-overlay" class="login-overlay">
-    <div class="login-card">
-      <h2>Welcome Back 👤</h2>
-      <div id="login-error" class="login-error-msg"></div>
-      
-      <div class="login-input-group">
-        <label for="login-username">Your Name</label>
-        <input type="text" id="login-username" class="login-input" placeholder="Enter name used for registration..." autocomplete="username">
-      </div>
-      
-      <div class="login-input-group">
-        <label for="login-password">Password</label>
-        <input type="password" id="login-password" class="login-input" placeholder="Enter password..." autocomplete="current-password">
-      </div>
-      
-      <div class="login-actions">
-        <button id="btn-login-cancel" class="btn-login-cancel">Cancel</button>
-        <button id="btn-login-submit" class="btn-login-submit">Log In ✓</button>
-      </div>
-    </div>
-  </div>
 </body>
 </html>

@@ -19,6 +19,8 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json({ limit: '10mb' })); // Support larger base64 file payloads for photos
 
+const path = require('path');
+
 // Register route handlers
 app.use('/api/auth', authRoutes);
 app.use('/api/entries', entriesRoutes);
@@ -27,6 +29,14 @@ app.use('/api/games', gamesRoutes);
 app.use('/api/companion', companionRoutes);
 app.use('/api/notifications', notificationsRoutes);
 app.use('/api/payments', paymentsRoutes);
+
+// Serve static frontend files from parent directory
+app.use(express.static(path.join(__dirname, '../')));
+
+// Wildcard route to serve index.html as fallback (for routing)
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../index.html'));
+});
 
 // Database connection & server startup
 sequelize.sync()
