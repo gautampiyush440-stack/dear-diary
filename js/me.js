@@ -1,6 +1,24 @@
 /**
  * Dear Diary - My Space Profile Controller
  */
+// Protect page via Firebase Auth state
+(function() {
+  const checkFirebase = setInterval(() => {
+    if (typeof window.firebase !== 'undefined') {
+      clearInterval(checkFirebase);
+      window.firebase.auth().onAuthStateChanged((user) => {
+        if (!user) {
+          if (window.location.protocol === 'file:') {
+            window.location.href = 'login.html';
+          } else {
+            window.location.href = '/pages/login.html';
+          }
+        }
+      });
+    }
+  }, 50);
+})();
+
 document.addEventListener('DOMContentLoaded', () => {
 
   // ==========================================================================
@@ -1583,8 +1601,17 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   if (btnConfirmSignOut && signOutConfirmModal) {
-    btnConfirmSignOut.addEventListener('click', () => {
-      // WIPE LocalStorage completely
+    btnConfirmSignOut.addEventListener('click', async () => {
+      // 1. Firebase Sign Out
+      if (window.firebase) {
+        try {
+          await window.firebase.auth().signOut();
+        } catch (fbErr) {
+          console.error("Firebase Auth Sign Out failed:", fbErr);
+        }
+      }
+
+      // 2. WIPE LocalStorage completely
       localStorage.clear();
       if (typeof API !== 'undefined') {
         API.clearToken();
@@ -1601,7 +1628,7 @@ document.addEventListener('DOMContentLoaded', () => {
       fadeOverlay.style.opacity = '1';
 
       setTimeout(() => {
-        window.location.href = '../index.html'; // redirect index.html onboarding
+        window.location.href = 'login.html'; // redirect to login.html
       }, 800);
     });
   }

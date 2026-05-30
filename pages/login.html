@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dear Diary — Login & Sign Up</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Lato:ital,wght@0,300;0,400;0,700;1,400&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: #1A0A00;
+      color: #FFFAF0;
+      font-family: 'Lato', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      overflow-x: hidden;
+    }
+
+    .login-container {
+      background-color: #1C0A00;
+      border: 1px solid #B8860B;
+      border-radius: 20px;
+      padding: 40px 30px;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+      animation: fadeIn 0.6s ease-out;
+      position: relative;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(15px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .shake {
+      animation: shake 0.4s ease-in-out;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-8px); }
+      40%, 80% { transform: translateX(8px); }
+    }
+
+    .brand-header {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    .brand-logo {
+      font-family: 'Dancing Script', cursive;
+      font-size: 40px;
+      color: #FFD700;
+      font-weight: 700;
+      line-height: 1;
+      margin-bottom: 5px;
+      user-select: none;
+    }
+
+    .brand-name {
+      font-family: 'Dancing Script', cursive;
+      font-size: 28px;
+      color: #FFD700;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .brand-subtitle {
+      font-family: 'Lato', sans-serif;
+      font-style: italic;
+      font-size: 13px;
+      color: #B8860B;
+      letter-spacing: 0.5px;
+    }
+
+    .tab-switcher {
+      display: flex;
+      border-bottom: 1px solid #8B7355;
+      margin-bottom: 25px;
+    }
+
+    .tab-btn {
+      flex: 1;
+      background: none;
+      border: none;
+      padding: 12px;
+      font-family: 'Lato', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      color: #8B7355;
+      cursor: pointer;
+      transition: color 0.3s, border-bottom 0.3s;
+      text-align: center;
+      border-bottom: 2px solid transparent;
+      outline: none;
+    }
+
+    .tab-btn.active {
+      color: #FFD700;
+      border-bottom: 2px solid #FFD700;
+    }
+
+    .form-wrapper {
+      position: relative;
+    }
+
+    .auth-form {
+      display: none;
+      animation: slideUp 0.4s ease-out;
+    }
+
+    .auth-form.active {
+      display: block;
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .input-group {
+      margin-bottom: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      position: relative;
+    }
+
+    .input-group label {
+      font-family: 'Lato', sans-serif;
+      font-weight: 700;
+      font-size: 12px;
+      color: #B8860B;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .input-wrapper {
+      position: relative;
+      width: 100%;
+    }
+
+    .input-field {
+      width: 100%;
+      background-color: #2C1503;
+      border: 1px solid #B8860B;
+      border-radius: 8px;
+      padding: 12px 16px;
+      padding-right: 46px; /* Space for eye toggle */
+      color: #FFFAF0;
+      font-family: 'Lato', sans-serif;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+    .input-field::placeholder {
+      color: #8B7355;
+    }
+
+    .input-field:focus {
+      border-color: #FFD700;
+      box-shadow: 0 0 8px rgba(255, 215, 0, 0.25);
+    }
+
+    .toggle-password {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      color: #8B7355;
+      display: flex;
+      align-items: center;
+      transition: color 0.3s;
+    }
+
+    .toggle-password:hover {
+      color: #FFD700;
+    }
+
+    .eye-icon {
+      width: 20px;
+      height: 20px;
+    }
+
+    .btn-submit {
+      background-color: #FFD700;
+      color: #1A0A00;
+      font-family: 'Lato', sans-serif;
+      font-weight: 700;
+      font-size: 14px;
+      border: none;
+      border-radius: 8px;
+      padding: 14px;
+      width: 100%;
+      cursor: pointer;
+      margin-top: 15px;
+      box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+      transition: background-color 0.3s, box-shadow 0.3s, transform 0.1s;
+      outline: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-submit:hover {
+      background-color: #FFE65A;
+      box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+    }
+
+    .btn-submit:active {
+      transform: scale(0.98);
+    }
+
+    .btn-submit:disabled {
+      background-color: #8B7355;
+      color: #2C1503;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(26, 10, 0, 0.25);
+      border-radius: 50%;
+      border-top-color: #1A0A00;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .forgot-link {
+      font-family: 'Lato', sans-serif;
+      font-size: 12px;
+      color: #8B7355;
+      text-decoration: none;
+      display: block;
+      text-align: center;
+      margin-top: 18px;
+      transition: color 0.3s;
+      outline: none;
+    }
+
+    .forgot-link:hover {
+      color: #FFD700;
+    }
+
+    .error-panel {
+      color: #FF6B6B;
+      font-family: 'Lato', sans-serif;
+      font-size: 12px;
+      margin-top: 12px;
+      text-align: center;
+      display: none;
+      line-height: 1.4;
+    }
+
+    .card-footer {
+      font-family: 'Lato', sans-serif;
+      font-size: 10px;
+      color: #8B7355;
+      text-align: center;
+      margin-top: 25px;
+      line-height: 1.4;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="login-container" id="login-card">
+    <!-- Top Branding Logo & Name -->
+    <header class="brand-header">
+      <div class="brand-logo">db</div>
+      <h1 class="brand-name">Dear Diary</h1>
+      <div class="brand-subtitle" id="form-subtitle">Welcome Back 🥺</div>
+    </header>
+
+    <!-- Tab Switcher -->
+    <nav class="tab-switcher">
+      <button class="tab-btn active" id="tab-login">Login</button>
+      <button class="tab-btn" id="tab-signup">Sign Up</button>
+    </nav>
+
+    <!-- Forms Container -->
+    <div class="form-wrapper">
+      
+      <!-- 1. LOGIN FORM -->
+      <form class="auth-form active" id="form-login" onsubmit="return false;">
+        <div class="input-group">
+          <label for="login-email">Email</label>
+          <div class="input-wrapper">
+            <input type="email" id="login-email" class="input-field" placeholder="your@email.com" required autocomplete="email">
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label for="login-password">Password</label>
+          <div class="input-wrapper">
+            <input type="password" id="login-password" class="input-field" placeholder="••••••••" required autocomplete="current-password">
+            <span class="toggle-password" onclick="togglePasswordVisibility('login-password')">
+              <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+            </span>
+          </div>
+        </div>
+
+        <button class="btn-submit" id="btn-login-submit">
+          Log In
+        </button>
+
+        <a href="#" class="forgot-link" id="btn-forgot-password">Forgot Password?</a>
+        <div class="error-panel" id="login-error"></div>
+      </form>
+
+      <!-- 2. SIGN UP FORM -->
+      <form class="auth-form" id="form-signup" onsubmit="return false;">
+        <div class="input-group">
+          <label for="signup-name">Your Name</label>
+          <div class="input-wrapper">
+            <input type="text" id="signup-name" class="input-field" placeholder="What shall I call you?" required autocomplete="name">
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label for="signup-email">Email</label>
+          <div class="input-wrapper">
+            <input type="email" id="signup-email" class="input-field" placeholder="your@email.com" required autocomplete="email">
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label for="signup-password">Password</label>
+          <div class="input-wrapper">
+            <input type="password" id="signup-password" class="input-field" placeholder="Min 6 characters" required autocomplete="new-password">
+            <span class="toggle-password" onclick="togglePasswordVisibility('signup-password')">
+              <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+            </span>
+          </div>
+        </div>
+
+        <button class="btn-submit" id="btn-signup-submit">
+          Create My Diary ✨
+        </button>
+        <div class="error-panel" id="signup-error"></div>
+      </form>
+
+    </div>
+
+    <!-- Bottom agreements footer -->
+    <footer class="card-footer">
+      By continuing you agree to our<br>Terms & Privacy Policy
+    </footer>
+  </div>
+
+  <!-- Central API Service Layer -->
+  <script src="../js/api.js"></script>
+
+  <!-- Firebase Configuration & Initialization Module -->
+  <script type="module" src="../js/firebase-config.js"></script>
+
+  <!-- Redesigned Login Controller Logic -->
+  <script type="module">
+    document.addEventListener('DOMContentLoaded', () => {
+      
+      const loginCard = document.getElementById('login-card');
+      const formSubtitle = document.getElementById('form-subtitle');
+
+      // Tabs
+      const tabLogin = document.getElementById('tab-login');
+      const tabSignup = document.getElementById('tab-signup');
+
+      // Forms
+      const formLogin = document.getElementById('form-login');
+      const formSignup = document.getElementById('form-signup');
+
+      // Submit Buttons
+      const btnLoginSubmit = document.getElementById('btn-login-submit');
+      const btnSignupSubmit = document.getElementById('btn-signup-submit');
+
+      // Errors
+      const loginError = document.getElementById('login-error');
+      const signupError = document.getElementById('signup-error');
+
+      // Forgot Password Link
+      const btnForgot = document.getElementById('btn-forgot-password');
+
+      // Check auth on load: If already logged in, redirect to home.html
+      const checkFirebaseInterval = setInterval(() => {
+        if (typeof window.firebase !== 'undefined') {
+          clearInterval(checkFirebaseInterval);
+          
+          window.firebase.auth().onAuthStateChanged((user) => {
+            if (user) {
+              window.location.href = 'home.html';
+            }
+          });
+        }
+      }, 50);
+
+      // Tab switches
+      if (tabLogin && tabSignup) {
+        tabLogin.addEventListener('click', () => {
+          tabLogin.classList.add('active');
+          tabSignup.classList.remove('active');
+          formLogin.classList.add('active');
+          formSignup.classList.remove('active');
+          formSubtitle.textContent = "Welcome Back 🥺";
+          if (loginError) loginError.style.display = 'none';
+        });
+
+        tabSignup.addEventListener('click', () => {
+          tabSignup.classList.add('active');
+          tabLogin.classList.remove('active');
+          formSignup.classList.add('active');
+          formLogin.classList.remove('active');
+          formSubtitle.textContent = "Join Us ✨";
+          if (signupError) signupError.style.display = 'none';
+        });
+      }
+
+      function triggerShake() {
+        if (loginCard) {
+          loginCard.classList.remove('shake');
+          void loginCard.offsetWidth; // trigger reflow
+          loginCard.classList.add('shake');
+          setTimeout(() => loginCard.classList.remove('shake'), 400);
+        }
+      }
+
+      function showButtonLoading(btn, text) {
+        btn.disabled = true;
+        btn.innerHTML = `<span class="spinner"></span> ${text}`;
+      }
+
+      function hideButtonLoading(btn, text) {
+        btn.disabled = false;
+        btn.innerHTML = text;
+      }
+
+      function formatFirebaseError(err) {
+        console.error("Firebase auth error:", err);
+        const code = err.code || '';
+        if (code.includes('auth/invalid-credential') || code.includes('auth/wrong-password') || code.includes('auth/user-not-found')) {
+          return "Wrong email or password";
+        } else if (code.includes('auth/email-already-in-use')) {
+          return "Email already in use";
+        } else if (code.includes('auth/invalid-email')) {
+          return "Please enter valid email";
+        } else if (code.includes('auth/weak-password')) {
+          return "Password too short (min 6)";
+        }
+        return err.message || "An authentication error occurred. Please try again.";
+      }
+
+      // 1. Firebase Auth Login Process
+      if (btnLoginSubmit) {
+        btnLoginSubmit.addEventListener('click', async () => {
+          const emailInput = document.getElementById('login-email');
+          const passwordInput = document.getElementById('login-password');
+
+          const email = emailInput ? emailInput.value.trim() : '';
+          const password = passwordInput ? passwordInput.value : '';
+
+          if (loginError) loginError.style.display = 'none';
+
+          if (!email || !password) {
+            if (loginError) {
+              loginError.textContent = "Please fill in all fields! 🔑";
+              loginError.style.display = 'block';
+            }
+            triggerShake();
+            return;
+          }
+
+          try {
+            showButtonLoading(btnLoginSubmit, "Logging in...");
+
+            // Log in via Firebase Auth
+            const userCredential = await window.firebase.auth().signInWithEmailAndPassword(email, password);
+            const user = userCredential.user;
+
+            // Sync browser local storage
+            API.setToken('firebase-local-token');
+            localStorage.setItem('user_name', user.displayName || 'Friend');
+            localStorage.setItem('userName', user.displayName || 'Friend');
+            localStorage.setItem('userEmail', user.email);
+            localStorage.setItem('userId', user.uid);
+
+            // Redirect to home.html
+            window.location.href = 'home.html';
+
+          } catch (err) {
+            hideButtonLoading(btnLoginSubmit, "Log In");
+            if (loginError) {
+              loginError.textContent = formatFirebaseError(err);
+              loginError.style.display = 'block';
+            }
+            triggerShake();
+          }
+        });
+      }
+
+      // 2. Firebase Auth Sign Up Process
+      if (btnSignupSubmit) {
+        btnSignupSubmit.addEventListener('click', async () => {
+          const nameInput = document.getElementById('signup-name');
+          const emailInput = document.getElementById('signup-email');
+          const passwordInput = document.getElementById('signup-password');
+
+          const name = nameInput ? nameInput.value.trim() : '';
+          const email = emailInput ? emailInput.value.trim() : '';
+          const password = passwordInput ? passwordInput.value : '';
+
+          if (signupError) signupError.style.display = 'none';
+
+          if (!name || !email || !password) {
+            if (signupError) {
+              signupError.textContent = "Please fill in all fields! 🔑";
+              signupError.style.display = 'block';
+            }
+            triggerShake();
+            return;
+          }
+
+          if (password.length < 6) {
+            if (signupError) {
+              signupError.textContent = "Password too short (min 6)";
+              signupError.style.display = 'block';
+            }
+            triggerShake();
+            return;
+          }
+
+          try {
+            showButtonLoading(btnSignupSubmit, "Creating diary...");
+
+            // Register User in Firebase Auth
+            const userCredential = await window.firebase.auth().createUserWithEmailAndPassword(email, password);
+            const user = userCredential.user;
+
+            // Set user displayName profile attribute in Firebase
+            await user.updateProfile({ displayName: name });
+
+            // Sync browser local storage
+            API.setToken('firebase-local-token');
+            localStorage.setItem('user_name', name);
+            localStorage.setItem('userName', name);
+            localStorage.setItem('userEmail', user.email);
+            localStorage.setItem('userId', user.uid);
+
+            // Redirect to onboarding.html
+            window.location.href = 'onboarding.html';
+
+          } catch (err) {
+            hideButtonLoading(btnSignupSubmit, "Create My Diary ✨");
+            if (signupError) {
+              signupError.textContent = formatFirebaseError(err);
+              signupError.style.display = 'block';
+            }
+            triggerShake();
+          }
+        });
+      }
+
+      // 3. Forgot Password
+      if (btnForgot) {
+        btnForgot.addEventListener('click', async (e) => {
+          e.preventDefault();
+          const emailInput = document.getElementById('login-email');
+          const email = emailInput ? emailInput.value.trim() : '';
+
+          if (loginError) loginError.style.display = 'none';
+
+          if (!email) {
+            if (loginError) {
+              loginError.textContent = "Please enter your Email above first! 📧";
+              loginError.style.color = "#FFD700";
+              loginError.style.display = 'block';
+            }
+            triggerShake();
+            return;
+          }
+
+          try {
+            await window.firebase.auth().sendPasswordResetEmail(email);
+            alert(`Password reset link sent successfully to ${email} 📨`);
+          } catch (err) {
+            if (loginError) {
+              loginError.style.color = "#FF6B6B";
+              loginError.textContent = formatFirebaseError(err);
+              loginError.style.display = 'block';
+            }
+            triggerShake();
+          }
+        });
+      }
+    });
+
+    window.togglePasswordVisibility = function(fieldId) {
+      const input = document.getElementById(fieldId);
+      const btn = input ? input.nextElementSibling : null;
+      if (input && btn) {
+        const eyeSvg = btn.querySelector('.eye-icon');
+        if (input.type === 'password') {
+          input.type = 'text';
+          if (eyeSvg) {
+            eyeSvg.innerHTML = `
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+              <line x1="1" y1="1" x2="23" y2="23" stroke="currentColor" stroke-width="2"></line>
+            `;
+          }
+        } else {
+          input.type = 'password';
+          if (eyeSvg) {
+            eyeSvg.innerHTML = `
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            `;
+          }
+        }
+      }
+    };
+  </script>
+</body>
+</html>

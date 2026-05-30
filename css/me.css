@@ -469,8 +469,8 @@ body {
   background: transparent;
   border: none;
   font-family: 'Lato', sans-serif;
-  font-size: 14px; /* Lato #C4826A 14px */
-  color: #C4826A;
+  font-size: 14px;
+  color: #FF4D4D; /* Vibrant Red color */
   font-weight: 700;
   text-align: center; /* Center aligned */
   padding: 10px;
@@ -481,7 +481,7 @@ body {
 }
 
 .btn-sign-out:hover {
-  color: #d19580;
+  color: #FF6B6B;
   text-decoration: underline;
 }
 

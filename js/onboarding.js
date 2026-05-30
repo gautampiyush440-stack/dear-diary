@@ -1,6 +1,24 @@
 /**
  * Dear Diary - Onboarding Controller (3D Page Flip Mechanics)
  */
+// Protect page via Firebase Auth state
+(function() {
+  const checkFirebase = setInterval(() => {
+    if (typeof window.firebase !== 'undefined') {
+      clearInterval(checkFirebase);
+      window.firebase.auth().onAuthStateChanged((user) => {
+        if (!user) {
+          if (window.location.protocol === 'file:') {
+            window.location.href = 'login.html';
+          } else {
+            window.location.href = '/pages/login.html';
+          }
+        }
+      });
+    }
+  }, 50);
+})();
+
 document.addEventListener('DOMContentLoaded', () => {
   // Navigation State
   let currentStep = 1;
