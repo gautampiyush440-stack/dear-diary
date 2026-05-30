@@ -455,11 +455,30 @@ document.addEventListener('DOMContentLoaded', () => {
     newEntryScreen.classList.remove('page-flip-close');
     newEntryScreen.classList.add('active');
     textEditor.focus();
+    if (window.visualViewport) {
+      setTimeout(handleViewportChange, 100);
+    }
+  }
+
+  function handleViewportChange() {
+    if (window.visualViewport && newEntryScreen && newEntryScreen.classList.contains('active')) {
+      newEntryScreen.style.height = `${window.visualViewport.height}px`;
+      newEntryScreen.style.top = `${window.visualViewport.offsetTop}px`;
+    }
+  }
+
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', handleViewportChange);
+    window.visualViewport.addEventListener('scroll', handleViewportChange);
   }
 
   function closeEditor() {
     newEntryScreen.classList.remove('active');
     editingEntryId = null;
+    if (window.visualViewport) {
+      newEntryScreen.style.height = '';
+      newEntryScreen.style.top = '';
+    }
   }
 
   // ---------------------------------------------------------

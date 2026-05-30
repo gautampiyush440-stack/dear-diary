@@ -495,7 +495,7 @@ body {
   overflow-y: auto;
   box-shadow: inset 15px 0 30px rgba(0, 0, 0, 0.08), inset -5px 0 10px rgba(0, 0, 0, 0.05);
   transition: background-color 0.4s ease, background-image 0.4s ease;
-  padding: 30px 20px 80px 20px; /* bottom padding is for typing toolbar clearance */
+  padding: 30px 20px 40px 20px; /* reduced bottom padding since toolbar is in normal flow */
 }
 
 /* Page style classes for canvas */
@@ -675,9 +675,6 @@ body {
    WRITING TOOLBAR (Fixed above keyboard)
    -------------------------------------------------------------------------- */
 .writing-toolbar {
-  position: absolute;
-  bottom: 0;
-  left: 0;
   width: 100%;
   height: 48px;
   background-color: #1A0A00; /* Background #1A0A00 */
@@ -687,6 +684,7 @@ body {
   justify-content: space-around;
   align-items: center;
   z-index: 100;
+  flex-shrink: 0;
 }
 
 .format-btn, .toolbar-tool-btn {
@@ -1552,12 +1550,14 @@ body {
     line-height: 28px;
     min-height: 320px;
   }
-  .write-tools-bar {
-    gap: 10px;
+  .writing-toolbar {
+    gap: 8px;
     padding: 6px 12px;
   }
-  .tool-btn {
-    font-size: 15px;
+  .format-btn, .toolbar-tool-btn {
+    font-size: 14px;
+    width: 28px;
+    height: 28px;
   }
   .polaroid-card {
     width: 140px;
