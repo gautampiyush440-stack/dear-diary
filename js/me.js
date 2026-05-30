@@ -12,6 +12,8 @@
       window.firebase.auth().onAuthStateChanged((user) => {
         if (window.firebase.auth().currentUser === null) {
           window.location.href = 'login.html';
+        } else {
+          document.dispatchEvent(new CustomEvent('auth-resolved', { detail: user }));
         }
       });
     }
@@ -83,42 +85,128 @@ document.addEventListener('DOMContentLoaded', () => {
   if (floatEmoji) floatEmoji.textContent = companionEmoji;
 
   // --- Async Backend Integration Loader ---
-  async function loadServerData() {
-    if (typeof API === 'undefined' || !API.isAuthenticated()) {
-      updateMainProfileUI();
-      initAchievementsBoard();
-      return;
-    }
-
+  async function loadServerData(user) {
     try {
-      const profile = await API.getProfile();
-      userName = profile.username || userName;
-      diaryName = profile.diaryName || diaryName;
-      companionName = profile.companionName || companionName;
-      companionEmoji = profile.companionEmoji || companionEmoji;
-      coins = profile.coins !== undefined ? profile.coins : coins;
-      writingStreak = profile.streak !== undefined ? profile.streak : writingStreak;
+      if (user) {
+        // Fetch user doc from Firestore
+        const userDoc = await window.firebase.firestore().collection("users").doc(user.uid).get();
+        if (userDoc.exists) {
+          const uData = userDoc.data();
+          userName = uData.name || userName;
+          diaryName = uData.diaryName || diaryName;
+          companionName = uData.character || companionName;
+          companionEmoji = uData.characterEmoji || companionEmoji;
+          coins = uData.coins !== undefined ? uData.coins : coins;
+          writingStreak = uData.writingStreak !== undefined ? uData.writingStreak : writingStreak;
 
-      const isPremium = !!profile.isPremium;
-      localStorage.setItem('premiumUpgrade', isPremium ? 'true' : 'false');
+          localStorage.setItem('user_name', userName);
+          localStorage.setItem('diary_name', diaryName);
+          localStorage.setItem('companion_name', companionName);
+          localStorage.setItem('companion_emoji', companionEmoji);
+          localStorage.setItem('coins', coins);
+          localStorage.setItem('writingStreak', writingStreak);
+        }
 
-      // Sync local storage for other views/tabs
-      localStorage.setItem('user_name', userName);
-      localStorage.setItem('diary_name', diaryName);
-      localStorage.setItem('companion_name', companionName);
-      localStorage.setItem('companion_emoji', companionEmoji);
-      localStorage.setItem('coins', coins);
-      localStorage.setItem('writingStreak', writingStreak);
+        // Fetch streaks document
+        const streakDoc = await window.firebase.firestore().collection("streaks").doc(user.uid).get();
+        if (streakDoc.exists) {
+          const sData = streakDoc.data();
+          writingStreak = sData.writingStreak !== undefined ? sData.writingStreak : writingStreak;
+          snapStreak = sData.snapStreak !== undefined ? sData.snapStreak : snapStreak;
+          localStorage.setItem('writingStreak', writingStreak);
+          localStorage.setItem('snapStreak', snapStreak);
+        }
 
-      if (profile.settingsPin) {
-        localStorage.setItem('pin', profile.settingsPin);
-        localStorage.setItem('diaryLocked', 'true');
+        // Fetch entries from Firestore
+        try {
+          const querySnapshot = await window.firebase.firestore().collection("entries")
+            .where("userId", "==", user.uid)
+            .orderBy("date", "desc")
+            .get();
+          
+          diaryEntries = [];
+          querySnapshot.forEach(doc => {
+            const data = doc.data();
+            let dateStr = '';
+            if (data.date) {
+              const options = { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' };
+              dateStr = data.date.toDate().toLocaleDateString('en-US', options);
+            }
+            diaryEntries.push({
+              id: doc.id,
+              content: data.content,
+              mood: data.mood,
+              pageStyle: data.pageStyle,
+              font: data.font,
+              date: dateStr,
+              wordCount: data.wordCount,
+              createdAt: data.date ? data.date.toDate() : new Date()
+            });
+          });
+          localStorage.setItem('diary_entries', JSON.stringify(diaryEntries));
+        } catch (e) {
+          console.warn('Firestore entries query failed:', e);
+          diaryEntries = JSON.parse(localStorage.getItem('diary_entries')) || [];
+        }
+
+        // Fetch snaps from Firestore
+        try {
+          const querySnapshot = await window.firebase.firestore().collection("snaps")
+            .where("userId", "==", user.uid)
+            .orderBy("date", "desc")
+            .get();
+          
+          snaps = [];
+          querySnapshot.forEach(doc => {
+            const data = doc.data();
+            let dateStr = '';
+            if (data.date) {
+              dateStr = data.date.toDate().toLocaleDateString('en-US');
+            }
+            snaps.push({
+              id: doc.id,
+              src: data.imageData,
+              date: dateStr,
+              filter: data.filter || 'normal'
+            });
+          });
+          localStorage.setItem('diary_snaps', JSON.stringify(snaps));
+        } catch (e) {
+          console.warn('Firestore snaps query failed:', e);
+          snaps = JSON.parse(localStorage.getItem('diary_snaps')) || [];
+        }
       } else {
-        localStorage.removeItem('pin');
-        localStorage.setItem('diaryLocked', 'false');
+        // Offline Fallback
+        const profile = await API.getProfile();
+        userName = profile.username || userName;
+        diaryName = profile.diaryName || diaryName;
+        companionName = profile.companionName || companionName;
+        companionEmoji = profile.companionEmoji || companionEmoji;
+        coins = profile.coins !== undefined ? profile.coins : coins;
+        writingStreak = profile.streak !== undefined ? profile.streak : writingStreak;
+
+        localStorage.setItem('user_name', userName);
+        localStorage.setItem('diary_name', diaryName);
+        localStorage.setItem('companion_name', companionName);
+        localStorage.setItem('companion_emoji', companionEmoji);
+        localStorage.setItem('coins', coins);
+        localStorage.setItem('writingStreak', writingStreak);
+
+        try {
+          const entries = await API.getEntries();
+          diaryEntries = entries || [];
+          localStorage.setItem('diary_entries', JSON.stringify(diaryEntries));
+        } catch (err) {}
+
+        try {
+          const snapsData = await API.getSnaps();
+          snaps = snapsData || [];
+          localStorage.setItem('diary_snaps', JSON.stringify(snaps));
+        } catch (err) {}
       }
 
-      // Sync premium cards
+      // Sync premium Upgrade card text
+      const isPremium = localStorage.getItem('premiumUpgrade') === 'true';
       const btnUpgrade = document.getElementById('btn-upgrade-premium');
       if (btnUpgrade) {
         if (isPremium) {
@@ -130,25 +218,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
 
-      // Fetch entries from DB
-      try {
-        const entries = await API.getEntries();
-        diaryEntries = entries || [];
-        localStorage.setItem('diary_entries', JSON.stringify(diaryEntries));
-      } catch (err) {
-        console.warn('Failed to load server entries, using local fallback:', err);
-      }
-
-      // Fetch snaps from DB
-      try {
-        const snapsData = await API.getSnaps();
-        snaps = snapsData || [];
-        localStorage.setItem('diary_snaps', JSON.stringify(snaps));
-      } catch (err) {
-        console.warn('Failed to load server snaps, using local fallback:', err);
-      }
-
-      // Refresh visuals
+      // Refresh UI Visuals
       updateMainProfileUI();
       animateCounter('stat-entries-count', diaryEntries.length);
       animateCounter('stat-streak-count', writingStreak);
@@ -163,8 +233,24 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Trigger sync load
-  loadServerData();
+  let profileInitialized = false;
+  function triggerInitProfile(user) {
+    if (profileInitialized) return;
+    profileInitialized = true;
+    loadServerData(user);
+  }
+
+  document.addEventListener('auth-resolved', (e) => {
+    clearInterval(checkAuthInterval);
+    triggerInitProfile(e.detail);
+  });
+
+  const checkAuthInterval = setInterval(() => {
+    if (window.firebase && window.firebase.auth().currentUser) {
+      clearInterval(checkAuthInterval);
+      triggerInitProfile(window.firebase.auth().currentUser);
+    }
+  }, 50);
 
   // ==========================================================================
   // FLOATING COMPANION DRAGGING (POINTER EVENTS)
@@ -418,11 +504,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
     inputName.onchange = async () => {
       const newName = inputName.value.trim();
-      if (newName && typeof API !== 'undefined' && API.isAuthenticated()) {
-        try {
-          await API.updateCompanion(newName, companionEmoji);
-        } catch (err) {
-          console.error('Failed to save companion name to database:', err);
+      if (newName) {
+        if (typeof API !== 'undefined' && API.isAuthenticated()) {
+          try {
+            await API.updateCompanion(newName, companionEmoji);
+          } catch (err) {
+            console.error('Failed to save companion name to database:', err);
+          }
+        }
+        const user = window.firebase ? window.firebase.auth().currentUser : null;
+        if (user) {
+          try {
+            await window.firebase.firestore().collection("users").doc(user.uid).set({
+              character: newName
+            }, { merge: true });
+          } catch (fsErr) {
+            console.error('Failed to save companion name to Firestore:', fsErr);
+          }
         }
       }
     };
@@ -478,6 +576,17 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('Failed to save companion selection to database:', err);
           }
         }
+        const user = window.firebase ? window.firebase.auth().currentUser : null;
+        if (user) {
+          try {
+            await window.firebase.firestore().collection("users").doc(user.uid).set({
+              character: companionName,
+              characterEmoji: companionEmoji
+            }, { merge: true });
+          } catch (fsErr) {
+            console.error('Failed to save companion selection to Firestore:', fsErr);
+          }
+        }
       };
     });
   }
@@ -509,6 +618,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         selectedTheme = themeVal;
         localStorage.setItem('selectedTheme', themeVal);
+        const user = window.firebase ? window.firebase.auth().currentUser : null;
+        if (user) {
+          window.firebase.firestore().collection("users").doc(user.uid).set({
+            theme: themeVal
+          }, { merge: true }).catch(err => console.error("Failed to save theme to Firestore:", err));
+        }
         if (currentThemeLabel) currentThemeLabel.textContent = card.querySelector('.theme-card-name').textContent;
 
         applyThemeStyles(themeVal);
@@ -1528,6 +1643,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
           if (typeof API !== 'undefined' && API.isAuthenticated()) {
             await API.updateProfile(newUsername, newDiaryName);
+          }
+          const user = window.firebase ? window.firebase.auth().currentUser : null;
+          if (user) {
+            await window.firebase.firestore().collection("users").doc(user.uid).set({
+              name: newUsername,
+              diaryName: newDiaryName
+            }, { merge: true });
           }
 
           userName = newUsername;

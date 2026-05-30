@@ -12,6 +12,8 @@
       window.firebase.auth().onAuthStateChanged((user) => {
         if (window.firebase.auth().currentUser === null) {
           window.location.href = 'login.html';
+        } else {
+          document.dispatchEvent(new CustomEvent('auth-resolved', { detail: user }));
         }
       });
     }
@@ -163,7 +165,21 @@ document.addEventListener('DOMContentLoaded', () => {
     await renderDiaryHome();
   }
 
-  initWorkspace();
+  let workspaceInitialized = false;
+  function triggerInitWorkspace() {
+    if (workspaceInitialized) return;
+    workspaceInitialized = true;
+    initWorkspace();
+  }
+
+  document.addEventListener('auth-resolved', triggerInitWorkspace);
+
+  const checkAuthInterval = setInterval(() => {
+    if (window.firebase && window.firebase.auth().currentUser) {
+      clearInterval(checkAuthInterval);
+      triggerInitWorkspace();
+    }
+  }, 50);
 
   // ---------------------------------------------------------
   // CALENDAR STRIP GENERATOR
@@ -249,33 +265,42 @@ document.addEventListener('DOMContentLoaded', () => {
   // ---------------------------------------------------------
   async function renderDiaryHome() {
     try {
-      entries = await API.getEntries();
-      // Map database relational objects to frontend property formats
-      entries.forEach(e => {
-        if (!e.photos && e.Polaroids) {
-          e.photos = e.Polaroids.map(p => ({
-            src: p.src,
-            caption: p.caption,
-            left: p.left,
-            top: p.top,
-            tilt: p.tilt
-          }));
-        }
-        if (!e.decorations && e.Stickers) {
-          e.decorations = e.Stickers.map(s => ({
-            type: s.type,
-            left: s.left,
-            top: s.top
-          }));
-        }
-        if (e.createdAt && !e.date) {
-          const options = { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' };
-          e.date = new Date(e.createdAt).toLocaleDateString('en-US', options);
-        }
-      });
-      localStorage.setItem('diary_entries', JSON.stringify(entries));
+      const user = window.firebase ? window.firebase.auth().currentUser : null;
+      if (user) {
+        const querySnapshot = await window.firebase.firestore().collection("entries")
+          .where("userId", "==", user.uid)
+          .orderBy("date", "desc")
+          .get();
+        
+        entries = [];
+        querySnapshot.forEach(doc => {
+          const data = doc.data();
+          let dateStr = '';
+          let createdAtVal = null;
+          if (data.date) {
+            createdAtVal = data.date.toDate();
+            const options = { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' };
+            dateStr = createdAtVal.toLocaleDateString('en-US', options);
+          }
+          entries.push({
+            id: doc.id,
+            content: data.content,
+            mood: data.mood,
+            pageStyle: data.pageStyle,
+            font: data.font,
+            date: dateStr,
+            wordCount: data.wordCount,
+            photos: data.photos || [],
+            decorations: data.decorations || [],
+            createdAt: createdAtVal || new Date()
+          });
+        });
+        localStorage.setItem('diary_entries', JSON.stringify(entries));
+      } else {
+        entries = JSON.parse(localStorage.getItem('diary_entries')) || [];
+      }
     } catch (err) {
-      console.warn('Backend API request failed, using localStorage fallback:', err);
+      console.warn('Firestore load failed, using localStorage fallback:', err);
       entries = JSON.parse(localStorage.getItem('diary_entries')) || [];
     }
 
@@ -283,7 +308,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!entriesList || !emptyState) return;
     
     // Sort entries descending (newest first)
-    entries.sort((a, b) => b.id - a.id);
+    entries.sort((a, b) => {
+      const timeA = a.createdAt ? new Date(a.createdAt).getTime() : (typeof a.id === 'number' ? a.id : 0);
+      const timeB = b.createdAt ? new Date(b.createdAt).getTime() : (typeof b.id === 'number' ? b.id : 0);
+      return timeB - timeA;
+    });
     
     if (entries.length === 0) {
       entriesList.style.display = 'none';
@@ -1020,13 +1049,54 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     try {
-      if (editingEntryId) {
-        await API.updateEntry(editingEntryId, payload);
-      } else {
-        const res = await API.createEntry(payload);
-        if (res.streak) {
-          localStorage.setItem('writingStreak', String(res.streak));
+      const user = window.firebase ? window.firebase.auth().currentUser : null;
+      if (user) {
+        const docPayload = {
+          userId: user.uid,
+          content: contentHtml,
+          mood: moodEmoji,
+          pageStyle: pageStyle,
+          font: fontStyle,
+          date: window.firebase.firestore.FieldValue.serverTimestamp(),
+          wordCount: wordCount,
+          photos: activePhotos,
+          decorations: activeDecorations
+        };
+
+        if (editingEntryId) {
+          await window.firebase.firestore().collection("entries").doc(editingEntryId).set(docPayload, { merge: true });
+        } else {
+          await window.firebase.firestore().collection("entries").add(docPayload);
+
+          // Update streaks (increment writingStreak and set lastWritten)
+          const streakRef = window.firebase.firestore().collection("streaks").doc(user.uid);
+          await window.firebase.firestore().runTransaction(async (transaction) => {
+            const streakDoc = await transaction.get(streakRef);
+            let writingStreak = 1;
+            if (streakDoc.exists) {
+              writingStreak = (streakDoc.data().writingStreak || 0) + 1;
+            }
+            transaction.set(streakRef, {
+              writingStreak: writingStreak,
+              lastWritten: window.firebase.firestore.FieldValue.serverTimestamp()
+            }, { merge: true });
+            localStorage.setItem('writingStreak', String(writingStreak));
+          });
+
+          // Update coins (+10 coins in user profile doc)
+          const userRef = window.firebase.firestore().collection("users").doc(user.uid);
+          await window.firebase.firestore().runTransaction(async (transaction) => {
+            const userDoc = await transaction.get(userRef);
+            let coins = 10;
+            if (userDoc.exists) {
+              coins = (userDoc.data().coins || 0) + 10;
+            }
+            transaction.set(userRef, { coins: coins }, { merge: true });
+            localStorage.setItem('coins', String(coins));
+          });
         }
+      } else {
+        throw new Error("No active Firebase user");
       }
     } catch (err) {
       console.warn('API save failed, executing local fallback saving:', err);

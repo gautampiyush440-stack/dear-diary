@@ -516,6 +516,46 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('companion_emoji', compEmoji);
         localStorage.setItem('first_entry', entryText);
 
+        // 3. Save User Profile and Streaks to Firestore
+        const user = window.firebase ? window.firebase.auth().currentUser : null;
+        if (user) {
+          try {
+            await window.firebase.firestore().collection("users").doc(user.uid).set({
+              name: username,
+              diaryName: diaryName,
+              character: compName,
+              characterEmoji: compEmoji,
+              coins: 0,
+              theme: "premium-golden",
+              createdAt: window.firebase.firestore.FieldValue.serverTimestamp(),
+              writingStreak: 1,
+              snapStreak: 1
+            });
+
+            await window.firebase.firestore().collection("streaks").doc(user.uid).set({
+              writingStreak: 1,
+              lastWritten: window.firebase.firestore.FieldValue.serverTimestamp(),
+              snapStreak: 1,
+              lastSnap: window.firebase.firestore.FieldValue.serverTimestamp()
+            });
+
+            if (entryText) {
+              const words = entryText.split(/\s+/).filter(w => w.length > 0).length;
+              await window.firebase.firestore().collection("entries").add({
+                userId: user.uid,
+                content: entryText,
+                mood: '😄',
+                pageStyle: 'classic',
+                font: 'dancing',
+                date: window.firebase.firestore.FieldValue.serverTimestamp(),
+                wordCount: words
+              });
+            }
+          } catch (fsErr) {
+            console.error("Failed to save profile/entry to Firestore:", fsErr);
+          }
+        }
+
         // Disable status
         btnFinish.disabled = false;
         btnFinish.textContent = 'Begin My Journey ✨';

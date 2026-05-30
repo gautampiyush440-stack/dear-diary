@@ -2,6 +2,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-analytics.js";
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, updateProfile, sendPasswordResetEmail, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -18,6 +19,14 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 const auth = getAuth(app);
+export const db = getFirestore(app);
+
+// Initialize compat library globally if compat CDN scripts are loaded in the head
+if (typeof window.firebase !== 'undefined') {
+  if (!window.firebase.apps || window.firebase.apps.length === 0) {
+    window.firebase.initializeApp(firebaseConfig);
+  }
+}
 
 // Patch user object to support Namespaced User.updateProfile()
 const wrapUser = (user) => {
@@ -28,32 +37,34 @@ const wrapUser = (user) => {
   return user;
 };
 
-// Global Firebase Namespaced Interface Wrapper
-window.firebase = {
-  app: () => app,
-  analytics: () => analytics,
-  auth: () => {
-    return {
-      get currentUser() {
-        return wrapUser(auth.currentUser);
-      },
-      signInWithEmailAndPassword: (email, password) => 
-        signInWithEmailAndPassword(auth, email, password).then((cred) => {
-          if (cred.user) wrapUser(cred.user);
-          return cred;
-        }),
-      createUserWithEmailAndPassword: (email, password) => 
-        createUserWithEmailAndPassword(auth, email, password).then((cred) => {
-          if (cred.user) wrapUser(cred.user);
-          return cred;
-        }),
-      onAuthStateChanged: (callback) => 
-        onAuthStateChanged(auth, (user) => {
-          if (user) wrapUser(user);
-          callback(user);
-        }),
-      sendPasswordResetEmail: (email) => sendPasswordResetEmail(auth, email),
-      signOut: () => signOut(auth)
-    };
-  }
-};
+// Global Firebase Namespaced Interface Wrapper (for custom fallback support)
+if (typeof window.firebase === 'undefined') {
+  window.firebase = {
+    app: () => app,
+    analytics: () => analytics,
+    auth: () => {
+      return {
+        get currentUser() {
+          return wrapUser(auth.currentUser);
+        },
+        signInWithEmailAndPassword: (email, password) => 
+          signInWithEmailAndPassword(auth, email, password).then((cred) => {
+            if (cred.user) wrapUser(cred.user);
+            return cred;
+          }),
+        createUserWithEmailAndPassword: (email, password) => 
+          createUserWithEmailAndPassword(auth, email, password).then((cred) => {
+            if (cred.user) wrapUser(cred.user);
+            return cred;
+          }),
+        onAuthStateChanged: (callback) => 
+          onAuthStateChanged(auth, (user) => {
+            if (user) wrapUser(user);
+            callback(user);
+          }),
+        sendPasswordResetEmail: (email) => sendPasswordResetEmail(auth, email),
+        signOut: () => signOut(auth)
+      };
+    }
+  };
+}

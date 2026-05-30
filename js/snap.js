@@ -12,6 +12,8 @@
       window.firebase.auth().onAuthStateChanged((user) => {
         if (window.firebase.auth().currentUser === null) {
           window.location.href = 'login.html';
+        } else {
+          document.dispatchEvent(new CustomEvent('auth-resolved', { detail: user }));
         }
       });
     }
@@ -143,27 +145,78 @@ document.addEventListener('DOMContentLoaded', () => {
   // Initialize snaps database
   async function initSnaps() {
     try {
-      const profile = await API.getProfile();
-      userName = profile.username || userName;
-      companionEmoji = profile.companionEmoji || companionEmoji;
-      companionName = profile.companionName || companionName;
+      const user = window.firebase ? window.firebase.auth().currentUser : null;
+      if (user) {
+        // Fetch snaps from Firestore
+        const snapsSnapshot = await window.firebase.firestore().collection("snaps")
+          .where("userId", "==", user.uid)
+          .orderBy("date", "desc")
+          .get();
+        
+        snaps = [];
+        snapsSnapshot.forEach(doc => {
+          const data = doc.data();
+          let dateStr = '';
+          let createdAtVal = null;
+          if (data.date) {
+            createdAtVal = data.date.toDate();
+            const options = { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' };
+            dateStr = createdAtVal.toLocaleDateString('en-US', options);
+          }
+          snaps.push({
+            id: doc.id,
+            imageData: data.imageData,
+            filter: data.filter,
+            date: dateStr,
+            createdAt: createdAtVal || new Date(),
+            stickers: data.stickers || [],
+            caption: data.caption || '',
+            linkedEntryId: data.linkedEntryId || null
+          });
+        });
+        localStorage.setItem('diary_snaps', JSON.stringify(snaps));
 
-      localStorage.setItem('user_name', userName);
-      localStorage.setItem('companion_name', companionName);
-      localStorage.setItem('companion_emoji', companionEmoji);
+        // Fetch entries from Firestore
+        const entriesSnapshot = await window.firebase.firestore().collection("entries")
+          .where("userId", "==", user.uid)
+          .orderBy("date", "desc")
+          .get();
+        
+        entries = [];
+        entriesSnapshot.forEach(doc => {
+          const data = doc.data();
+          let dateStr = '';
+          if (data.date) {
+            const dateObj = data.date.toDate();
+            const options = { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' };
+            dateStr = dateObj.toLocaleDateString('en-US', options);
+          }
+          entries.push({
+            id: doc.id,
+            content: data.content,
+            mood: data.mood,
+            date: dateStr,
+            wordCount: data.wordCount,
+            createdAt: data.date ? data.date.toDate() : new Date()
+          });
+        });
+        localStorage.setItem('diary_entries', JSON.stringify(entries));
 
-      const res = await API.getSnaps();
-      snaps = res.snaps || [];
-      snapStreak = res.streak || 0;
-      snaps.forEach(s => {
-        if (!s.imageData && s.src) s.imageData = s.src;
-      });
-      localStorage.setItem('diary_snaps', JSON.stringify(snaps));
-
-      entries = await API.getEntries();
-      localStorage.setItem('diary_entries', JSON.stringify(entries));
+        // Fetch streak from Firestore
+        const streakDoc = await window.firebase.firestore().collection("streaks").doc(user.uid).get();
+        if (streakDoc.exists) {
+          snapStreak = streakDoc.data().snapStreak || 1;
+        } else {
+          snapStreak = 1;
+        }
+        localStorage.setItem('snapStreak', String(snapStreak));
+      } else {
+        snaps = JSON.parse(localStorage.getItem('diary_snaps')) || [];
+        entries = JSON.parse(localStorage.getItem('diary_entries')) || [];
+        snapStreak = parseInt(localStorage.getItem('snapStreak'), 10) || 1;
+      }
     } catch (err) {
-      console.warn('API error loading snaps state fallback:', err);
+      console.warn('Firestore snaps load failed, using local fallback:', err);
       snaps = JSON.parse(localStorage.getItem('diary_snaps')) || [];
       entries = JSON.parse(localStorage.getItem('diary_entries')) || [];
       snapStreak = parseInt(localStorage.getItem('snapStreak'), 10) || 1;
@@ -177,7 +230,21 @@ document.addEventListener('DOMContentLoaded', () => {
     renderSnapHome();
   }
 
-  initSnaps();
+  let snapsInitialized = false;
+  function triggerInitSnaps() {
+    if (snapsInitialized) return;
+    snapsInitialized = true;
+    initSnaps();
+  }
+
+  document.addEventListener('auth-resolved', triggerInitSnaps);
+
+  const checkAuthInterval = setInterval(() => {
+    if (window.firebase && window.firebase.auth().currentUser) {
+      clearInterval(checkAuthInterval);
+      triggerInitSnaps();
+    }
+  }, 50);
 
   // ---------------------------------------------------------
   // SNAP FEED & PROGRESS LOGIC
@@ -672,22 +739,79 @@ document.addEventListener('DOMContentLoaded', () => {
       const todayDateStr = new Date().toISOString().split('T')[0];
 
       try {
-        const res = await API.uploadSnap(imgDataUrl, todayDateStr);
-        if (res.streak) {
-          snapStreak = res.streak;
-          localStorage.setItem('snapStreak', String(snapStreak));
-        }
-        
-        // Refresh local cache list
-        const refreshed = await API.getSnaps();
-        snaps = refreshed.snaps || [];
-        snaps.forEach(s => {
-          if (!s.imageData && s.src) s.imageData = s.src;
-        });
-        try {
+        const user = window.firebase ? window.firebase.auth().currentUser : null;
+        if (user) {
+          const docPayload = {
+            userId: user.uid,
+            imageData: imgDataUrl,
+            filter: activeFilter,
+            date: window.firebase.firestore.FieldValue.serverTimestamp(),
+            stickers: [],
+            caption: '',
+            linkedEntryId: null
+          };
+
+          const snapRef = await window.firebase.firestore().collection("snaps").add(docPayload);
+
+          // Update snap streaks (increment snapStreak, set lastSnap)
+          const streakRef = window.firebase.firestore().collection("streaks").doc(user.uid);
+          await window.firebase.firestore().runTransaction(async (transaction) => {
+            const streakDoc = await transaction.get(streakRef);
+            let sStreak = 1;
+            if (streakDoc.exists) {
+              sStreak = (streakDoc.data().snapStreak || 0) + 1;
+            }
+            transaction.set(streakRef, {
+              snapStreak: sStreak,
+              lastSnap: window.firebase.firestore.FieldValue.serverTimestamp()
+            }, { merge: true });
+            snapStreak = sStreak;
+            localStorage.setItem('snapStreak', String(snapStreak));
+          });
+
+          // Update coins (+5 coins in user profile doc)
+          const userRef = window.firebase.firestore().collection("users").doc(user.uid);
+          await window.firebase.firestore().runTransaction(async (transaction) => {
+            const userDoc = await transaction.get(userRef);
+            let coins = 5;
+            if (userDoc.exists) {
+              coins = (userDoc.data().coins || 0) + 5;
+            }
+            transaction.set(userRef, { coins: coins }, { merge: true });
+            localStorage.setItem('coins', String(coins));
+          });
+
+          // Fetch updated snaps from Firestore to sync local cache
+          const snapsSnapshot = await window.firebase.firestore().collection("snaps")
+            .where("userId", "==", user.uid)
+            .orderBy("date", "desc")
+            .get();
+          
+          snaps = [];
+          snapsSnapshot.forEach(doc => {
+            const data = doc.data();
+            let dateStr = '';
+            let createdAtVal = null;
+            if (data.date) {
+              createdAtVal = data.date.toDate();
+              const options = { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' };
+              dateStr = createdAtVal.toLocaleDateString('en-US', options);
+            }
+            snaps.push({
+              id: doc.id,
+              imageData: data.imageData,
+              filter: data.filter,
+              date: dateStr,
+              createdAt: createdAtVal || new Date(),
+              stickers: data.stickers || [],
+              caption: data.caption || '',
+              linkedEntryId: data.linkedEntryId || null
+            });
+          });
           localStorage.setItem('diary_snaps', JSON.stringify(snaps));
-        } catch (storageErr) {
-          console.error('LocalStorage write failed:', storageErr);
+
+        } else {
+          throw new Error("No active Firebase user");
         }
       } catch (err) {
         console.warn('API upload snap failed, running local fallback:', err);

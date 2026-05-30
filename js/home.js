@@ -12,6 +12,8 @@
       window.firebase.auth().onAuthStateChanged((user) => {
         if (window.firebase.auth().currentUser === null) {
           window.location.href = 'login.html';
+        } else {
+          document.dispatchEvent(new CustomEvent('auth-resolved', { detail: user }));
         }
       });
     }
@@ -39,36 +41,90 @@
 })();
 
 document.addEventListener('DOMContentLoaded', () => {
+  let writingStreak = 1;
+  let snapStreak = 1;
+
   // Initialize dashboard stats
-  async function initDashboard() {
+  async function initDashboard(user) {
     let userName = 'Friend';
     let diaryName = 'My Diary';
     let companionName = 'Ollie';
     let companionEmoji = '🦉';
-    let writingStreak = 1;
-    let snapStreak = 1;
+    writingStreak = 1;
+    snapStreak = 1;
 
     try {
-      // 1. Fetch live profile
-      const profile = await API.getProfile();
-      userName = profile.username || 'Friend';
-      diaryName = profile.diaryName || 'My Diary';
-      companionName = profile.companionName || 'Ollie';
-      companionEmoji = profile.companionEmoji || '🦉';
-      writingStreak = profile.streak || 0;
+      if (user) {
+        // Fetch user doc
+        const userDocRef = window.firebase.firestore().collection("users").doc(user.uid);
+        const userDoc = await userDocRef.get();
+        if (userDoc.exists) {
+          const uData = userDoc.data();
+          userName = uData.name || userName;
+          diaryName = uData.diaryName || diaryName;
+          companionName = uData.character || companionName;
+          companionEmoji = uData.characterEmoji || companionEmoji;
+          
+          localStorage.setItem('user_name', userName);
+          localStorage.setItem('diary_name', diaryName);
+          localStorage.setItem('companion_name', companionName);
+          localStorage.setItem('companion_emoji', companionEmoji);
+        }
 
-      // Sync local storage backups
-      localStorage.setItem('user_name', userName);
-      localStorage.setItem('diary_name', diaryName);
-      localStorage.setItem('companion_name', companionName);
-      localStorage.setItem('companion_emoji', companionEmoji);
+        // Fetch streaks document and do decay check
+        const streakDocRef = window.firebase.firestore().collection("streaks").doc(user.uid);
+        const streakDoc = await streakDocRef.get();
+        if (streakDoc.exists) {
+          const sData = streakDoc.data();
+          writingStreak = sData.writingStreak || 0;
+          snapStreak = sData.snapStreak || 0;
+          
+          const lastWritten = sData.lastWritten;
+          if (lastWritten) {
+            const lastWrittenDate = lastWritten.toDate();
+            const hoursDiff = (Date.now() - lastWrittenDate.getTime()) / (1000 * 60 * 60);
+            if (hoursDiff > 24) {
+              writingStreak = 0;
+              await streakDocRef.set({ writingStreak: 0 }, { merge: true });
+              await userDocRef.set({ writingStreak: 0 }, { merge: true });
+            }
+          }
+          
+          const lastSnap = sData.lastSnap;
+          if (lastSnap) {
+            const lastSnapDate = lastSnap.toDate();
+            const hoursDiff = (Date.now() - lastSnapDate.getTime()) / (1000 * 60 * 60);
+            if (hoursDiff > 24) {
+              snapStreak = 0;
+              await streakDocRef.set({ snapStreak: 0 }, { merge: true });
+              await userDocRef.set({ snapStreak: 0 }, { merge: true });
+            }
+          }
 
-      // Load snap list
-      try {
-        const snaps = await API.getSnaps();
-        snapStreak = snaps.length > 0 ? 1 : 0;
-      } catch (err) {
-        snapStreak = parseInt(localStorage.getItem('snapStreak'), 10) || 0;
+          localStorage.setItem('writingStreak', String(writingStreak));
+          localStorage.setItem('snapStreak', String(snapStreak));
+        }
+      } else {
+        // Fallbacks
+        const profile = await API.getProfile();
+        userName = profile.username || 'Friend';
+        diaryName = profile.diaryName || 'My Diary';
+        companionName = profile.companionName || 'Ollie';
+        companionEmoji = profile.companionEmoji || '🦉';
+        writingStreak = profile.streak || 0;
+
+        // Sync local storage backups
+        localStorage.setItem('user_name', userName);
+        localStorage.setItem('diary_name', diaryName);
+        localStorage.setItem('companion_name', companionName);
+        localStorage.setItem('companion_emoji', companionEmoji);
+
+        try {
+          const snaps = await API.getSnaps();
+          snapStreak = snaps.length > 0 ? 1 : 0;
+        } catch (err) {
+          snapStreak = parseInt(localStorage.getItem('snapStreak'), 10) || 0;
+        }
       }
     } catch (err) {
       console.warn('Backend API request failed, using localStorage fallback:', err);
@@ -140,8 +196,24 @@ document.addEventListener('DOMContentLoaded', () => {
     renderStreakRing(writingStreak);
   }
 
-  // Trigger loading dashboard
-  initDashboard();
+  let dashboardInitialized = false;
+  function triggerInitDashboard(user) {
+    if (dashboardInitialized) return;
+    dashboardInitialized = true;
+    initDashboard(user);
+  }
+
+  document.addEventListener('auth-resolved', (e) => {
+    clearInterval(checkAuthInterval);
+    triggerInitDashboard(e.detail);
+  });
+
+  const checkAuthInterval = setInterval(() => {
+    if (window.firebase && window.firebase.auth().currentUser) {
+      clearInterval(checkAuthInterval);
+      triggerInitDashboard(window.firebase.auth().currentUser);
+    }
+  }, 50);
 
   // Define helper functions outside initDashboard
   function renderStreakRing(writingStreak) {

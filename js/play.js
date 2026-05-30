@@ -12,6 +12,8 @@
       window.firebase.auth().onAuthStateChanged((user) => {
         if (window.firebase.auth().currentUser === null) {
           window.location.href = 'login.html';
+        } else {
+          document.dispatchEvent(new CustomEvent('auth-resolved', { detail: user }));
         }
       });
     }
@@ -49,31 +51,103 @@ document.addEventListener('DOMContentLoaded', () => {
   let coins = 0;
   let diaryEntries = [];
   let snaps = [];
+  const headerCoinCount = document.getElementById('header-coin-count');
 
-  async function initPlayCabin() {
+  async function initPlayCabin(user) {
     try {
-      const profile = await API.getProfile();
-      userName = profile.username || userName;
-      companionName = profile.companionName || companionName;
-      companionEmoji = profile.companionEmoji || companionEmoji;
-      coins = profile.coins || 0;
+      if (user) {
+        // Query users
+        const userDoc = await window.firebase.firestore().collection("users").doc(user.uid).get();
+        if (userDoc.exists) {
+          const data = userDoc.data();
+          userName = data.name || userName;
+          companionName = data.character || companionName;
+          companionEmoji = data.characterEmoji || companionEmoji;
+          coins = data.coins || 0;
+          
+          localStorage.setItem('user_name', userName);
+          localStorage.setItem('companion_name', companionName);
+          localStorage.setItem('companion_emoji', companionEmoji);
+          localStorage.setItem('coins', String(coins));
+        }
 
-      // Sync local storage backups
-      localStorage.setItem('user_name', userName);
-      localStorage.setItem('companion_name', companionName);
-      localStorage.setItem('companion_emoji', companionEmoji);
-      localStorage.setItem('coins', String(coins));
+        // Query entries
+        try {
+          const querySnapshot = await window.firebase.firestore().collection("entries")
+            .where("userId", "==", user.uid)
+            .orderBy("date", "desc")
+            .get();
+          
+          diaryEntries = [];
+          querySnapshot.forEach(doc => {
+            const data = doc.data();
+            let dateStr = '';
+            if (data.date) {
+              const options = { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' };
+              dateStr = data.date.toDate().toLocaleDateString('en-US', options);
+            }
+            diaryEntries.push({
+              id: doc.id,
+              content: data.content,
+              text: data.content ? data.content.replace(/<[^>]*>/g, '') : '',
+              mood: data.mood,
+              pageStyle: data.pageStyle,
+              font: data.font,
+              date: dateStr,
+              wordCount: data.wordCount
+            });
+          });
+          localStorage.setItem('diary_entries', JSON.stringify(diaryEntries));
+        } catch (e) {
+          console.warn('Firestore entries query failed:', e);
+          diaryEntries = JSON.parse(localStorage.getItem('diary_entries')) || [];
+        }
 
-      try {
-        diaryEntries = await API.getEntries();
-        localStorage.setItem('diary_entries', JSON.stringify(diaryEntries));
-      } catch (e) {}
+        // Query snaps
+        try {
+          const querySnapshot = await window.firebase.firestore().collection("snaps")
+            .where("userId", "==", user.uid)
+            .orderBy("date", "desc")
+            .get();
+          
+          snaps = [];
+          querySnapshot.forEach(doc => {
+            const data = doc.data();
+            let dateStr = '';
+            if (data.date) {
+              dateStr = data.date.toDate().toLocaleDateString('en-US');
+            }
+            snaps.push({
+              id: doc.id,
+              src: data.imageData,
+              date: dateStr,
+              filter: data.filter || 'normal'
+            });
+          });
+          localStorage.setItem('diary_snaps', JSON.stringify(snaps));
+        } catch (e) {
+          console.warn('Firestore snaps query failed:', e);
+          snaps = JSON.parse(localStorage.getItem('diary_snaps')) || [];
+        }
+      } else {
+        // Fallback for no user context resolved yet/locally
+        const profile = await API.getProfile();
+        userName = profile.username || userName;
+        companionName = profile.companionName || companionName;
+        companionEmoji = profile.companionEmoji || companionEmoji;
+        coins = profile.coins || 0;
+        
+        try {
+          diaryEntries = await API.getEntries();
+          localStorage.setItem('diary_entries', JSON.stringify(diaryEntries));
+        } catch (e) {}
 
-      try {
-        const snapsRes = await API.getSnaps();
-        snaps = snapsRes.snaps || [];
-        localStorage.setItem('diary_snaps', JSON.stringify(snaps));
-      } catch (e) {}
+        try {
+          const snapsRes = await API.getSnaps();
+          snaps = snapsRes.snaps || [];
+          localStorage.setItem('diary_snaps', JSON.stringify(snaps));
+        } catch (e) {}
+      }
     } catch (err) {
       console.warn('API error loading play cabin configuration fallback:', err);
       userName = localStorage.getItem('user_name') || 'Friend';
@@ -114,8 +188,24 @@ document.addEventListener('DOMContentLoaded', () => {
     if (saysLabel) saysLabel.textContent = `${companionName} says:`;
   }
 
-  // Trigger loading configurations
-  initPlayCabin();
+  let playCabinInitialized = false;
+  function triggerInitPlayCabin(user) {
+    if (playCabinInitialized) return;
+    playCabinInitialized = true;
+    initPlayCabin(user);
+  }
+
+  document.addEventListener('auth-resolved', (e) => {
+    clearInterval(checkAuthInterval);
+    triggerInitPlayCabin(e.detail);
+  });
+
+  const checkAuthInterval = setInterval(() => {
+    if (window.firebase && window.firebase.auth().currentUser) {
+      clearInterval(checkAuthInterval);
+      triggerInitPlayCabin(window.firebase.auth().currentUser);
+    }
+  }, 50);
 
   // --------------------------------------------------------------------------
   // TIMER RESETS: MIDNIGHT COUNTDOWN
@@ -168,12 +258,84 @@ document.addEventListener('DOMContentLoaded', () => {
 
   async function addCoins(amount) {
     try {
-      const res = await API.claimReward(amount, 'Mini Games');
-      coins = res.coins;
-      localStorage.setItem('coins', String(coins));
+      const user = window.firebase ? window.firebase.auth().currentUser : null;
+      if (user) {
+        const userRef = window.firebase.firestore().collection("users").doc(user.uid);
+        let finalCoins = 0;
+        let leveledUp = false;
+        
+        await window.firebase.firestore().runTransaction(async (transaction) => {
+          const userDoc = await transaction.get(userRef);
+          let oldCoins = 0;
+          if (userDoc.exists) {
+            oldCoins = userDoc.data().coins || 0;
+          }
+          
+          let baselineNewCoins = oldCoins + amount;
+          
+          const getLevel = (c) => {
+            if (c >= 300) return 5;
+            if (c >= 150) return 4;
+            if (c >= 50) return 3;
+            if (c >= 15) return 2;
+            return 1;
+          };
+          
+          const oldLevel = getLevel(oldCoins);
+          const newLevel = getLevel(baselineNewCoins);
+          
+          let transactionCoins = baselineNewCoins;
+          if (newLevel > oldLevel) {
+            transactionCoins += 100 * (newLevel - oldLevel);
+            leveledUp = true;
+          }
+          
+          transaction.set(userRef, { coins: transactionCoins }, { merge: true });
+          finalCoins = transactionCoins;
+        });
+        
+        coins = finalCoins;
+        localStorage.setItem('coins', String(coins));
+        
+        if (leveledUp) {
+          console.log("Companion Leveled Up! Awarded +100 coins!");
+          const relBadge = document.getElementById('relationship-label');
+          if (relBadge) {
+            let lvl = 1;
+            let lbl = 'Stranger';
+            if (coins >= 300) { lvl = 5; lbl = 'Soulmate 💜'; }
+            else if (coins >= 150) { lvl = 4; lbl = 'Close Friend 🧡'; }
+            else if (coins >= 50) { lvl = 3; lbl = 'Friend 💛'; }
+            else if (coins >= 15) { lvl = 2; lbl = 'Companion 💙'; }
+            relBadge.textContent = `${lbl} — Level ${lvl}`;
+            localStorage.setItem('companion_level', lvl);
+          }
+        }
+      } else {
+        throw new Error("No active Firebase user");
+      }
     } catch (err) {
       console.warn('API coins award failed, adding locally:', err);
-      coins += amount;
+      let oldCoins = parseInt(localStorage.getItem('coins'), 10) || 0;
+      let baselineNewCoins = oldCoins + amount;
+      
+      const getLevel = (c) => {
+        if (c >= 300) return 5;
+        if (c >= 150) return 4;
+        if (c >= 50) return 3;
+        if (c >= 15) return 2;
+        return 1;
+      };
+      
+      const oldLevel = getLevel(oldCoins);
+      const newLevel = getLevel(baselineNewCoins);
+      
+      let finalCoins = baselineNewCoins;
+      if (newLevel > oldLevel) {
+        finalCoins += 100 * (newLevel - oldLevel);
+      }
+      
+      coins = finalCoins;
       localStorage.setItem('coins', String(coins));
     }
     animateCoinBalance(coins);
@@ -846,7 +1008,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Prepare Word Database
     const defaultWords = ['DIARY', 'MEMORY', 'STORY', 'FRIEND', 'TODAY'];
-    wordsToFind = [];
 
     // Parse words from real reflections if they exist
     let collectedReflectionsWords = [];
@@ -862,30 +1023,25 @@ document.addEventListener('DOMContentLoaded', () => {
     // Unique filter and exclude common stop words if desired
     collectedReflectionsWords = [...new Set(collectedReflectionsWords)].filter(w => w.length >= 4 && w.length <= 6);
 
-    // Pick words
-    for (let i = 0; i < 5; i++) {
+    // Pick and place candidates
+    const candidateWords = [];
+    for (let i = 0; i < 15; i++) {
       if (collectedReflectionsWords[i]) {
-        wordsToFind.push(collectedReflectionsWords[i]);
+        candidateWords.push(collectedReflectionsWords[i]);
       } else {
-        wordsToFind.push(defaultWords[i % defaultWords.length]);
+        candidateWords.push(defaultWords[i % defaultWords.length]);
       }
     }
+    const uniqueCandidates = [...new Set(candidateWords)];
 
-    // Populate words checklist in UI
-    wordsToFind.forEach(word => {
-      const li = document.createElement('li');
-      li.classList.add('word-search-item');
-      li.setAttribute('data-word', word);
-      li.textContent = word;
-      wordListUl.appendChild(li);
-    });
-
-    // 6x6 Grid constructor
-    const size = 6;
+    wordsToFind = [];
+    const size = 8;
+    grid.style.gridTemplateColumns = `repeat(${size}, 1fr)`;
     let gridMatrix = Array(size).fill(null).map(() => Array(size).fill(''));
 
-    // Place words in grid random alignment (horizontal or vertical)
-    wordsToFind.forEach(word => {
+    for (let w = 0; w < uniqueCandidates.length; w++) {
+      if (wordsToFind.length >= 5) break;
+      const word = uniqueCandidates[w];
       let placed = false;
       let attempts = 0;
 
@@ -931,6 +1087,19 @@ document.addEventListener('DOMContentLoaded', () => {
           }
         }
       }
+
+      if (placed) {
+        wordsToFind.push(word);
+      }
+    }
+
+    // Populate words checklist in UI
+    wordsToFind.forEach(word => {
+      const li = document.createElement('li');
+      li.classList.add('word-search-item');
+      li.setAttribute('data-word', word);
+      li.textContent = word;
+      wordListUl.appendChild(li);
     });
 
     // Fill remaining grids with random alphabets
@@ -963,6 +1132,17 @@ document.addEventListener('DOMContentLoaded', () => {
         cell.addEventListener('mouseenter', () => handleCellDrag(cell));
       }
     }
+
+    // Touch drag move selection handler for mobile devices
+    grid.addEventListener('touchmove', (e) => {
+      if (!isPuzzleSelecting) return;
+      e.preventDefault();
+      const touch = e.touches[0];
+      const element = document.elementFromPoint(touch.clientX, touch.clientY);
+      if (element && element.classList.contains('puzzle-cell') && element.parentElement === grid) {
+        handleCellDrag(element);
+      }
+    }, { passive: false });
 
     // Global drag end
     document.addEventListener('mouseup', endSelection);
@@ -1185,6 +1365,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
   async function saveChallengeToDiary(text) {
     const wordCount = text.split(/\s+/).filter(w => w.length > 0).length;
+    const user = window.firebase ? window.firebase.auth().currentUser : null;
+    if (user) {
+      try {
+        await window.firebase.firestore().collection("entries").add({
+          userId: user.uid,
+          content: `<p>${text}</p>`,
+          mood: '😄',
+          pageStyle: 'ruled',
+          font: 'dancing',
+          date: window.firebase.firestore.FieldValue.serverTimestamp(),
+          wordCount: wordCount
+        });
+      } catch (e) {
+        console.error("Firestore save challenge entry failed:", e);
+      }
+    }
     try {
       await API.createEntry({
         content: `<p>${text}</p>`,
@@ -1278,7 +1474,24 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  function saveStoryToDiary(fullStory) {
+  async function saveStoryToDiary(fullStory) {
+    const wordCount = fullStory.split(/\s+/).filter(w => w.length > 0).length;
+    const user = window.firebase ? window.firebase.auth().currentUser : null;
+    if (user) {
+      try {
+        await window.firebase.firestore().collection("entries").add({
+          userId: user.uid,
+          content: `<p>${fullStory.replace(/\n/g, '<br>')}</p>`,
+          mood: '😄',
+          pageStyle: 'ruled',
+          font: 'dancing',
+          date: window.firebase.firestore.FieldValue.serverTimestamp(),
+          wordCount: wordCount
+        });
+      } catch (e) {
+        console.error("Firestore save story entry failed:", e);
+      }
+    }
     const newEntry = {
       id: 'entry_' + Date.now(),
       date: new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }),
