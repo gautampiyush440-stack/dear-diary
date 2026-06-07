@@ -11,6 +11,7 @@ const gamesRoutes = require('./routes/games');
 const companionRoutes = require('./routes/companion');
 const notificationsRoutes = require('./routes/notifications');
 const paymentsRoutes = require('./routes/payments');
+const chatRoutes = require('./routes/chat');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -29,6 +30,7 @@ app.use('/api/games', gamesRoutes);
 app.use('/api/companion', companionRoutes);
 app.use('/api/notifications', notificationsRoutes);
 app.use('/api/payments', paymentsRoutes);
+app.use('/api', chatRoutes);
 
 // Serve static frontend files from parent directory
 app.use(express.static(path.join(__dirname, '../')));

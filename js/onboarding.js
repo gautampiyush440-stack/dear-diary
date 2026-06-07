@@ -288,6 +288,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let name = userNameInput.value.trim();
     if (!name) name = 'Friend';
     localStorage.setItem('user_name', name);
+    localStorage.setItem('userName', name);
     
     // Inject name into Screen 2 greeting header
     if (greetingNameText) {
@@ -300,6 +301,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let diaryName = diaryNameInput.value.trim();
     if (!diaryName) diaryName = 'My Diary';
     localStorage.setItem('diary_name', diaryName);
+    localStorage.setItem('diaryName', diaryName);
 
     // Inject diary name into Screen 3 heading
     if (diaryReadyTitleText) {
@@ -310,6 +312,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // SCREEN 3 -> SCREEN 4 Transition: Save Companion Info
   function saveCompanionData() {
     localStorage.setItem('companion_name', selectedCompanion.name);
+    localStorage.setItem('selectedCharacter', selectedCompanion.name);
     localStorage.setItem('companion_emoji', selectedCompanion.emoji);
 
     // Inject companion details into Screen 4 bouncing header
@@ -378,6 +381,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // Save character name and emoji to localStorage immediately
       localStorage.setItem('companion_name', selectedCompanion.name);
+      localStorage.setItem('selectedCharacter', selectedCompanion.name);
       localStorage.setItem('companion_emoji', selectedCompanion.emoji);
 
       // Show confirmation text: "[character] will be your companion! 🥺"
@@ -520,16 +524,17 @@ document.addEventListener('DOMContentLoaded', () => {
         const user = window.firebase ? window.firebase.auth().currentUser : null;
         if (user) {
           try {
-            await window.firebase.firestore().collection("users").doc(user.uid).set({
-              name: username,
-              diaryName: diaryName,
-              character: compName,
+            await window.firebase.firestore().collection('users').doc(user.uid).set({
+              name: user.displayName || username,
+              diaryName: localStorage.getItem('diaryName'),
+              character: localStorage.getItem('selectedCharacter'),
               characterEmoji: compEmoji,
               coins: 0,
-              theme: "premium-golden",
-              createdAt: window.firebase.firestore.FieldValue.serverTimestamp(),
+              streak: 1,
               writingStreak: 1,
-              snapStreak: 1
+              snapStreak: 1,
+              theme: "premium-golden",
+              createdAt: window.firebase.firestore.FieldValue.serverTimestamp()
             });
 
             await window.firebase.firestore().collection("streaks").doc(user.uid).set({
